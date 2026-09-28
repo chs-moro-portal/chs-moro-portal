@@ -1742,8 +1742,18 @@ function renderSchoolEmployees(semis=currentSchoolSemis){
  const tools=document.getElementById('schoolTeacherAdminTools');if(tools)tools.classList.toggle('hidden',!isAdmin()); if(document.getElementById('schoolTeacherManager')?.classList.contains('active'))renderSchoolTeacherManager();
 }
 
-function records(){try{const raw=localStorage.getItem('employeeRecords');if(raw){const a=JSON.parse(raw);return Array.isArray(a)?a:[]}const seed=(typeof SCHOOL_EMPLOYEES!=='undefined'&&SCHOOL_EMPLOYEES['416030313'])?SCHOOL_EMPLOYEES['416030313'].map(x=>({name:x.name,gender:'',father:'',cnic:'',personal:x.pid||x.reg||'',designation:x.designation||'',cluster:'HC',school:'Cluster Head School Taluka Moro',district:'Naushahro Feroze',joining:'',seniority:x.reg||'',mobile:'',qualification:'',remarks:'Initial portal records'})):[];localStorage.setItem('employeeRecords',JSON.stringify(seed));return seed}catch(e){return []}}
-function setRecords(r){
+function records(){
+  try{
+    const raw=localStorage.getItem('employeeRecords');
+    if(raw){
+      const a=JSON.parse(raw);
+      return Array.isArray(a)?a:[];
+    }
+    return [];
+  }catch(e){
+    return [];
+  }
+}
   const arr=Array.isArray(r)?r:[];
   localStorage.setItem('employeeRecords',JSON.stringify(arr));
   try{ if(window.CHS_LIVE_DB && typeof window.CHS_LIVE_DB.queueEmployees==='function') window.CHS_LIVE_DB.queueEmployees(arr); }catch(e){ console.warn('Central employee sync queue failed',e); }
