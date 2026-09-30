@@ -707,7 +707,29 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 #newProformaExcelInputVisible{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .excel-choose-btn{display:inline-block;background:#16805a;color:#fff;padding:7px 11px;border-radius:8px;cursor:pointer;font-weight:900;font-size:12px;letter-spacing:.3px;box-shadow:0 2px 7px rgba(7,91,63,.16)}
 @media(max-width:650px){.proforma-tab-wrap .proforma-tab{font-size:10px;padding:7px 8px!important}.excel-add-label{font-size:10px}.excel-choose-btn{font-size:10px;padding:7px 9px}}
-</style></head>
+</style>
+<style id="chs-sponsor-styles">
+.sponsor-page-wrap{max-width:1120px;margin:0 auto;padding:20px 14px 35px}
+.sponsor-hero{background:linear-gradient(135deg,#043a28,#075c3b 55%,#0a7c51);color:#fff;border-radius:22px;padding:38px 28px;text-align:center;box-shadow:0 14px 38px rgba(0,0,0,.14)}
+.sponsor-hero h1{margin:0 0 10px;font-size:34px}.sponsor-hero p{max-width:780px;margin:0 auto;line-height:1.7;color:#e9f7f0}
+.sponsor-kicker{display:inline-block;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.25);padding:7px 13px;border-radius:999px;font-weight:800;font-size:12px;margin-bottom:12px}
+.sponsor-section{margin-top:18px;background:#fff;border:1px solid #dce8e2;border-radius:18px;padding:24px;box-shadow:0 7px 22px rgba(0,0,0,.06)}
+.sponsor-section h2{color:#075c3b;margin:0 0 10px}.sponsor-section p{line-height:1.7;color:#566b62}
+.sponsor-benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+.sponsor-benefit{padding:18px;border:1px solid #dbe8e1;border-radius:14px;background:#f8fbf9}.sponsor-benefit .ico{font-size:27px}.sponsor-benefit h3{font-size:15px;color:#174c39;margin:8px 0 5px}.sponsor-benefit p{font-size:12px;margin:0}
+.sponsor-packages{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px}
+.sponsor-package{border:1px solid #dbe5df;border-radius:16px;padding:20px;background:#fff;box-shadow:0 5px 16px rgba(0,0,0,.05);position:relative}
+.sponsor-package h3{margin:0 0 7px;color:#075c3b}.sponsor-package .level{font-weight:900;font-size:13px;color:#b28728;margin-bottom:12px}.sponsor-package ul{margin:0;padding-left:20px;color:#52655d;line-height:1.8;font-size:13px}
+.sponsor-package.featured{border:2px solid #0b744b;background:#f5fbf7}
+.sponsor-suitable{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px}.sponsor-suitable div{padding:11px 13px;border-radius:10px;background:#f1f7f4;color:#275644;font-weight:700}
+.sponsor-form{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:14px}.sponsor-form .full-row{grid-column:1/-1}.sponsor-form label{display:block;font-size:12px;font-weight:800;color:#344e43;margin-top:8px}.sponsor-form input,.sponsor-form select,.sponsor-form textarea{margin:6px 0 10px}.sponsor-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}.sponsor-policy{font-size:11px;color:#718078;line-height:1.6;margin-top:14px}.sponsor-msg{display:none;padding:12px;border-radius:10px;margin-top:12px;background:#dcfce7;color:#166534;font-weight:700}
+.sponsor-print{background:#64748b}.sponsor-back{margin-bottom:12px}
+@media(max-width:800px){.sponsor-benefits{grid-template-columns:repeat(2,1fr)}.sponsor-packages{grid-template-columns:1fr}}
+@media(max-width:560px){.sponsor-hero{padding:28px 18px}.sponsor-hero h1{font-size:27px}.sponsor-section{padding:17px}.sponsor-benefits,.sponsor-suitable,.sponsor-form{grid-template-columns:1fr}.sponsor-form .full-row{grid-column:auto}.sponsor-actions button{width:100%}}
+@media print{body *{visibility:hidden!important}.sponsor-page-wrap,.sponsor-page-wrap *{visibility:visible!important}.sponsor-page-wrap{position:absolute;left:0;top:0;width:100%;padding:0}.sponsor-actions,.sponsor-back{display:none!important}}
+</style>
+
+</head>
 <div aria-label="Current date and time" id="liveDateTime"><div class="dt-date" id="liveDate"></div><div class="dt-time" id="liveTime"></div></div><script>(function(){function updateLiveDateTime(){const now=new Date();const d=document.getElementById('liveDate'),t=document.getElementById('liveTime');if(d)d.textContent=now.toLocaleDateString('en-US',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});if(t)t.textContent=now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true})}updateLiveDateTime();setInterval(updateLiveDateTime,1000)})();</script>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
@@ -717,7 +739,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div><div class="gov-title">GOVERNMENT OF SINDH</div><div class="gov-sub">SINDH EDUCATION &amp; LITERACY DEPARTMENT</div></div>
 </div>
 <div class="header-center"><h1>CLUSTER HEAD SCHOOL</h1><h2>Taluka Moro District NAUSHAHRO FEROZE</h2><div class="version">VERSION 41</div></div>
-<nav aria-label="Main navigation" class="nav left-nav"><button onclick="goHome()">⌂ Home</button><button onclick="schoolInfo()">🏫 School</button><button onclick="show('dataSubmit')" class="submit-data-nav">📋 Submit Data</button><button onclick="showLinks()">🔗 Links</button><button onclick="showNotifications()">🔔 Notifications</button><button onclick="showIntroduction()">📖 Introduction</button><button onclick="show('gallery')">🖼️ Gallery</button><button onclick="show('ebook-library')">📚 eBooks</button><button onclick="show('examPaper')">📝 Paper Tool</button><button onclick="show('download');renderPublicFiles&amp;&amp;renderPublicFiles();">⇩ Download</button><button onclick="contactUs()">✉ Contact Us</button></nav>
+<nav aria-label="Main navigation" class="nav left-nav"><button onclick="goHome()">⌂ Home</button><button onclick="schoolInfo()">🏫 School</button><button onclick="show('dataSubmit')" class="submit-data-nav">📋 Submit Data</button><button onclick="showLinks()">🔗 Links</button><button onclick="showNotifications()">🔔 Notifications</button><button onclick="showIntroduction()">📖 Introduction</button><button onclick="show('gallery')">🖼️ Gallery</button><button onclick="show('ebook-library')">📚 eBooks</button><button onclick="show('examPaper')">📝 Paper Tool</button><button onclick="show('download');renderPublicFiles&amp;&amp;renderPublicFiles();">⇩ Download</button><button onclick="contactUs()">✉ Contact Us</button><button onclick="show('sponsor')">🤝 Sponsor / Advertise</button></nav>
 </header>
 <div aria-label="Latest News and Updates" class="news-marquee top-latest-marquee"><div class="bell-box" title="Notifications">🔔</div><div class="news-label">📢 Latest Updates</div><div class="news-track"><div class="news-scroll" id="newsScroll"></div></div></div>
 <section class="page active" id="home">
@@ -870,6 +892,83 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="suggestion-msg" id="suggestionMsg"></div>
 </div>
 </section>
+
+<section class="page" id="sponsor">
+  <div class="sponsor-page-wrap">
+    <button class="gray sponsor-back" type="button" onclick="show('home')">⌂ Back to Home</button>
+    <div class="sponsor-hero">
+      <div class="sponsor-kicker">🤝 PARTNERSHIP OPPORTUNITY</div>
+      <h1>Partner With CHS Moro Portal</h1>
+      <p><b>Support Digital Education • Connect With the Education Community</b><br>
+      CHS Moro Portal is a digital platform designed to support teachers, schools and cluster-level educational activities through digital tools, employee record management, school information, educational resources and reporting facilities.</p>
+    </div>
+
+    <div class="sponsor-section">
+      <h2>🌟 Why Partner With CHS Moro Portal?</h2>
+      <div class="sponsor-benefits">
+        <div class="sponsor-benefit"><div class="ico">🎓</div><h3>Education-Focused Audience</h3><p>Connect your organization with users interested in education, schools, teaching resources and digital services.</p></div>
+        <div class="sponsor-benefit"><div class="ico">💻</div><h3>Digital Platform</h3><p>Promote your organization through a modern web-based educational platform.</p></div>
+        <div class="sponsor-benefit"><div class="ico">🤝</div><h3>Community Partnership</h3><p>Support digital solutions for schools and educators while building awareness of your organization.</p></div>
+        <div class="sponsor-benefit"><div class="ico">📢</div><h3>Professional Visibility</h3><p>Approved sponsors can receive dedicated visibility through designated sponsorship areas.</p></div>
+      </div>
+    </div>
+
+    <div class="sponsor-section">
+      <h2>💼 Partnership Opportunities</h2>
+      <div class="sponsor-packages">
+        <div class="sponsor-package">
+          <div class="level">🥉 COMMUNITY SPONSOR</div>
+          <h3>Community Support</h3>
+          <ul><li>Organization name</li><li>Logo</li><li>Short introduction</li><li>Sponsor acknowledgement</li><li>Placement in Sponsor / Partner section</li></ul>
+        </div>
+        <div class="sponsor-package featured">
+          <div class="level">🥈 EDUCATION PARTNER</div>
+          <h3>Education Partnership</h3>
+          <ul><li>Organization name and logo</li><li>Dedicated partner card</li><li>Short organization profile</li><li>Approved product/service information</li><li>Education Partner badge</li></ul>
+        </div>
+        <div class="sponsor-package">
+          <div class="level">🥇 STRATEGIC PARTNER</div>
+          <h3>Strategic Partnership</h3>
+          <ul><li>Prominent sponsor placement</li><li>Organization profile</li><li>Dedicated partnership section</li><li>Approved educational campaign/resource promotion</li><li>Customized promotional arrangement</li></ul>
+        </div>
+      </div>
+      <p><b>Package details and pricing are discussed directly with interested organizations.</b></p>
+    </div>
+
+    <div class="sponsor-section">
+      <h2>📣 Suitable Sponsors & Partners</h2>
+      <div class="sponsor-suitable">
+        <div>📚 Educational Publishers</div><div>💻 Educational Technology Providers</div>
+        <div>🏫 Training & Professional Development Organizations</div><div>🖨️ Printing & Stationery Businesses</div>
+        <div>📖 Educational Resource Providers</div><div>🌐 Digital Education Service Providers</div>
+      </div>
+    </div>
+
+    <div class="sponsor-section">
+      <h2>📩 Become a Sponsor or Partner</h2>
+      <p>Interested in partnering with CHS Moro Portal? Complete the inquiry form below. Your request will be saved on this device for review by the portal administrator.</p>
+      <form class="sponsor-form" onsubmit="submitSponsorInquiry(event)">
+        <div><label>Organization / Business Name *</label><input id="sponsorOrg" required placeholder="Enter organization name"></div>
+        <div><label>Contact Person *</label><input id="sponsorPerson" required placeholder="Enter contact person"></div>
+        <div><label>Phone / WhatsApp *</label><input id="sponsorPhone" required placeholder="Enter contact number"></div>
+        <div><label>Email Address</label><input id="sponsorEmail" type="email" placeholder="Enter email address"></div>
+        <div><label>Organization Type</label><select id="sponsorType"><option>Educational Publisher</option><option>Education Technology</option><option>Training Organization</option><option>Printing / Stationery</option><option>Educational Resources</option><option>Other</option></select></div>
+        <div><label>Partnership Interest</label><select id="sponsorPackage"><option>Community Sponsor</option><option>Education Partner</option><option>Strategic Partner</option></select></div>
+        <div class="full-row"><label>Message</label><textarea id="sponsorMessage" rows="5" placeholder="Tell us about your organization and partnership interest"></textarea></div>
+        <div class="full-row sponsor-actions"><button type="submit">📨 Send Sponsorship Request</button><button type="button" class="sponsor-print" onclick="window.print()">🖨️ Print Proposal</button></div>
+      </form>
+      <div class="sponsor-msg" id="sponsorMsg"></div>
+      <div class="sponsor-policy"><b>Privacy & Sponsorship Policy:</b> Sponsorship and promotional arrangements are subject to review and approval. CHS Moro Portal reserves the right to decline or remove promotional material that is inappropriate, misleading, unrelated to the educational purpose of the platform, or inconsistent with applicable requirements. Displaying a sponsor does not constitute an endorsement or guarantee of that organization's products or services.</div>
+    </div>
+
+    <div class="sponsor-section" style="text-align:center">
+      <h2>🤝 Let's Support Digital Education Together</h2>
+      <p>For sponsorship discussions, submit the inquiry above and the portal administrator can contact your organization to discuss the available arrangement.</p>
+      <p style="font-size:12px;color:#718078"><b>CHS Moro Portal</b> • Employee Data Centre • Taluka Moro<br>Developed by <b>Faisal Jan Thaheem</b> • <b>Focal Person (Cluster School)</b></p>
+    </div>
+  </div>
+</section>
+
 <section class="page" id="schools"><div class="container"><div class="card schools-card">
 <div class="topbar"><h2>Schools — Cluster Head School Taluka Moro</h2><button class="gray" onclick="show('home')">⌂ Home</button></div>
 <div style="margin:10px 0;padding:11px 14px;border:1px solid #b9dccb;border-radius:12px;background:#f1faf5;color:#075c3b;font-weight:700">👁️ Visitor View Only — Schools can be searched and viewed. Editing, adding or deleting school data is available to Admin only.</div><p class="school-help">Search by <b>SEMIS Code</b> or <b>School Name</b>. Click a school to view its record.</p>
@@ -1380,36 +1479,63 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </div>
 <script>
 if(window.__CHS_SAVED_STATE__){try{const S=window.__CHS_SAVED_STATE__;Object.keys(S).forEach(k=>{if(S[k])localStorage.setItem(k,S[k])})}catch(e){console.error(e)}}
-const ADMIN_USER='Faisal',ADMIN_PASS='12345',HC_USER='HC',HC_PASS='HC12345';let editIndex=-1,employeePage=1;
+const ADMIN_USER='Faisal',ADMIN_PASS='Faisal@1993',HC_USER='HC',HC_PASS='HC12345';let editIndex=-1,employeePage=1;
+document.addEventListener('DOMContentLoaded',function(){setupAdminTeacherSearch();});
 const DEFAULT_COLUMNS=[
- {key:'name',label:'Employee Name',required:true,visible:true},
- {key:'gender',label:'Gender',visible:true,required:true,type:'gender'},
+ {key:'semisCode',label:'SEMIS CODE',visible:true},
+ {key:'school',label:'Name Of School',visible:true},
+ {key:'costCentre',label:'Cost Centre',visible:true},
+ {key:'name',label:'Name Of Employee',required:true,visible:true},
  {key:'father',label:'Father Name',visible:true},
- {key:'cnic',label:'CNIC',required:true,visible:true},
- {key:'personal',label:'Personal Number',visible:true},
- {key:'designation',label:'Designation',visible:true},
+ {key:'gender',label:'Gender',visible:true,required:true,type:'gender'},
  {key:'cluster',label:'Cluster',visible:true,required:true,type:'cluster'},
- {key:'school',label:'School / Office',visible:true},
- {key:'district',label:'District',visible:true},
- {key:'joining',label:'Joining Date',type:'date',visible:true},
- {key:'seniority',label:'Seniority Number',visible:true},
- {key:'mobile',label:'Mobile Number',visible:true},
- {key:'qualification',label:'Qualification',visible:true},
- {key:'remarks',label:'Remarks',type:'textarea',visible:true}
+ {key:'designation',label:'Designation 9-Scale',visible:true},
+ {key:'cnic',label:'CNIC Number',required:true,visible:true},
+ {key:'personal',label:'PID Number',visible:true},
+ {key:'rid',label:'RID',visible:true},
+ {key:'dob',label:'Date Of Birth',visible:true,type:'date'},
+ {key:'academicQualification',label:'Academic Qualification',visible:true},
+ {key:'professionalQualification',label:'Professional Qualification',visible:true},
+ {key:'bedDeclarationDate',label:'Date of Declaration of B.Ed',visible:true,type:'date'},
+ {key:'firstAppointmentDesignationGrade',label:'First appointment designation and grade',visible:true},
+ {key:'firstAppointmentPlace',label:'First appointment place of posting',visible:true},
+ {key:'regularisationDate',label:'Date of Regularisation',visible:true,type:'date'},
+ {key:'lastPromotionAs',label:'Last promotion as',visible:true},
+ {key:'lastPromotionDate',label:'Date of Last Promotion',visible:true,type:'date'},
+ {key:'ibianNumber',label:'IBIAN Number',visible:true},
+ {key:'testBy',label:'Test by? IBA/NTS/SINDH/OTHER?',visible:true},
+ {key:'testMarks',label:'Marks in test',visible:true},
+ {key:'meritNumber',label:'Merit Number',visible:true},
+ {key:'quota',label:'Quota/Disable/Son Quota',visible:true},
+ {key:'workingAsPerSTR',label:'Working as per STR or Original?',visible:true},
+ {key:'email',label:'Email',visible:true,type:'email'},
+ {key:'mobile',label:'Contact Number',visible:true},
+ {key:'remarks',label:'Remarks if any',visible:true,type:'textarea'}
 ];
 function getColumns(){
+  const fresh=()=>DEFAULT_COLUMNS.map(x=>({...x}));
   let saved=localStorage.getItem('employeeColumns');
-  if(!saved){localStorage.setItem('employeeColumns',JSON.stringify(DEFAULT_COLUMNS));return DEFAULT_COLUMNS.map(x=>({...x}));}
+  if(!saved){
+    const cols=fresh();localStorage.setItem('employeeColumns',JSON.stringify(cols));return cols;
+  }
   try{
-    let cols=JSON.parse(saved); if(!Array.isArray(cols)||!cols.length) throw 0;
-    if(!cols.some(c=>c&&c.key==='cluster')){
-      const idx=cols.findIndex(c=>c&&c.key==='school');
-      const clusterCol={key:'cluster',label:'Cluster',visible:true,required:true,type:'cluster'};
-      if(idx>=0)cols.splice(idx,0,clusterCol); else cols.splice(1,0,clusterCol);
+    let cols=JSON.parse(saved);
+    if(!Array.isArray(cols)||!cols.length)throw 0;
+
+    // The portal previously used a 14-column employee schema.
+    // Automatically migrate that saved browser configuration to the required 29-column teacher schema.
+    const required29=['semisCode','school','costCentre','name','father','gender','cluster','designation','cnic','personal','rid','dob','academicQualification','professionalQualification','bedDeclarationDate','firstAppointmentDesignationGrade','firstAppointmentPlace','regularisationDate','lastPromotionAs','lastPromotionDate','ibianNumber','testBy','testMarks','meritNumber','quota','workingAsPerSTR','email','mobile','remarks'];
+    const is29=required29.every(k=>cols.some(c=>c&&c.key===k));
+    if(!is29){
+      cols=fresh();
       localStorage.setItem('employeeColumns',JSON.stringify(cols));
+      return cols;
     }
+
     return cols;
-  }catch(e){localStorage.setItem('employeeColumns',JSON.stringify(DEFAULT_COLUMNS));return DEFAULT_COLUMNS.map(x=>({...x}));}
+  }catch(e){
+    const cols=fresh();localStorage.setItem('employeeColumns',JSON.stringify(cols));return cols;
+  }
 }
 function setColumns(c){localStorage.setItem('employeeColumns',JSON.stringify(c));renderColumnManager();renderTable();}
 function visibleColumns(){return getColumns().filter(c=>c.visible!==false);}
@@ -1858,7 +1984,7 @@ function renderView(e){
   if(photoBox) photoBox.innerHTML=photo?'<img src="'+esc(photo)+'" alt="Employee Photo" style="width:100%;height:230px;object-fit:cover;border-radius:14px">':'<div style="height:230px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:#edf5f1;color:#075c3b;font-weight:800">EMPLOYEE PHOTO<br><small style="display:block;margin-top:8px">Not uploaded</small></div>';
   document.getElementById('viewFields').innerHTML=f.map(c=>'<div><label><b>'+esc(c.label)+'</b></label><input class="readonly" readonly value="'+esc(fieldDisplayValue(e,c))+'"></div>').join('')
 }
-function adminLogin(){let u=document.getElementById('user').value.trim(),p=document.getElementById('pass').value,e=document.getElementById('adminError');if(u===ADMIN_USER&&p===ADMIN_PASS){sessionStorage.role='admin';sessionStorage.admin='yes';e.style.display='none';employeePage=1;renderColumnManager();renderRecordForm();renderTable();renderSchoolManager();renderLinkManager();renderPhotoManager();renderContactManager();if(typeof renderWaseemPhoto==='function')renderWaseemPhoto();const st=document.getElementById('schoolAdminTools');if(st)st.classList.remove('hidden');show('admin')}else if(u===HC_USER&&p===HC_PASS){sessionStorage.role='hc';sessionStorage.removeItem('admin');e.style.display='none';show('download')}else{e.textContent='Username or password is incorrect.';e.style.display='block'}}
+function adminLogin(){let u=document.getElementById('user').value.trim(),p=document.getElementById('pass').value,e=document.getElementById('adminError');if(u===ADMIN_USER&&p===ADMIN_PASS){sessionStorage.role='admin';sessionStorage.admin='yes';e.style.display='none';employeePage=1;renderColumnManager();renderRecordForm();setupAdminTeacherSearch();renderTable();renderSchoolManager();renderLinkManager();renderPhotoManager();renderContactManager();if(typeof renderWaseemPhoto==='function')renderWaseemPhoto();const st=document.getElementById('schoolAdminTools');if(st)st.classList.remove('hidden');show('admin')}else if(u===HC_USER&&p===HC_PASS){sessionStorage.role='hc';sessionStorage.removeItem('admin');e.style.display='none';show('download')}else{e.textContent='Username or password is incorrect.';e.style.display='block'}}
 function adminLogout(){sessionStorage.removeItem('admin');sessionStorage.removeItem('role');cancelEdit();const st=document.getElementById('schoolAdminTools');if(st)st.classList.add('hidden');show('home')}
 function getTeacherAccounts(){try{return JSON.parse(localStorage.getItem('teacherAccounts')||'[]')}catch(e){return []}}
 function setTeacherAccounts(a){localStorage.setItem('teacherAccounts',JSON.stringify(a))}
@@ -2054,9 +2180,24 @@ function renderClusterGraph(all){
 
 function renderTable(){
   const cols=visibleColumns();
-  const q=norm(document.getElementById('adminSearch')?.value||'');
+  const searchEl=document.getElementById('adminSearch');
+  const q=norm(searchEl?.value||'');
   const all=records();
-  const filtered=all.map((e,i)=>({e,i})).filter(x=>!q||norm(x.e.name).includes(q)||norm(x.e.cnic).includes(q)||norm(x.e.personal).includes(q)||norm(x.e.school).includes(q));
+  // Admin search checks the employee name, school, CNIC/PID/RID and every
+  // teacher field, so imported 29-column records can be found by any value.
+  const filtered=all.map((e,i)=>({e,i})).filter(x=>{
+    if(!q)return true;
+    const e=x.e||{};
+    const hay=[
+      e.name,e.school,e.cnic,e.personal,e.rid,e.semisCode,e.costCentre,
+      e.father,e.gender,e.cluster,e.designation,e.dob,e.academicQualification,
+      e.professionalQualification,e.bedDeclarationDate,e.firstAppointmentDesignationGrade,
+      e.firstAppointmentPlace,e.regularisationDate,e.lastPromotionAs,e.lastPromotionDate,
+      e.ibianNumber,e.testBy,e.testMarks,e.meritNumber,e.quota,e.workingAsPerSTR,
+      e.email,e.mobile,e.remarks
+    ].map(v=>norm(v)).join(' ');
+    return hay.includes(q);
+  });
   const size=Number(document.getElementById('employeePageSize')?.value||20);
   const totalPages=Math.max(1,Math.ceil(filtered.length/size));
   employeePage=Math.min(Math.max(1,employeePage),totalPages);
@@ -2071,6 +2212,22 @@ function renderTable(){
   const pg=document.getElementById('employeePagination');
   if(pg){pg.innerHTML='';const add=(txt,page,disabled=false,active=false)=>{const b=document.createElement('button');b.type='button';b.textContent=txt;b.disabled=disabled;if(active)b.className='active-page';b.onclick=()=>{employeePage=page;renderTable()};pg.appendChild(b)};add('◀ Previous',employeePage-1,employeePage===1);for(let p=1;p<=totalPages;p++){if(totalPages>7&&p>3&&p<totalPages-2){if(p===4){const sp=document.createElement('span');sp.textContent='…';pg.appendChild(sp)}continue}add(String(p),p,false,p===employeePage)}add('Next ▶',employeePage+1,employeePage===totalPages)}
 }
+// Keep the Admin Teacher Search input directly editable and searchable.
+// This also recovers gracefully if another portal component re-renders the admin panel.
+function setupAdminTeacherSearch(){
+  const el=document.getElementById('adminSearch');
+  if(!el)return;
+  el.removeAttribute('readonly');
+  el.removeAttribute('disabled');
+  el.type='search';
+  if(el.dataset.searchBound==='1')return;
+  el.dataset.searchBound='1';
+  const run=()=>{employeePage=1;renderTable()};
+  el.addEventListener('input',run);
+  el.addEventListener('keyup',run);
+  el.addEventListener('change',run);
+}
+
 function deleteRecord(i){
   if(!isAdmin()){alert('Admin login required. Please login first.');return}
   const r=records();if(!r[i])return;
@@ -2081,57 +2238,113 @@ function deleteRecord(i){
 function msg(t,err=false){let x=document.getElementById('adminMsg');x.textContent=t;x.className='message '+(err?'error':'success');x.style.display='block';setTimeout(()=>x.style.display='none',2500)}
 function importExcel(ev){
   const file=ev.target.files && ev.target.files[0];
-  if(!file) return;
+  if(!file)return;
   if(typeof XLSX==='undefined'){msg('Excel library could not load. Please connect to the internet first, then try again.',true);return}
   const reader=new FileReader();
   reader.onload=function(e){
     try{
-      const wb=XLSX.read(e.target.result,{type:'array'});
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:false});
       if(!wb.SheetNames.length) throw new Error('No worksheet');
       const ws=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false});
       if(!rows.length){msg('Excel sheet is empty.',true);return}
+
       let r=records(),added=0,updated=0,skipped=0;
+      const val=(row,names)=>String(excelValue(row,names)||'').trim();
+
       rows.forEach(row=>{
-        const n=String(excelValue(row,['Name','Employee Name','EmployeeName','Teacher Name','TeacherName'])||'').trim();
-        const c=formatCNICValue(excelValue(row,['CNIC','CNIC Number','CNIC No','CNICNo','CNIC #'])||'');
-        const p=String(excelValue(row,['Personal Number','Personal No','Personal','PID','PID No','PID Number','Employee ID','Employee ID No'])||'').trim();
-        const reg=String(excelValue(row,['Reg','Reg No','Reg Number','Registration','Registration No','Registration Number','Seniority Number','Seniority No','Seniority'])||'').trim();
-        const identifier=p||reg;
-        if(!n){skipped++;return}
+        const name=val(row,['Name Of Employee','Name of Employee','Employee Name','Name','Teacher Name']);
+        const cnic=formatCNICValue(val(row,['CNIC Number','CNIC No','CNIC']));
+        const pid=val(row,['PID Number','PID No','PID','Personal Number','Personal No','Personal']);
+        const rid=val(row,['RID','Reg No','Reg Number','Registration Number','Seniority Number','Seniority No','Seniority']);
+        if(!name){skipped++;return}
+
         const e={
-          name:n,
-          gender:String(excelValue(row,['Gender','Sex'])||'').trim(),
-          cluster:String(excelValue(row,['Cluster','Branch','Cluster Head'])||'').trim().toUpperCase(),
-          father:String(excelValue(row,['Father Name','Father','FatherName'])||'').trim(),
-          cnic:c,
-          personal:identifier,
-          designation:String(excelValue(row,['Designation','Post','Designation/Post'])||'').trim(),
-          school:String(excelValue(row,['School/Office','School Office','School','School Name'])||'').trim(),
-          district:String(excelValue(row,['District'])||'').trim(),
-          joining:String(excelValue(row,['Joining Date','Joining','Date of Joining'])||'').trim(),
-          seniority:reg,
-          mobile:String(excelValue(row,['Mobile','Mobile Number','Contact','Contact Number'])||'').trim(),
-          qualification:String(excelValue(row,['Qualification','Education'])||'').trim(),
-          remarks:String(excelValue(row,['Remarks','Remark'])||'').trim()
+          semisCode:val(row,['SEMIS CODE','SEMIS Code','SEMIS','SEMIS CODE Number']),
+          school:val(row,['Name Of School','Name of School','School Name','School/Office','School Office','School']),
+          costCentre:val(row,['Cost Centre','CostCenter','Cost Center']),
+          name:name,
+          father:val(row,['Father Name','Father','FatherName']),
+          gender:val(row,['Gender','Sex']),
+          cluster:val(row,['Cluster','Branch','Cluster Head']).toUpperCase(),
+          designation:val(row,['Designation 9-Scale','Designation 9-Sacle','Designation','Post']),
+          cnic:cnic,
+          personal:pid,
+          rid:rid,
+          dob:val(row,['Date Of Birth','Date of Birth','DOB']),
+          academicQualification:val(row,['Academic Qualification','AcademicQualification']),
+          professionalQualification:val(row,['Professional Qualification','ProfessionalQualification']),
+          bedDeclarationDate:val(row,['Date of Declaration of B.Ed','Date Of Declaration Of B.Ed','B.Ed Declaration Date']),
+          firstAppointmentDesignationGrade:val(row,['First appointment designation and grade','First Appointment Designation and Grade','First Appointment Designation']),
+          firstAppointmentPlace:val(row,['First appointment place of posting','First Appointment Place of Posting','First Appointment Place']),
+          regularisationDate:val(row,['Date of Regularisation','Date Of Regularisation','Regularisation Date','Regularization Date']),
+          lastPromotionAs:val(row,['Last promotion as','Last Promotion As']),
+          lastPromotionDate:val(row,['Date of Last Promotion','Date Of Last Promotion','Last Promotion Date']),
+          ibianNumber:val(row,['IBIAN Number','IBIAN No','IBIAN']),
+          testBy:val(row,['Test by? IBA/NTS/SINDH/OTHER?','Test by','Test By','Test']),
+          testMarks:val(row,['Marks in test','Marks In Test','Test Marks','Marks']),
+          meritNumber:val(row,['Merit Number','Merit No','Merit']),
+          quota:val(row,['Quota/Disable/Son Quota','Quota Disable Son Quota','Quota']),
+          workingAsPerSTR:val(row,['Working as per STR or Original?','Working as per STR','Working As Per STR or Original','Working']),
+          email:val(row,['Email','Email Address']),
+          mobile:val(row,['Contact Number','Contact','Mobile Number','Mobile']),
+          remarks:val(row,['Remarks if any','Remarks','Remark'])
         };
-        getColumns().filter(col=>!(col.key in e)).forEach(col=>{e[col.key]=String(excelValue(row,[col.label,col.key])||'').trim()});
-        const idx=r.findIndex(x=>(c&&norm(x.cnic)===norm(c))||(identifier&&norm(x.personal)===norm(identifier))||(reg&&norm(x.seniority)===norm(reg)));
-        if(idx>=0){r[idx]={...r[idx],...e};updated++}else{r.push(e);added++}
+
+        // Preserve any custom columns an administrator may have added.
+        getColumns().filter(col=>!(col.key in e)).forEach(col=>{
+          e[col.key]=val(row,[col.label,col.key]);
+        });
+
+        const idx=r.findIndex(x=>{
+          const xc=String(x.cnic||'').replace(/\D/g,'');
+          const ec=String(cnic||'').replace(/\D/g,'');
+          return (ec && xc===ec) ||
+                 (pid && norm(x.personal)===norm(pid)) ||
+                 (rid && norm(x.rid)===norm(rid));
+        });
+
+        if(idx>=0){
+          // Merge instead of replacing so older records keep fields that are not present in an import.
+          r[idx]={...r[idx],...e};
+          updated++;
+        }else{
+          r.push(e);
+          added++;
+        }
       });
-      setRecords(r); renderTable(); updatePortalStats(); ev.target.value='';
+
+      setRecords(r);
+      renderTable();
+      updatePortalStats();
+      ev.target.value='';
       msg(`Excel imported successfully. Added: ${added}, Updated: ${updated}, Skipped: ${skipped}.`);
-    }catch(err){console.error(err);msg('Excel upload failed. Please use .xlsx, .xls or .csv and keep the first row as column headings.',true)}
+    }catch(err){
+      console.error(err);
+      msg('Excel upload failed. Please use .xlsx, .xls or .csv and keep the first row as the 29 column headings.',true);
+    }
   };
   reader.readAsArrayBuffer(file);
 }
 
 function downloadExcel(){
   if(typeof XLSX==='undefined'){msg('Excel library could not load. Please connect to the internet and try again.',true);return}
-  const r=records(); if(!r.length){msg('No employee records available to download.',true);return}
-  const data=r.map((e,i)=>({'#':i+1,'Name':e.name||'','Father Name':e.father||'','CNIC':e.cnic||'','Personal Number':e.personal||'','Designation':e.designation||'','School/Office':e.school||'','District':e.district||'','Joining Date':e.joining||'','Seniority Number':e.seniority||'','Mobile':e.mobile||'','Qualification':e.qualification||'','Remarks':e.remarks||''}));
-  const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Employee Records'); XLSX.writeFile(wb,'CHS_Moro_Employee_Records.xlsx');
+  const r=records();
+  if(!r.length){msg('No employee records available to download.',true);return}
+
+  const cols=getColumns().filter(c=>c.visible!==false);
+  const data=r.map(e=>{
+    const row={};
+    cols.forEach(c=>{row[c.label]=e[c.key]??''});
+    return row;
+  });
+
+  const ws=XLSX.utils.json_to_sheet(data, {header:cols.map(c=>c.label)});
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Teacher Records');
+  XLSX.writeFile(wb,'CHS_Moro_Teacher_Records_29_Columns.xlsx');
 }
+
 document.addEventListener('DOMContentLoaded',()=>{registerWebsiteVisit();getSchoolTeachers();renderRecordForm();renderPhotoGrid();renderNews();renderNotifications();renderPublicFiles();renderFileManager();renderLinks();renderSchools();renderIntroductions();updatePortalStats();});
 
 // ===== CONTACT DETAILS =====
@@ -3815,4 +4028,34 @@ window.addEventListener('storage',refreshAdminExcelFolder);
 setInterval(function(){if(document.getElementById('dataSubmit')?.classList.contains('active')||document.getElementById('dataSubmit')?.style.display!=='none'){inject();refreshAdminExcelFolder()}},700);
 })();
 </script>
+
+<script id="chs-sponsor-script">
+function submitSponsorInquiry(ev){
+  ev.preventDefault();
+  try{
+    const item={
+      id:'SP-'+Date.now(),
+      organization:document.getElementById('sponsorOrg').value.trim(),
+      person:document.getElementById('sponsorPerson').value.trim(),
+      phone:document.getElementById('sponsorPhone').value.trim(),
+      email:document.getElementById('sponsorEmail').value.trim(),
+      type:document.getElementById('sponsorType').value,
+      package:document.getElementById('sponsorPackage').value,
+      message:document.getElementById('sponsorMessage').value.trim(),
+      submittedAt:new Date().toLocaleString()
+    };
+    const old=JSON.parse(localStorage.getItem('chsSponsorInquiries')||'[]');
+    old.push(item);
+    localStorage.setItem('chsSponsorInquiries',JSON.stringify(old));
+    const box=document.getElementById('sponsorMsg');
+    box.textContent='Thank you. Your sponsorship inquiry has been recorded successfully. The portal administrator can review it and contact you.';
+    box.style.display='block';
+    ev.target.reset();
+  }catch(e){
+    alert('Could not save the sponsorship request on this device. Please try again.');
+    console.error(e);
+  }
+}
+</script>
+
 </body></html>
