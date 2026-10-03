@@ -959,7 +959,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 .chs-v41-panel button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-height:40px!important;white-space:nowrap!important;padding:9px 11px!important;}
 @media(max-width:900px){.chs-v41-panel{justify-content:flex-start!important;overflow-x:auto!important}.chs-v41-panel button{font-size:12px!important;padding:8px 10px!important}}
 </style>
-</head>
+<style id="chs-menu-width-fix">.chs-v41-panel{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;max-width:none!important;padding:3px!important;overflow-x:auto!important}.chs-v41-panel button{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:max-content!important;padding:4px 7px!important;margin:0!important;height:30px!important;min-height:30px!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}.chs-v41-panel button span{display:inline!important;width:auto!important;max-width:max-content!important}@media(max-width:900px){.chs-v41-panel{gap:2px!important}.chs-v41-panel button{padding:4px 6px!important;height:29px!important;min-height:29px!important;font-size:10px!important}}</style></head>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
 <header class="site-header">
@@ -968,7 +968,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div><div class="gov-title">GOVERNMENT OF SINDH</div><div class="gov-sub">SINDH EDUCATION &amp; LITERACY DEPARTMENT</div></div>
 </div>
 <div class="header-center"><h1>CLUSTER HEAD SCHOOL</h1><h2>Taluka Moro District NAUSHAHRO FEROZE</h2><div class="version"></div></div>
-<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
+<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
 </header>
 <div aria-label="Latest News and Updates" class="news-marquee top-latest-marquee"><div class="bell-box" title="Notifications">🔔</div><div class="news-label">📢 Latest Updates</div><div class="news-track"><div class="news-scroll" id="newsScroll"></div></div></div>
 <section class="page active" id="home">
@@ -1697,26 +1697,10 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="employee-form-actions"><button class="blue" onclick="saveRecord()">💾 Save Record</button><button class="gray hidden" id="cancel" onclick="cancelEdit()">Cancel</button></div>
 <div class="message" id="employeeFormMsg"></div>
 </div></div></section>
-<div class="footer" id="portalFooter">
-  <div style="font-weight:800">Contact</div>
-  <div id="footerContactDetails" style="font-size:13px;margin:5px 0 8px">📞 03002597624 &nbsp; • &nbsp; ✉ faisaljan670@gmail.com</div>
-  <div>Developed by <b>Faisal Jan Thaheem</b>  •  <b>Focal Person (Cluster School)</b></div>
-  <div>Employee Data Centre • Taluka Moro</div>
+<div class="footer">
+<div>Developed by <b>Faisal Jan Thaheem</b>  •  <b>Focal Person (Cluster School)</b></div>
+<div>Employee Data Centre • Taluka Moro</div>
 </div>
-<script>
-(function(){
-  function renderFooterContact(){
-    var b=document.getElementById('footerContactDetails'); if(!b)return;
-    try{
-      var raw=localStorage.getItem('portalContacts');
-      var a=raw?JSON.parse(raw):[{type:'phone',label:'Cell Phone',value:'03002597624'},{type:'email',label:'Email',value:'faisaljan670@gmail.com'}];
-      if(!Array.isArray(a)||!a.length)return;
-      b.innerHTML=a.map(function(x){var t=String(x.type||'').toLowerCase();return (t==='email'?'✉ ':'📞 ')+String(x.value||'');}).join(' &nbsp; • &nbsp; ');
-    }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded',renderFooterContact);
-})();
-</script>
 <script>
 if(window.__CHS_SAVED_STATE__){try{const S=window.__CHS_SAVED_STATE__;Object.keys(S).forEach(k=>{if(S[k])localStorage.setItem(k,S[k])})}catch(e){console.error(e)}}
 const ADMIN_USER='Faisal',ADMIN_PASS='Faisal@1993',HC_USER='HC',HC_PASS='HC12345';let editIndex=-1,employeePage=1;
@@ -4187,6 +4171,16 @@ window.generateExamPaper=function(){document.getElementById('examPaperPreview').
 .chs-v41-panel button{flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:38px!important;white-space:nowrap!important;}
 @media(max-width:900px){.chs-v41-panel{justify-content:flex-start!important;overflow-x:auto!important;scrollbar-width:none!important}.chs-v41-panel::-webkit-scrollbar{display:none!important}}
 </style>
+<style id="chs-normal-one-line-menu-final">
+/* FINAL: normal-size one-line menu — same compact size for Home, School, Submit Data, etc. */
+.chs-v41-menu{position:relative!important;left:auto!important;right:auto!important;top:auto!important;width:100%!important;margin:8px 0 0!important;text-align:center!important;z-index:999999!important;}
+.chs-v41-toggle{display:none!important;}
+.chs-v41-panel{position:relative!important;left:auto!important;top:auto!important;display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:flex-start!important;gap:5px!important;width:100%!important;max-width:100%!important;padding:5px 6px!important;margin:0!important;box-sizing:border-box!important;background:transparent!important;border:0!important;box-shadow:none!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none!important;}
+.chs-v41-panel::-webkit-scrollbar{display:none!important;}
+.chs-v41-panel button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;gap:5px!important;min-width:0!important;width:max-content!important;max-width:125px!important;min-height:30px!important;height:30px!important;padding:4px 7px!important;margin:0!important;box-sizing:border-box!important;border-radius:7px!important;font-size:12px!important;line-height:1!important;font-weight:700!important;white-space:nowrap!important;}
+.chs-v41-panel button span{display:inline!important;margin:0!important;}
+@media(max-width:900px){.chs-v41-panel button{min-height:29px!important;height:29px!important;padding:4px 6px!important;font-size:10px!important;max-width:120px!important;}.chs-v41-panel{gap:4px!important;}}
+</style>
 </head><body>'+p.html+'<script id="ebook-admin-visibility-fix">
 (function(){
   function ensure(){
@@ -4396,9 +4390,76 @@ function submitSponsorInquiry(ev){
   setTimeout(clean,100); setTimeout(clean,500);
 })();
 </script>
-<style id="chs-simple-series-final">
-.chs-v41-menu{position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;transform:none!important;width:100%!important;text-align:center!important;margin:8px 0 0!important;z-index:1000!important;}
-.chs-v41-panel{display:flex!important;visibility:visible!important;opacity:1!important;position:static!important;transform:none!important;flex-wrap:nowrap!important;justify-content:center!important;align-items:center!important;gap:5px!important;width:100%!important;max-width:none!important;max-height:none!important;overflow-x:auto!important;overflow-y:hidden!important;padding:5px 4px!important;box-sizing:border-box!important;background:transparent!important;border:0!important;box-shadow:none!important;}
-.chs-v41-panel button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-height:40px!important;width:auto!important;white-space:nowrap!important;padding:9px 11px!important;}
-@media(max-width:900px){.chs-v41-panel{justify-content:flex-start!important;overflow-x:auto!important}.chs-v41-panel button{font-size:12px!important;padding:8px 10px!important;}}
-</style></body></html>
+\n<style id="chs-teacher-apps-hub-css">
+#chsTeacherAppsTools{margin:18px auto 8px;max-width:1100px;padding:0 10px}
+#chsTeacherAppsTools .chs-mt-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid #b9d9c9;border-radius:9px;background:#fff;color:#075c3b;font-weight:700;cursor:pointer;font-size:13px}
+#chsTeacherAppsTools .chs-mt-menu{display:none;margin-top:7px;padding:8px;border:1px solid #cfe2d7;border-radius:10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+#chsTeacherAppsTools .chs-mt-menu button{display:block;width:100%;text-align:left;padding:8px 10px;border:0;border-radius:7px;background:transparent;color:#174d39;cursor:pointer;font-size:13px}
+#chsTeacherAppsTools .chs-mt-menu button:hover{background:#eef8f2}
+#chsTeacherAppsHub{display:none;margin:12px auto;max-width:1100px;padding:16px;border:1px solid #cfe2d7;border-radius:14px;background:#f8fcfa}
+.chs-app-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.chs-app-card{padding:12px;border:1px solid #d8e8df;border-radius:11px;background:#fff}
+.chs-app-card h4{margin:0 0 5px;color:#075c3b;font-size:14px}.chs-app-card p{margin:0 0 9px;color:#60736b;font-size:11px}.chs-app-card a{display:inline-block;padding:7px 10px;border-radius:7px;background:#16834f;color:#fff;text-decoration:none;font-size:11px;font-weight:700}
+@media(max-width:700px){.chs-app-grid{grid-template-columns:1fr}.chs-mt-btn{width:auto}}
+</style>
+<div id="chsTeacherAppsTools">
+  <button type="button" class="chs-mt-btn" onclick="toggleCHSTeacherAppsTools()">🛠️ MANAGEMENT TOOLS ▾</button>
+  <div id="chsTeacherAppsToolsMenu" class="chs-mt-menu">
+    <button type="button" onclick="showCHSTeacherAppsHub()">📱 Teacher Software &amp; Apps</button>
+  </div>
+</div>
+<section id="chsTeacherAppsHub">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <div><h3 style="margin:0;color:#075c3b">📱 Teacher Software &amp; Apps</h3><p style="margin:5px 0 0;color:#667970;font-size:12px">Useful teacher applications. Links open the official Google Play listing.</p></div>
+    <button type="button" onclick="document.getElementById('chsTeacherAppsHub').style.display='none'" style="border:0;border-radius:7px;padding:7px 10px;cursor:pointer">✕ Close</button>
+  </div>
+  <div class="chs-app-grid" style="margin-top:12px">
+    <div class="chs-app-card"><h4>📝 Lesson Notes &amp; Exam Maker</h4><p>Lesson planning and exam preparation.</p><a href="https://play.google.com/store/apps/details?id=com.headteacher.lessonexam" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>📊 Smart Teacher: Class Gradebook</h4><p>Class and gradebook management.</p><a href="https://play.google.com/store/apps/details?id=com.edevolearning.edevoteacher" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>👨‍🏫 EduManager Teacher</h4><p>Teacher classroom management tools.</p><a href="https://play.google.com/store/apps/details?id=edu.manager.teacher" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>📚 Taleemia</h4><p>Education and learning resources.</p><a href="https://play.google.com/store/apps/details?id=app.taleemia" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>🧰 Teacher Toolkit</h4><p>Practical teacher utilities.</p><a href="https://play.google.com/store/apps/details?id=com.toolkit.teacher" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>⏱️ TeachTime</h4><p>Classroom timing and teaching support.</p><a href="https://play.google.com/store/apps/details?id=com.teachtime.info486" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>🎓 Khan Academy</h4><p>Free learning and teaching resources.</p><a href="https://play.google.com/store/apps/details?id=org.khanacademy.android" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>🏫 Google Classroom</h4><p>Classroom and assignment management.</p><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.classroom" target="_blank" rel="noopener">Open Play Store</a></div>
+    <div class="chs-app-card"><h4>🎨 Canva</h4><p>Presentations, worksheets and educational designs.</p><a href="https://play.google.com/store/apps/details?id=com.canva.editor" target="_blank" rel="noopener">Open Play Store</a></div>
+  </div>
+</section>
+<script>
+function toggleCHSTeacherAppsTools(){var m=document.getElementById('chsTeacherAppsToolsMenu');if(m)m.style.display=m.style.display==='block'?'none':'block'}
+function showCHSTeacherAppsHub(){var m=document.getElementById('chsTeacherAppsToolsMenu');if(m)m.style.display='none';var h=document.getElementById('chsTeacherAppsHub');if(h){h.style.display='block';h.scrollIntoView({behavior:'smooth',block:'start'})}}
+</script>
+<style id="chs-random-clock-timer-css">
+#chsRandomClock{position:fixed;top:10px;right:10px;z-index:2147483000;width:104px;height:40px;border-radius:12px;background:rgba(5,45,32,.92);color:#fff;border:1px solid rgba(120,240,180,.45);box-shadow:0 5px 18px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:Arial,sans-serif;font-size:14px;letter-spacing:.4px;backdrop-filter:blur(6px)}
+#chsRandomClock .rc-small{font-size:9px;opacity:.78;display:block;text-align:center;margin-top:1px;font-weight:600}
+#chsRandomClock.analog{width:58px;height:58px;border-radius:50%;font-size:0}
+#chsRandomClock.analog:before{content:"";width:4px;height:20px;background:#fff;border-radius:3px;position:absolute;left:27px;top:9px;transform-origin:2px 20px;transform:rotate(var(--h,0deg))}
+#chsRandomClock.analog:after{content:"";width:3px;height:23px;background:#9cf5c9;border-radius:3px;position:absolute;left:27.5px;top:7px;transform-origin:1.5px 23px;transform:rotate(var(--m,0deg))}
+</style>
+<div id="chsRandomClock" aria-label="Random clock and timer"></div>
+<script id="chs-random-clock-timer-js">
+(function(){
+ try{
+  var el=document.getElementById('chsRandomClock'); if(!el)return;
+  var modes=['digital','date','analog','digital','minimal']; var mode=0, next=Date.now()+7000;
+  function pad(n){return String(n).padStart(2,'0')}
+  function render(){
+   var d=new Date(), h=d.getHours(), m=d.getMinutes(), sec=d.getSeconds();
+   if(Date.now()>=next){mode=(mode+1)%modes.length;next=Date.now()+7000;}
+   el.className='';
+   var type=modes[mode];
+   if(type==='analog'){
+    el.className='analog'; el.style.setProperty('--h',(h%12)*30+m*.5+'deg'); el.style.setProperty('--m',(m+sec/60)*6+'deg'); el.innerHTML='';
+   }else if(type==='date'){
+    el.innerHTML=pad(d.getDate())+' '+d.toLocaleString('en',{month:'short'})+' '+d.getFullYear();
+   }else if(type==='minimal'){
+    el.innerHTML=pad(h)+':'+pad(m)+'<span class="rc-small">'+pad(sec)+' sec</span>';
+   }else{
+    el.innerHTML=pad(h)+':'+pad(m)+':'+pad(sec);
+   }
+  }
+  render(); setInterval(render,1000);
+ }catch(e){}
+})();
+</script>
+</body></html>
