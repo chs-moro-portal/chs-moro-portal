@@ -1392,10 +1392,11 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </section>
 <section class="page" id="download"><div class="container"><div class="card download-card">
 <div class="topbar"><h2>⇩ Downloads</h2><button class="gray" onclick="show('home')">⌂ Home</button></div>
+<div id="downloadAdminAccess" style="display:none;margin:10px 0;padding:10px;border:1px solid #cfe2d7;border-radius:10px;background:#f3faf6"><b>🔐 Admin Download Control</b><p style="margin:4px 0 8px;color:#667970;font-size:12px">Admin-only access to upload, approve, revoke and remove Forms &amp; Documents.</p><button class="blue" type="button" onclick="show('admin');setTimeout(function(){if(typeof toggleFileManager==='function'){var p=document.getElementById('fileManager');if(p&amp;&amp;!p.classList.contains('active'))toggleFileManager();}},50)">⚙ Open Forms Approval</button></div>
 <p class="school-help">All approved forms and documents uploaded by Admin are available for everyone to download.</p>
 <div class="download-grid">
 <div class="download-item"><div class="download-icon">📝</div><h3>Teacher Data Form</h3><p>Open the online Teacher Data Form in a separate page.</p><button class="blue" onclick="show('teacherPortal')" type="button">📝 Open Form</button></div>
-<div class="download-item"><div class="download-icon">📊</div><h3>Employee Excel</h3><p>Employee records Excel download — available to everyone.</p><button class="blue" onclick="downloadExcelFile()" type="button">⬇ Download Excel</button></div>
+<div class="download-item"><div class="download-icon">📊</div><h3>Employee Excel</h3><p>Employee records Excel download — Admin approval required.</p><button class="blue" onclick="if(chsAdminExcelDownloadGuard()) downloadExcelFile()" type="button">🔒 Admin Download Excel</button></div>
 </div>
 <div class="card" style="margin-top:18px"><h3>📚 Forms &amp; Documents</h3><p class="school-help">Anyone can download documents uploaded by Admin.</p><div class="notification-list" id="publicFilesList"></div></div>
 <div class="message error" id="downloadAccessMsg" style="display:none;margin-top:15px"></div>
@@ -1552,7 +1553,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </div></section><section class="page" id="admin"><div class="container"><div class="card">
 <div class="topbar"><h2>Admin Panel</h2><button class="red" onclick="adminLogout()">Logout</button></div>
 <p>Admin can Add and Edit employee records. Records are saved automatically in this browser. Public users can only view records.</p>
-<div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">🔄 Sync Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
+<div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">🔄 Sync Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
 <div class="manage-panel" id="columnManager">
 <h3 style="margin-top:0">Manage Employee Columns</h3>
 <div class="column-help">Edit changes the column title. Hide/Remove only removes it from the screen; existing employee data is kept. You can add it again later.</div>
@@ -1700,6 +1701,15 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="footer">
 <div>Developed by <b>Faisal Jan Thaheem</b>  •  <b>Focal Person (Cluster School)</b></div>
 <div>Employee Data Centre • Taluka Moro</div>
+<div style="margin-top:8px"><div id="chsReliableMgmt">
+  <button id="chsReliableMgmtBtn" type="button" onclick="chsRM_toggle()">🛠️ Management Tools ▾</button>
+  <div id="chsReliableMgmtMenu">
+    <button type="button" onclick="chsRM_open('apps')">📱 Teacher Software &amp; Apps</button>
+    <button type="button" onclick="chsRM_open('quality')">📊 Data Quality Checker</button>
+    <button type="button" onclick="chsRM_open('queries')">💬 Queries / Suggestions</button>
+    <button type="button" onclick="chsRM_open('approval')">✅ Forms Approval</button>
+  </div>
+</div></div>
 </div>
 <script>
 if(window.__CHS_SAVED_STATE__){try{const S=window.__CHS_SAVED_STATE__;Object.keys(S).forEach(k=>{if(S[k])localStorage.setItem(k,S[k])})}catch(e){console.error(e)}}
@@ -1780,7 +1790,8 @@ function removeNotification(i){if(!isAdmin()){alert('Admin login required. Pleas
 function getPublicFiles(){try{const a=JSON.parse(localStorage.getItem('portalPublicFiles')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
 function getPublicFiles(){try{const a=JSON.parse(localStorage.getItem('portalPublicFiles')||'[]');if(!Array.isArray(a))return[];let changed=false;a.forEach(x=>{if(x && typeof x.approved==='undefined'){x.approved=true;changed=true}});if(changed)localStorage.setItem('portalPublicFiles',JSON.stringify(a));return a}catch(e){return[]}}
 function setPublicFiles(a){localStorage.setItem('portalPublicFiles',JSON.stringify(a));renderPublicFiles();renderFileManager()}
-function renderPublicFiles(){const b=document.getElementById('publicFilesList');if(!b)return;const a=getPublicFiles().map((x,i)=>({...x,__i:i})).filter(x=>x.approved===true);b.innerHTML=a.length?a.map(x=>`<div class="notification-item"><div><b>📄 ${esc(x.title||x.fileName)}</b><div class="notification-text">${esc(x.fileName||'')}</div><div class="file-approved-badge">✅ Admin Approved</div></div><button class="blue" onclick="downloadPublicFile(${x.__i})">⬇ Download</button></div>`).join(''):'<div class="no-schools">No approved forms or documents available for download.</div>'}
+function updateDownloadAdminAccess(){var b=document.getElementById('downloadAdminAccess');if(b)b.style.display=(typeof isAdmin==='function'&&isAdmin())?'block':'none'}
+function renderPublicFiles(){updateDownloadAdminAccess();const b=document.getElementById('publicFilesList');if(!b)return;const a=getPublicFiles().map((x,i)=>({...x,__i:i})).filter(x=>x.approved===true);b.innerHTML=a.length?a.map(x=>`<div class="notification-item"><div><b>📄 ${esc(x.title||x.fileName)}</b><div class="notification-text">${esc(x.fileName||'')}</div><div class="file-approved-badge">✅ Admin Approved</div></div><button class="blue" onclick="downloadPublicFile(${x.__i})">⬇ Download</button></div>`).join(''):'<div class="no-schools">No approved forms or documents available for download.</div>'}
 function downloadPublicFile(i){const x=getPublicFiles()[i];if(!x||x.approved!==true){alert('This file is waiting for Admin approval.');return}if(x.fileData)downloadDataUrl(x.fileData,x.fileName||x.title||'document')}
 function toggleFileManager(){if(!isAdmin()){alert('Admin login required. Please login first.');return}const p=document.getElementById('fileManager');p.classList.toggle('active');if(p.classList.contains('active'))renderFileManager()}
 function approvePublicFile(i){if(!isAdmin()){alert('Admin login required.');return}const a=getPublicFiles();if(!a[i])return;a[i].approved=true;a[i].approvedAt=new Date().toISOString();setPublicFiles(a);msg('File approved. It is now available for download.')}
@@ -1863,9 +1874,19 @@ function isAdmin(){return sessionStorage.role==='admin' || sessionStorage.admin=
 function isHC(){return sessionStorage.role==='hc'}
 function canDownload(){return true}
 function currentRole(){return isAdmin()?'Admin':(isHC()?'HC':'Public')}
-function openDownload(){show('download');const m=document.getElementById('downloadAccessMsg');if(m){m.style.display='none';}}
+function openDownload(){show('download');const m=document.getElementById('downloadAccessMsg');if(m){m.style.display='none';}if(typeof updateDownloadAdminAccess==='function')updateDownloadAdminAccess();}
 function downloadPortalFile(){downloadPortal(true)}
-function downloadExcelFile(){downloadExcel(true)}
+function chsAdminExcelDownloadGuard(){
+  try{ if(typeof isAdmin==='function' && isAdmin()) return true; }catch(e){}
+  alert('🔒 Admin access required. Please login as Admin to download Excel files.');
+  if(typeof show==='function') show('adminLogin');
+  return false;
+}
+function downloadExcelFile(){
+  if(!chsAdminExcelDownloadGuard()) return;
+  if(typeof downloadExcel==='function') return downloadExcel(true);
+  alert('Employee Excel download function is not available.');
+}
 function getSchools(){let saved=localStorage.getItem('moroSchools');if(!saved){localStorage.setItem('moroSchools',JSON.stringify(MORO_SCHOOLS));return MORO_SCHOOLS.map(x=>({...x}));}try{let a=JSON.parse(saved);return Array.isArray(a)?a:[];}catch(e){return []}}
 function setSchools(a){localStorage.setItem('moroSchools',JSON.stringify(a));renderSchools();renderSchoolManager();}
 function toggleSchoolManager(){if(!isAdmin()){alert('Admin login required.');return}const p=document.getElementById('schoolManager');p.classList.toggle('active');if(p.classList.contains('active'))renderSchoolManager()}
@@ -2451,11 +2472,27 @@ function setupAdminTeacherSearch(){
   el.addEventListener('change',run);
 }
 
-function deleteRecord(i){
+async function deleteRecord(i){
   if(!isAdmin()){alert('Admin login required. Please login first.');return}
   const r=records();if(!r[i])return;
-  if(!confirm('Delete '+(r[i].name||'this employee')+' from Employee Records?'))return;
-  r.splice(i,1);setRecords(r);const size=Number(document.getElementById('employeePageSize')?.value||20);employeePage=Math.min(employeePage,Math.max(1,Math.ceil(r.length/size)));renderTable();updatePortalStats();msg('Employee record deleted successfully.');
+  const target={...r[i]};
+  if(!confirm('Delete '+(target.name||'this employee')+' from Employee Records?'))return;
+  try{
+    if(window.CHS_LIVE_DB && typeof window.CHS_LIVE_DB.deleteEmployee==='function'){
+      await window.CHS_LIVE_DB.deleteEmployee(target);
+    }else{
+      throw new Error('Central Database delete function is not available.');
+    }
+    r.splice(i,1);
+    setRecords(r);
+    const size=Number(document.getElementById('employeePageSize')?.value||20);
+    employeePage=Math.min(employeePage,Math.max(1,Math.ceil(r.length/size)));
+    renderTable();updatePortalStats();
+    msg('Employee record deleted from Central Database and this device.');
+  }catch(e){
+    console.error('Central employee delete:',e);
+    msg('Delete failed — Central Database was not changed. '+e.message,true);
+  }
 }
 
 function msg(t,err=false){let x=document.getElementById('adminMsg');x.textContent=t;x.className='message '+(err?'error':'success');x.style.display='block';setTimeout(()=>x.style.display='none',2500)}
@@ -3284,15 +3321,18 @@ function downloadSettingChoice(n){
     alert('Portal download function is not available.');
   }
   if(n===2){
-    if(typeof downloadExcel==='function') return downloadExcel();
+    if(!chsAdminExcelDownloadGuard()) return;
+    if(typeof downloadExcel==='function') return downloadExcel(true);
     alert('Employee Excel download function is not available.');
   }
   if(n===3){
+    if(!chsAdminExcelDownloadGuard()) return;
     if(typeof downloadSchoolExcel==='function') return downloadSchoolExcel();
     if(typeof downloadAllSchoolData==='function') return downloadAllSchoolData();
     alert('School Excel download function is not available.');
   }
   if(n===4){
+    if(!chsAdminExcelDownloadGuard()) return;
     if(typeof downloadSchoolTemplate==='function') return downloadSchoolTemplate();
     alert('School Excel Template download function is not available.');
   }
@@ -3397,6 +3437,25 @@ function downloadSettingChoice(n){
     r.readAsDataURL(f);
   };
 
+  window.changeGalleryPhoto=function(id){
+    if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
+    var input=document.createElement('input');
+    input.type='file'; input.accept='image/*';
+    input.onchange=function(){
+      var f=input.files&&input.files[0]; if(!f)return;
+      if(!f.type || f.type.indexOf('image/')!==0){alert('Please select an image file.');return;}
+      if(f.size>5*1024*1024){alert('Please use an image smaller than 5 MB.');return;}
+      var r=new FileReader();
+      r.onload=function(){
+        var a=get(), x=a.find(function(v){return String(v.id)===String(id)});
+        if(!x)return;
+        x.src=r.result; save(a); render(); alert('Gallery photo changed successfully.');
+      };
+      r.readAsDataURL(f);
+    };
+    input.click();
+  };
+
   window.removeGalleryPhoto=function(id){
     if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
     if(!confirm('Remove this gallery photo?'))return;
@@ -3455,7 +3514,8 @@ function downloadSettingChoice(n){
         '<img src="'+x.src+'" alt="'+String(x.caption||'Gallery photo').replace(/"/g,'&quot;')+'">'+
         '<div class="gallery-caption"><strong>'+escapeHtml(x.caption||'Gallery Photo')+
         '</strong><span>'+escapeHtml(x.category||'Event')+'</span>'+
-        '<div class="gallery-edit" data-admin-gallery="'+x.id+'">'+
+        '<div class="gallery-edit" data-admin-gallery="'+x.id+'" style="display:'+(typeof isAdmin==='function' && isAdmin()?'flex':'none')+'">'+
+        '<button onclick="changeGalleryPhoto('+x.id+')">🖼️ Change Photo</button>'+
         '<button onclick="editGalleryCaption('+x.id+')">✏️ Edit Caption</button>'+
         '<button onclick="changeGalleryCategory('+x.id+')">🔄 Category</button>'+
         '<button class="remove" onclick="removeGalleryPhoto('+x.id+')">🗑️ Remove</button>'+
@@ -4058,7 +4118,15 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     if(!Array.isArray(rows)||!rows.length)throw new Error('Supabase did not confirm the employee record.');
     return rows[0];
   }
-  async function saveProforma(rec){
+  async function deleteEmployee(e){
+    const key=employeeKey(e);
+    const id=hashId('employeeRecord',key);
+    status('● Central Database: Deleting…',null);
+    await request(TABLE+'?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:headers({'Prefer':'return=representation'})});
+    status('● Central Database: Delete confirmed',true);
+    return true;
+  }
+    async function saveProforma(rec){
     const body={id:hashId('proforma',rec.id),employee_name:clean(rec.key),school:clean(rec.data?.school),semis:clean(rec.data?.semis),data:{source:'proforma',submission:rec}};
     await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
   }
@@ -4119,7 +4187,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     }catch(e){console.error('Central sync:',e);status('● Central Database: '+e.message,false);}
     finally{syncing=false;}
   }
-  window.CHS_LIVE_DB={saveEmployee,saveProforma,saveSubmission,queueEmployees,syncNow};
+  window.CHS_LIVE_DB={saveEmployee,deleteEmployee,saveProforma,saveSubmission,queueEmployees,syncNow};
   window.addEventListener('DOMContentLoaded',()=>{status('● Connecting to Central Database…',null);setTimeout(()=>{booted=true;syncNow();},800);});
 })();
 </script>
@@ -4407,44 +4475,61 @@ function submitSponsorInquiry(ev){
   setTimeout(clean,100); setTimeout(clean,500);
 })();
 </script>
-\n<style id="chs-teacher-apps-hub-css">
-#chsTeacherAppsTools{margin:18px auto 8px;max-width:1100px;padding:0 10px}
-#chsTeacherAppsTools .chs-mt-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid #b9d9c9;border-radius:9px;background:#fff;color:#075c3b;font-weight:700;cursor:pointer;font-size:13px}
-#chsTeacherAppsTools .chs-mt-menu{display:none;margin-top:7px;padding:8px;border:1px solid #cfe2d7;border-radius:10px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.08)}
-#chsTeacherAppsTools .chs-mt-menu button{display:block;width:100%;text-align:left;padding:8px 10px;border:0;border-radius:7px;background:transparent;color:#174d39;cursor:pointer;font-size:13px}
-#chsTeacherAppsTools .chs-mt-menu button:hover{background:#eef8f2}
-#chsTeacherAppsHub{display:none;margin:12px auto;max-width:1100px;padding:16px;border:1px solid #cfe2d7;border-radius:14px;background:#f8fcfa}
-.chs-app-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.chs-app-card{padding:12px;border:1px solid #d8e8df;border-radius:11px;background:#fff}
-.chs-app-card h4{margin:0 0 5px;color:#075c3b;font-size:14px}.chs-app-card p{margin:0 0 9px;color:#60736b;font-size:11px}.chs-app-card a{display:inline-block;padding:7px 10px;border-radius:7px;background:#16834f;color:#fff;text-decoration:none;font-size:11px;font-weight:700}
-@media(max-width:700px){.chs-app-grid{grid-template-columns:1fr}.chs-mt-btn{width:auto}}
+\n<style id="chs-management-extra-tools-css">
+#chsDataQualityBox{display:none;margin:12px auto;max-width:1100px;padding:16px;border:1px solid #cfe2d7;border-radius:14px;background:#f8fcfa}
+.chs-quality-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:12px 0}
+.chs-quality-card{padding:12px;border:1px solid #d8e8df;border-radius:10px;background:#fff;text-align:center}
+.chs-quality-card b{display:block;font-size:21px;color:#075c3b}.chs-quality-card span{font-size:11px;color:#667970}
+.chs-quality-list{display:grid;gap:8px;margin-top:12px}.chs-quality-item{padding:10px 12px;border:1px solid #e1e8e4;border-radius:9px;background:#fff;font-size:12px}.chs-quality-item strong{color:#075c3b}.chs-quality-empty{padding:12px;border-radius:9px;background:#ecfdf3;color:#166534;font-weight:700}
+@media(max-width:700px){.chs-quality-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<div id="chsTeacherAppsTools">
-  <button type="button" class="chs-mt-btn" onclick="toggleCHSTeacherAppsTools()">🛠️ MANAGEMENT TOOLS ▾</button>
-  <div id="chsTeacherAppsToolsMenu" class="chs-mt-menu">
-    <button type="button" onclick="showCHSTeacherAppsHub()">📱 Teacher Software &amp; Apps</button>
-  </div>
-</div>
-<section id="chsTeacherAppsHub">
+<div id="chsDataQualityBox">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-    <div><h3 style="margin:0;color:#075c3b">📱 Teacher Software &amp; Apps</h3><p style="margin:5px 0 0;color:#667970;font-size:12px">Useful teacher applications. Links open the official Google Play listing.</p></div>
-    <button type="button" onclick="document.getElementById('chsTeacherAppsHub').style.display='none'" style="border:0;border-radius:7px;padding:7px 10px;cursor:pointer">✕ Close</button>
+    <div><h3 style="margin:0;color:#075c3b">📊 Data Quality Checker</h3><p style="margin:5px 0 0;color:#667970;font-size:12px">Check teacher records for duplicate CNIC/PID, missing key fields and incomplete school information.</p></div>
+    <button type="button" onclick="document.getElementById('chsDataQualityBox').style.display='none'" style="border:0;border-radius:7px;padding:7px 10px;cursor:pointer">✕ Close</button>
   </div>
-  <div class="chs-app-grid" style="margin-top:12px">
-    <div class="chs-app-card"><h4>📝 Lesson Notes &amp; Exam Maker</h4><p>Lesson planning and exam preparation.</p><a href="https://play.google.com/store/apps/details?id=com.headteacher.lessonexam" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>📊 Smart Teacher: Class Gradebook</h4><p>Class and gradebook management.</p><a href="https://play.google.com/store/apps/details?id=com.edevolearning.edevoteacher" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>👨‍🏫 EduManager Teacher</h4><p>Teacher classroom management tools.</p><a href="https://play.google.com/store/apps/details?id=edu.manager.teacher" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>📚 Taleemia</h4><p>Education and learning resources.</p><a href="https://play.google.com/store/apps/details?id=app.taleemia" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>🧰 Teacher Toolkit</h4><p>Practical teacher utilities.</p><a href="https://play.google.com/store/apps/details?id=com.toolkit.teacher" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>⏱️ TeachTime</h4><p>Classroom timing and teaching support.</p><a href="https://play.google.com/store/apps/details?id=com.teachtime.info486" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>🎓 Khan Academy</h4><p>Free learning and teaching resources.</p><a href="https://play.google.com/store/apps/details?id=org.khanacademy.android" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>🏫 Google Classroom</h4><p>Classroom and assignment management.</p><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.classroom" target="_blank" rel="noopener">Open Play Store</a></div>
-    <div class="chs-app-card"><h4>🎨 Canva</h4><p>Presentations, worksheets and educational designs.</p><a href="https://play.google.com/store/apps/details?id=com.canva.editor" target="_blank" rel="noopener">Open Play Store</a></div>
-  </div>
-</section>
-<script>
-function toggleCHSTeacherAppsTools(){var m=document.getElementById('chsTeacherAppsToolsMenu');if(m)m.style.display=m.style.display==='block'?'none':'block'}
-function showCHSTeacherAppsHub(){var m=document.getElementById('chsTeacherAppsToolsMenu');if(m)m.style.display='none';var h=document.getElementById('chsTeacherAppsHub');if(h){h.style.display='block';h.scrollIntoView({behavior:'smooth',block:'start'})}}
+  <div id="chsQualitySummary" class="chs-quality-summary"></div>
+  <div id="chsQualityList" class="chs-quality-list"></div>
+</div>
+<script id="chs-management-extra-tools-js">
+(function(){
+  function admin(){try{return typeof isAdmin==='function'&&isAdmin()}catch(e){return false}}
+  function escQ(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  window.openCHSDataQualityChecker=function(){
+    if(!admin()){alert('Admin login required. Please login first.');return}
+    const box=document.getElementById('chsDataQualityBox'); if(!box)return;
+    box.style.display='block';
+    const rows=typeof records==='function'?records():[];
+    const seenCNIC=new Map(),seenPID=new Map(),issues=[];
+    rows.forEach((e,i)=>{
+      const name=e.name||e.employeeName||('Record '+(i+1));
+      const c=String(e.cnic||e.cnicNumber||'').replace(/\D/g,'');
+      const pid=String(e.personal||e.pid||e.pidNumber||'').trim().toLowerCase();
+      if(c){if(seenCNIC.has(c))issues.push({type:'Duplicate CNIC',text:`${name} — same CNIC as ${seenCNIC.get(c)}`});else seenCNIC.set(c,name)}
+      if(pid){if(seenPID.has(pid))issues.push({type:'Duplicate PID',text:`${name} — same PID/Personal Number as ${seenPID.get(pid)}`});else seenPID.set(pid,name)}
+      const missing=[];
+      if(!String(e.name||e.employeeName||'').trim())missing.push('Employee Name');
+      if(!String(e.cnic||e.cnicNumber||'').trim())missing.push('CNIC');
+      if(!String(e.school||e.schoolName||'').trim())missing.push('School');
+      if(!String(e.semis||e.semisCode||'').trim())missing.push('SEMIS');
+      if(!String(e.designation||'').trim())missing.push('Designation');
+      if(missing.length)issues.push({type:'Missing fields',text:`${name} — ${missing.join(', ')}`});
+    });
+    const dupCNIC=[...seenCNIC.keys()].filter(k=>rows.filter(e=>String(e.cnic||e.cnicNumber||'').replace(/\D/g,'')===k).length>1).length;
+    const dupPID=[...seenPID.keys()].filter(k=>rows.filter(e=>String(e.personal||e.pid||e.pidNumber||'').trim().toLowerCase()===k).length>1).length;
+    const missingCount=issues.filter(x=>x.type==='Missing fields').length;
+    const summary=document.getElementById('chsQualitySummary');
+    if(summary)summary.innerHTML=`<div class="chs-quality-card"><b>${rows.length}</b><span>Total Records</span></div><div class="chs-quality-card"><b>${dupCNIC}</b><span>Duplicate CNIC Groups</span></div><div class="chs-quality-card"><b>${dupPID}</b><span>Duplicate PID Groups</span></div><div class="chs-quality-card"><b>${missingCount}</b><span>Missing-Field Records</span></div>`;
+    const list=document.getElementById('chsQualityList');
+    if(list)list.innerHTML=issues.length?issues.slice(0,200).map(x=>`<div class="chs-quality-item"><strong>${escQ(x.type)}</strong> — ${escQ(x.text)}</div>`).join(''):'<div class="chs-quality-empty">✅ No common data-quality problems were found in the current teacher records.</div>';
+  };
+  window.openCHSQueriesManager=function(){
+    if(!admin()){alert('Admin login required. Please login first.');return}
+    const box=document.getElementById('suggestionsManager');
+    if(box){box.style.display='block';if(typeof renderSuggestions==='function')renderSuggestions();if(typeof updateSuggestionNotification==='function')updateSuggestionNotification();box.scrollIntoView({behavior:'smooth',block:'start'});return}
+    alert('Queries / Suggestions manager is not available in this portal build.');
+  };
+})();
 </script>
 <style id="chs-random-clock-timer-css">
 #chsRandomClock{position:fixed;top:10px;right:10px;z-index:2147483000;width:104px;height:40px;border-radius:12px;background:rgba(5,45,32,.92);color:#fff;border:1px solid rgba(120,240,180,.45);box-shadow:0 5px 18px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;font-weight:800;font-family:Arial,sans-serif;font-size:14px;letter-spacing:.4px;backdrop-filter:blur(6px)}
@@ -4479,4 +4564,201 @@ function showCHSTeacherAppsHub(){var m=document.getElementById('chsTeacherAppsTo
  }catch(e){}
 })();
 </script>
+
+<!-- CHS RELIABLE MANAGEMENT + FORMS APPROVAL FIX -->
+<style id="chs-reliable-management-css">
+#chsReliableMgmt{
+  position:relative;display:inline-block;z-index:50;font-family:Arial,sans-serif;margin:12px auto 4px;
+}
+#chsReliableMgmtBtn{
+  border:0;border-radius:10px;padding:10px 14px;background:#075c3b;color:#fff;
+  font-weight:800;font-size:13px;cursor:pointer;box-shadow:0 5px 16px rgba(0,0,0,.18)
+}
+#chsReliableMgmtMenu{
+  display:none;position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);width:270px;background:#fff;border:1px solid #cfe2d7;
+  border-radius:11px;padding:7px;box-shadow:0 10px 28px rgba(0,0,0,.18);text-align:left
+}
+#chsReliableMgmtMenu button{
+  width:100%;display:block;text-align:left;border:0;background:#fff;color:#174d39;
+  padding:10px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer
+}
+#chsReliableMgmtMenu button:hover{background:#eef8f2}
+.chs-rm-modal{
+  display:none;position:fixed;inset:0;z-index:2147483001;background:rgba(0,0,0,.42);
+  padding:30px;box-sizing:border-box;overflow:auto
+}
+.chs-rm-box{
+  max-width:1050px;margin:25px auto;background:#fff;border-radius:16px;padding:18px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25)
+}
+.chs-rm-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.chs-rm-head h2{margin:0;color:#075c3b;font-size:21px}
+.chs-rm-close{border:0;background:#eef3ef;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:800}
+.chs-rm-card{border:1px solid #dce9e2;border-radius:11px;padding:12px;margin-top:10px;background:#fbfefc}
+.chs-rm-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.chs-rm-actions button,.chs-rm-add{
+ border:0;border-radius:7px;padding:8px 10px;cursor:pointer;font-weight:700
+}
+.chs-rm-green{background:#16834f;color:#fff}.chs-rm-gray{background:#eef2f0;color:#234}
+.chs-rm-red{background:#dc2626;color:#fff}.chs-rm-blue{background:#2563eb;color:#fff}
+.chs-rm-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.chs-rm-stat{background:#f7fbf8;border:1px solid #dce9e2;border-radius:9px;padding:10px;text-align:center}
+.chs-rm-stat b{display:block;font-size:20px;color:#075c3b}.chs-rm-stat span{font-size:11px;color:#667970}
+.chs-rm-input{width:100%;box-sizing:border-box;border:1px solid #cfdcd5;border-radius:8px;padding:9px;margin-top:7px}
+.chs-rm-appgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.chs-rm-app{border:1px solid #dce9e2;border-radius:10px;padding:11px;background:#fff}
+.chs-rm-app h4{margin:0 0 5px;color:#075c3b}.chs-rm-app p{margin:0 0 8px;font-size:12px;color:#667970}
+.chs-rm-app a{display:inline-block;background:#16834f;color:#fff;text-decoration:none;padding:7px 9px;border-radius:7px;font-size:12px;font-weight:700}
+@media(max-width:760px){
+ #chsReliableMgmt{left:auto;top:auto}.chs-rm-modal{padding:10px}.chs-rm-box{margin:10px auto;padding:12px}
+ .chs-rm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chs-rm-appgrid{grid-template-columns:1fr}
+}
+</style>
+
+
+
+<div id="chsRMModal" class="chs-rm-modal" onclick="if(event.target===this)chsRM_close()">
+ <div class="chs-rm-box">
+  <div class="chs-rm-head"><h2 id="chsRMTitle">Management Tools</h2><button class="chs-rm-close" type="button" onclick="chsRM_close()">✕ Close</button></div>
+  <div id="chsRMBody"></div>
+ </div>
+</div>
+
+<script id="chs-reliable-management-js">
+(function(){
+  var apps=[
+    ['📝','Lesson Notes & Exam Maker','Lesson planning and exam preparation.','https://play.google.com/store/apps/details?id=com.headteacher.lessonexam'],
+    ['📊','Smart Teacher: Class Gradebook','Class and gradebook management.','https://play.google.com/store/apps/details?id=com.edevolearning.edevoteacher'],
+    ['👨‍🏫','EduManager Teacher','Teacher classroom management tools.','https://play.google.com/store/apps/details?id=edu.manager.teacher'],
+    ['📚','Taleemia','Education and learning resources.','https://play.google.com/store/apps/details?id=app.taleemia'],
+    ['🎓','Khan Academy','Learning and teaching resources.','https://play.google.com/store/apps/details?id=org.khanacademy.android'],
+    ['🏫','Google Classroom','Classroom and assignment management.','https://play.google.com/store/apps/details?id=com.google.android.apps.classroom']
+  ];
+  function admin(){
+    try{return typeof isAdmin==='function' && isAdmin()}catch(e){return false}
+  }
+  function escR(v){
+    return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})
+  }
+  window.chsRM_toggle=function(){
+    var m=document.getElementById('chsReliableMgmtMenu');
+    if(m)m.style.display=m.style.display==='block'?'none':'block';
+  };
+  window.chsRM_close=function(){
+    var m=document.getElementById('chsRMModal');if(m)m.style.display='none';
+  };
+  function body(h){document.getElementById('chsRMBody').innerHTML=h;document.getElementById('chsRMModal').style.display='block';}
+  window.chsRM_open=function(kind){
+    document.getElementById('chsReliableMgmtMenu').style.display='none';
+    if(kind==='apps')return openApps();
+    if(!admin()){alert('Admin login required. Please login first.');return}
+    if(kind==='quality')return openQuality();
+    if(kind==='queries')return openQueries();
+    if(kind==='approval')return openApproval();
+  };
+  function openApps(){
+    var h='<p style="color:#667970">Useful teacher applications and education tools.</p><div class="chs-rm-appgrid">';
+    apps.forEach(function(a){h+='<div class="chs-rm-app"><h4>'+a[0]+' '+escR(a[1])+'</h4><p>'+escR(a[2])+'</p><a href="'+escR(a[3])+'" target="_blank" rel="noopener">Open Play Store</a></div>'});
+    h+='</div>';document.getElementById('chsRMTitle').textContent='📱 Teacher Software & Apps';body(h);
+  }
+  function getRecordsSafe(){
+    try{return typeof records==='function'?(records()||[]):JSON.parse(localStorage.getItem('employeeRecords')||'[]')}catch(e){return []}
+  }
+  function openQuality(){
+    var r=getRecordsSafe(), missing=0, dup=0, bad=[];
+    var seen={};
+    r.forEach(function(x,i){
+      var name=x.name||x['Name Of Employee']||'Record '+(i+1);
+      var c=String(x.cnic||x.cnicNumber||x['CNIC Number']||'').trim();
+      var s=String(x.semisCode||x.semis||x['SEMIS CODE']||'').trim();
+      var miss=[];
+      if(!name.trim())miss.push('Name');
+      if(!c)miss.push('CNIC');
+      if(!s)miss.push('SEMIS');
+      if(miss.length){missing++;bad.push('<div class="chs-rm-card"><b>'+escR(name)+'</b><div style="color:#b45309;margin-top:4px">Missing: '+escR(miss.join(', '))+'</div></div>')}
+      if(c){if(seen['c'+c]){dup++;bad.push('<div class="chs-rm-card"><b>Duplicate CNIC</b><div>'+escR(c)+' — records '+seen['c'+c]+' and '+(i+1)+'</div></div>')}else seen['c'+c]=i+1}
+    });
+    var h='<p style="color:#667970">Checks employee records for missing key fields and duplicate CNIC numbers.</p>';
+    h+='<div class="chs-rm-grid"><div class="chs-rm-stat"><b>'+r.length+'</b><span>Total Records</span></div><div class="chs-rm-stat"><b>'+missing+'</b><span>Incomplete Records</span></div><div class="chs-rm-stat"><b>'+dup+'</b><span>Duplicate CNIC</span></div><div class="chs-rm-stat"><b>'+Math.max(0,r.length-missing)+'</b><span>Complete</span></div></div>';
+    h+='<div class="chs-rm-actions"><button class="chs-rm-green" onclick="chsRM_open(\'quality\')">🔍 Check Again</button></div>';
+    h+=bad.length?bad.join(''):'<div class="chs-rm-card" style="color:#166534;font-weight:700">✅ No missing key fields or duplicate CNIC numbers found.</div>';
+    document.getElementById('chsRMTitle').textContent='📊 Data Quality Checker';body(h);
+  }
+  function getSug(){
+    try{var a=JSON.parse(localStorage.getItem('portalSuggestions')||'[]');return Array.isArray(a)?a:[]}catch(e){return []}
+  }
+  window.chsRM_removeSuggestion=function(i){
+    if(!admin())return;var a=getSug();if(!a[i])return;
+    if(!confirm('Remove this suggestion?'))return;a.splice(i,1);localStorage.setItem('portalSuggestions',JSON.stringify(a));openQueries();
+  };
+  function openQueries(){
+    var a=getSug(),h='<p style="color:#667970">Queries and suggestions submitted through the portal.</p>';
+    if(!a.length)h+='<div class="chs-rm-card">No queries / suggestions submitted yet.</div>';
+    a.forEach(function(x,i){
+      h+='<div class="chs-rm-card"><b>'+escR(x.name||'Anonymous')+'</b>'+
+        (x.designation?' • '+escR(x.designation):'')+
+        '<div style="font-size:12px;color:#667970;margin-top:4px">'+escR(x.mobile||'')+(x.email?' • '+escR(x.email):'')+'</div>'+
+        '<div style="margin-top:7px">'+escR(x.text||x.query||'')+'</div>'+
+        '<div class="chs-rm-actions"><button class="chs-rm-red" onclick="chsRM_removeSuggestion('+i+')">🗑 Remove</button></div></div>';
+    });
+    document.getElementById('chsRMTitle').textContent='💬 Queries / Suggestions';body(h);
+  }
+  window.chsRM_approve=function(i){
+    if(!admin())return;var a=typeof getPublicFiles==='function'?getPublicFiles():[];
+    if(!a[i])return;a[i].approved=true;a[i].approvedAt=new Date().toISOString();
+    if(typeof setPublicFiles==='function')setPublicFiles(a);else localStorage.setItem('portalPublicFiles',JSON.stringify(a));
+    openApproval();
+  };
+  window.chsRM_revoke=function(i){
+    if(!admin())return;var a=typeof getPublicFiles==='function'?getPublicFiles():[];
+    if(!a[i])return;a[i].approved=false;delete a[i].approvedAt;
+    if(typeof setPublicFiles==='function')setPublicFiles(a);else localStorage.setItem('portalPublicFiles',JSON.stringify(a));
+    openApproval();
+  };
+  window.chsRM_removeFile=function(i){
+    if(!admin())return;var a=typeof getPublicFiles==='function'?getPublicFiles():[];
+    if(!a[i])return;if(!confirm('Remove this uploaded file?'))return;a.splice(i,1);
+    if(typeof setPublicFiles==='function')setPublicFiles(a);else localStorage.setItem('portalPublicFiles',JSON.stringify(a));
+    openApproval();
+  };
+  function openApproval(){
+    var a=typeof getPublicFiles==='function'?getPublicFiles():[];
+    var pending=a.filter(function(x){return x.approved!==true}).length;
+    var h='<p style="color:#667970">Admin controls which uploaded Forms & Documents are visible to visitors.</p>';
+    h+='<div class="chs-rm-grid"><div class="chs-rm-stat"><b>'+a.length+'</b><span>Total Files</span></div><div class="chs-rm-stat"><b>'+pending+'</b><span>Pending Approval</span></div><div class="chs-rm-stat"><b>'+(a.length-pending)+'</b><span>Approved</span></div><div class="chs-rm-stat"><b>🔒</b><span>Admin Only</span></div></div>';
+    h+='<div class="chs-rm-card"><b>Upload New Form / Document</b><input class="chs-rm-input" id="chsRMFileTitle" placeholder="Document title"><input class="chs-rm-input" id="chsRMFileInput" type="file"></div>';
+    h+='<div class="chs-rm-actions"><button class="chs-rm-blue" onclick="chsRM_addFile()">📤 Upload as Pending</button></div>';
+    if(!a.length)h+='<div class="chs-rm-card">No files uploaded yet.</div>';
+    a.forEach(function(x,i){
+      h+='<div class="chs-rm-card"><b>📄 '+escR(x.title||x.fileName||'Document')+'</b>'+
+      '<div style="font-size:12px;margin-top:5px;color:'+(x.approved===true?'#087443':'#b45309')+'">'+(x.approved===true?'✅ APPROVED — visible to visitors':'⏳ PENDING — not visible to visitors')+'</div>'+
+      '<div class="chs-rm-actions">'+(x.approved===true?'<button class="chs-rm-gray" onclick="chsRM_revoke('+i+')">Revoke Approval</button>':'<button class="chs-rm-green" onclick="chsRM_approve('+i+')">✅ Approve</button>')+
+      '<button class="chs-rm-gray" onclick="chsRM_preview('+i+')">Preview / Download</button><button class="chs-rm-red" onclick="chsRM_removeFile('+i+')">Remove</button></div></div>';
+    });
+    document.getElementById('chsRMTitle').textContent='✅ Forms Approval';body(h);
+  }
+  window.chsRM_preview=function(i){
+    var a=typeof getPublicFiles==='function'?getPublicFiles():[],x=a[i];
+    if(!x||!x.fileData){alert('File data is not available.');return}
+    var w=window.open();if(!w)return;
+    w.document.write('<title>'+escR(x.fileName||x.title||'Document')+'</title><iframe src="'+x.fileData+'" style="width:100%;height:100vh;border:0"></iframe>');
+  };
+  window.chsRM_addFile=function(){
+    if(!admin()){alert('Admin login required.');return}
+    var f=document.getElementById('chsRMFileInput'),t=document.getElementById('chsRMFileTitle'),file=f&&f.files[0];
+    if(!file){alert('Please select a file.');return}
+    var r=new FileReader();
+    r.onload=function(){
+      var a=typeof getPublicFiles==='function'?getPublicFiles():[];
+      a.push({title:(t.value.trim()||file.name),fileName:file.name,fileData:r.result,approved:false,uploadedAt:new Date().toISOString()});
+      if(typeof setPublicFiles==='function')setPublicFiles(a);else localStorage.setItem('portalPublicFiles',JSON.stringify(a));
+      openApproval();
+    };r.readAsDataURL(file);
+  };
+  document.addEventListener('click',function(e){
+    if(!e.target.closest('#chsReliableMgmt')){var m=document.getElementById('chsReliableMgmtMenu');if(m)m.style.display='none'}
+  });
+})();
+</script>
+
 </body></html>
