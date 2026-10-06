@@ -3450,10 +3450,17 @@ function downloadSettingChoice(n){
   };
 
   window.removeGalleryPhoto=function(id){
-    if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
-    if(!confirm('Remove this gallery photo?'))return;
-    save(get().filter(function(x){return String(x.id)!==String(id)}));
+    if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return false;}
+    if(!confirm('Remove this gallery photo?'))return false;
+    var a=get();
+    var before=a.length;
+    var cleaned=a.filter(function(x){return String(x && x.id)!==String(id)});
+    if(cleaned.length===before){
+      return false;
+    }
+    save(cleaned);
     render();
+    return false;
   };
 
   window.editGalleryCaption=function(id){
@@ -3511,7 +3518,7 @@ function downloadSettingChoice(n){
         '<button onclick="changeGalleryPhoto('+x.id+')">🖼️ Change Photo</button>'+
         '<button onclick="editGalleryCaption('+x.id+')">✏️ Edit Caption</button>'+
         '<button onclick="changeGalleryCategory('+x.id+')">🔄 Category</button>'+
-        '<button class="remove" onclick="removeGalleryPhoto('+x.id+')">🗑️ Remove</button>'+
+        '<button type="button" class="remove" onclick="return removeGalleryPhoto('+x.id+')">🗑️ Remove</button>'+
         '</div></div></div>';
     }).join('');
     grid.style.display=a.length?'grid':'none';
@@ -4751,6 +4758,172 @@ function submitSponsorInquiry(ev){
   document.addEventListener('click',function(e){
     if(!e.target.closest('#chsReliableMgmt')){var m=document.getElementById('chsReliableMgmtMenu');if(m)m.style.display='none'}
   });
+})();
+</script>
+
+<script id="chs-final-minimal-fix">
+(function(){
+  /* ===== Excel: use ONLY the columns currently saved in Admin ===== */
+  function adminExcelColumns(){
+    try{
+      var cols = (typeof getColumns==='function' ? getColumns() : []);
+      return cols.filter(function(c){ return c && c.key && c.visible !== false; });
+    }catch(e){ return []; }
+  }
+
+  window.openExcelColumnSelector=function(){
+    if(typeof XLSX==='undefined'){
+      if(typeof msg==='function') msg('Excel library could not load. Please connect to the internet and try again.',true);
+      return;
+    }
+    var r=typeof records==='function'?records():[];
+    if(!r.length){
+      if(typeof msg==='function') msg('No employee records available to download.',true);
+      return;
+    }
+    var box=document.getElementById('excelColumnList');
+    var modal=document.getElementById('excelColumnModal');
+    if(!box || !modal){ alert('Excel column selector is not available.'); return; }
+
+    var cols=adminExcelColumns();
+    if(!cols.length){
+      alert('No visible columns are configured. Open Manage Employee Columns and save your columns first.');
+      return;
+    }
+
+    box.innerHTML=cols.map(function(c){
+      return '<label class="excel-column-option">'+
+        '<input type="checkbox" class="excel-col-check" data-original-key="'+String(c.key).replace(/"/g,'&quot;')+'" checked>'+
+        '<span>'+String(c.label||c.key).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</span>'+ 
+        '</label>';
+    }).join('');
+    modal.classList.add('active');
+  };
+
+  window.selectAllExcelColumns=function(v){
+    document.querySelectorAll('#excelColumnList .excel-col-check').forEach(function(x){x.checked=v});
+  };
+
+  window.closeExcelColumnSelector=function(){
+    var m=document.getElementById('excelColumnModal');
+    if(m)m.classList.remove('active');
+  };
+
+  window.downloadSelectedEmployeeExcel=function(){
+    if(typeof XLSX==='undefined'){alert('Excel library could not load.');return;}
+    var r=typeof records==='function'?records():[];
+    if(!r.length){alert('No employee records available.');return;}
+
+    var cols=adminExcelColumns();
+    var checks=[].slice.call(document.querySelectorAll('#excelColumnList .excel-col-check:checked'));
+    if(!checks.length){alert('Please select at least one column.');return;}
+
+    var selected=checks.map(function(ch){
+      var key=ch.getAttribute('data-original-key');
+      return cols.find(function(c){return String(c.key)===String(key)});
+    }).filter(Boolean);
+
+    var data=r.map(function(e){
+      var row={};
+      selected.forEach(function(c){
+        var v=e[c.key];
+        row[c.label||c.key]=(v===undefined||v===null)?'':v;
+      });
+      return row;
+    });
+
+    var ws=XLSX.utils.json_to_sheet(data,{header:selected.map(function(c){return c.label||c.key})});
+    var wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Employee Records');
+    XLSX.writeFile(wb,'CHS_Moro_Employee_Records.xlsx');
+    closeExcelColumnSelector();
+  };
+
+  /* Every Employee Excel button opens the selector; nothing downloads automatically. */
+  window.downloadExcel=function(){ window.openExcelColumnSelector(); };
+  window.downloadExcelFile=function(){
+    if(typeof chsAdminExcelDownloadGuard==='function' && !chsAdminExcelDownloadGuard()) return;
+    window.openExcelColumnSelector();
+  };
+
+  /* ===== Gallery / Secretary photo: prevent old saved state from restoring it ===== */
+  function readArray(key){
+    try{var a=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(a)?a:[]}catch(e){return []}
+  }
+  function saveArray(key,a){localStorage.setItem(key,JSON.stringify(a));}
+  function isSecretary(x){
+    if(!x)return false;
+    var cap=String(x.caption||'').toLowerCase();
+    var src=String(x.src||x.image||'').toLowerCase();
+    return cap.indexOf('secretary school education')>=0 ||
+           cap.indexOf('secretary education')>=0 ||
+           src.indexOf('zahid_ali_abbasi')>=0 ||
+           src.indexOf('se_zahid_ali_abbasi')>=0;
+  }
+  function cleanSecretaryEverywhere(){
+    try{
+      var g=readArray('chsMoroGallery');
+      var g2=g.filter(function(x){return !isSecretary(x)});
+      if(g2.length!==g.length)saveArray('chsMoroGallery',g2);
+
+      var p=readArray('frontPagePhotos_v3');
+      var changed=false;
+      p=p.map(function(x){
+        if(isSecretary(x)){
+          changed=true;
+          return Object.assign({},x,{image:''});
+        }
+        return x;
+      });
+      if(changed)saveArray('frontPagePhotos_v3',p);
+
+      /* Also remove the old secretary photo if it was restored through the
+         embedded saved-state object before this script ran. */
+      if(window.__CHS_SAVED_STATE__ && window.__CHS_SAVED_STATE__.frontPagePhotos_v3){
+        try{
+          var s=JSON.parse(window.__CHS_SAVED_STATE__.frontPagePhotos_v3);
+          if(Array.isArray(s)){
+            var sc=s.map(function(x){return isSecretary(x)?Object.assign({},x,{image:''}):x});
+            window.__CHS_SAVED_STATE__.frontPagePhotos_v3=JSON.stringify(sc);
+          }
+        }catch(e){}
+      }
+
+      if(typeof renderPhotoManager==='function')renderPhotoManager();
+      if(typeof renderPhotoGrid==='function')renderPhotoGrid();
+      if(typeof filterGallery==='function')filterGallery('All',document.querySelector('#galleryTabs button'));
+    }catch(e){console.warn('Secretary photo cleanup:',e)}
+  }
+
+  /* Reliable front-page photo controls, same storage as Admin Photo Manager. */
+  window.removeFrontPhoto=function(i){
+    if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
+    if(!confirm('Remove Photo '+(i+1)+' from the front page?'))return;
+    var a=readArray('frontPagePhotos_v3');
+    if(!a[i])return;
+    a[i].image='';
+    saveArray('frontPagePhotos_v3',a);
+    cleanSecretaryEverywhere();
+    if(typeof msg==='function')msg('Photo '+(i+1)+' removed successfully.');
+  };
+
+  window.savePhotoCaption=function(i){
+    if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
+    var a=readArray('frontPagePhotos_v3');
+    var el=document.getElementById('photo_caption_'+i);
+    if(!a[i] || !el)return;
+    a[i].caption=el.value.trim();
+    saveArray('frontPagePhotos_v3',a);
+    cleanSecretaryEverywhere();
+    if(typeof msg==='function')msg('Photo '+(i+1)+' caption saved.');
+  };
+
+  function runCleanup(){cleanSecretaryEverywhere();}
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',function(){setTimeout(runCleanup,50);setTimeout(runCleanup,700);});
+  }else{
+    setTimeout(runCleanup,50);setTimeout(runCleanup,700);
+  }
 })();
 </script>
 
