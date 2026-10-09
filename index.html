@@ -4135,25 +4135,65 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     const body={id:hashId('dynamicSubmission',sub.id),pid:clean(d.cnicPid),nic:clean(d.cnicPid),employee_name:clean(d.teacherName||d.name),school:clean(d.schoolName),semis:clean(d.semis),designation:clean(d.designation),date_of_birth:clean(d.dob)||null,date_of_appointment:clean(d.appointmentDate)||null,data:{source:'dynamicSubmission',submission:sub}};
     await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
   }
+  function first(obj,keys){
+    for(const k of keys){if(obj && obj[k]!==undefined && obj[k]!==null && String(obj[k]).trim()!=='')return obj[k];}
+    return '';
+  }
+  function normalizeRemote(r){
+    const d=r.data&&typeof r.data==='object'?r.data:{};
+    const p=d.payload&&typeof d.payload==='object'?d.payload:(d.employee&&typeof d.employee==='object'?d.employee:d);
+    const out={...p};
+    const aliases={
+      name:['name','employee_name','employeeName','fullName','full_name','Name Of Employee','Full name','Name'],
+      father:['father','father_name','fatherName','Father Name',"Father's Name"],
+      cnic:['cnic','nic','CNIC Number','CNIC'], personal:['personal','pid','pidNumber','PID Number','Personal Number'],
+      rid:['rid','RID'], gender:['gender','Gender'], cluster:['cluster','Cluster'],
+      designation:['designation','currentPostingBps','designation9Scale','Designation 9-Scale','Current Posting & BPS','Designation'],
+      school:['school','school_name','schoolName','Name Of School','Current Posting & BPS'],
+      semis:['semis','semisCode','semis_code','SEMIS CODE'], costCentre:['costCentre','cost_centre','Cost Centre'],
+      dob:['dob','date_of_birth','dateOfBirth','Date Of Birth','D.O.B'], joining:['joining','date_of_appointment','dateOfAppointment','Date Of Appointment','D.O.A'],
+      retirementDate:['retirementDate','dateOfRetirement','date_of_retirement','Date of Retirement'],
+      academicQualification:['academicQualification','academic_qualification','Academic Qualification'],
+      professionalQualification:['professionalQualification','professional_qualification','Professional Qualification'],
+      bedDeclarationDate:['bedDeclarationDate','bed_declaration_date','Date of Declaration of B.Ed'],
+      firstAppointmentDesignationGrade:['firstAppointmentDesignationGrade','first_appointment_designation_grade','First appointment designation and grade','Designation at the time of Joining','BPS at the time of Joining'],
+      firstAppointmentPlace:['firstAppointmentPlace','first_appointment_place','First appointment place of posting'],
+      regularisationDate:['regularisationDate','regularisation_date','Date of Regularisation'],
+      lastPromotionAs:['lastPromotionAs','last_promotion_as','Last promotion as'], lastPromotionDate:['lastPromotionDate','last_promotion_date','Date of Last Promotion'],
+      ibianNumber:['ibianNumber','ibian_number','IBIAN Number'], testBy:['testBy','test_by','Test by? IBA/NTS/SINDH/OTHER?'],
+      testMarks:['testMarks','test_marks','Marks in test'], meritNumber:['meritNumber','merit_number','Merit Number'],
+      quota:['quota','Quota/Disable/Son Quota'], workingAsPerSTR:['workingAsPerSTR','working_as_per_str','Working as per STR or Original?'],
+      email:['email','Email'], mobile:['mobile','contactNumber','contact_number','Contact Number'], remarks:['remarks','Remarks if any','remarksIfAny'],
+      currentPostingBps:['currentPostingBps','current_posting_bps','Current Posting & BPS'],
+      joiningDesignation:['joiningDesignation','designationAtJoining','Designation at the time of Joining'],
+      joiningBps:['joiningBps','bpsAtJoining','BPS at the time of Joining'], salaryCode:['salaryCode','clusterCodeSalaryCode','Cluster Code/Salary Code']
+    };
+    for(const [key,keys] of Object.entries(aliases)){
+      const v=first(p,keys); if(v!=='' && (out[key]===undefined || out[key]===null || String(out[key]).trim()===''))out[key]=v;
+    }
+    const fallback={name:r.employee_name,cnic:r.nic,personal:r.pid,father:r.father_name,designation:r.designation,school:r.school,semis:r.semis,cluster:r.cluster,dob:r.date_of_birth,joining:r.date_of_appointment};
+    for(const [k,v] of Object.entries(fallback))if((out[k]===undefined||out[k]===null||String(out[k]).trim()==='')&&v)out[k]=v;
+    return out;
+  }
+  function meaningful(e){return !!(e && Object.values(e).some(v=>v!==null && v!==undefined && String(v).trim()!=='' && String(v).trim()!=='-'));}
   async function pullEmployees(){
     const q=TABLE+'?select=id,pid,nic,employee_name,father_name,designation,school,semis,cluster,date_of_birth,date_of_appointment,data&data->>source=eq.employeeRecord&order=created_at.asc&limit=5000';
     const txt=await request(q,{headers:headers()});
     const rows=JSON.parse(txt||'[]');
     if(!Array.isArray(rows)||!rows.length)return 0;
-    const remote=rows.map(r=>{
-      const p=r.data?.payload||{};
-      return {...p,name:p.name||r.employee_name||'',cnic:p.cnic||r.nic||'',personal:p.personal||r.pid||'',father:p.father||r.father_name||'',designation:p.designation||r.designation||'',school:p.school||r.school||'',semis:p.semis||r.semis||'',cluster:p.cluster||r.cluster||'',dob:p.dob||r.date_of_birth||'',joining:p.joining||r.date_of_appointment||''};
-    });
+    const remote=rows.map(normalizeRemote).filter(meaningful);
     const local=typeof records==='function'?records():[];
     const map=new Map();
-    local.forEach(e=>map.set(employeeKey(e),e));
-    remote.forEach(e=>{const key=employeeKey(e);const old=map.get(key);map.set(key,old?{...old,...e}:e);});
+    // Start with authoritative central rows; merge only useful local values into matching rows.
+    remote.forEach(e=>map.set(employeeKey(e),e));
+    local.filter(meaningful).forEach(e=>{
+      const key=employeeKey(e),old=map.get(key);
+      if(!old)map.set(key,e);
+      else for(const [k,v] of Object.entries(e))if((old[k]===undefined||old[k]===null||String(old[k]).trim()===''||String(old[k]).trim()==='-')&&v!==undefined&&v!==null&&String(v).trim()!==''&&String(v).trim()!=='-')old[k]=v;
+    });
     const merged=[...map.values()];
-    if(typeof setRecords==='function'){
-      // Avoid recursive queueing while applying remote data.
-      const raw=localStorage.getItem('employeeRecords');
-      localStorage.setItem('employeeRecords',JSON.stringify(merged));
-    }
+    localStorage.setItem('employeeRecords',JSON.stringify(merged));
+    try{if(typeof renderTable==='function')renderTable();if(typeof updatePortalStats==='function')updatePortalStats();}catch(_){ }
     return remote.length;
   }
   async function queueEmployees(arr){
@@ -4183,7 +4223,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
       if(remoteCount===0 && local.length){
         for(const e of local) await saveEmployee(e);
       }
-      status('● Central Database: Connected / Synced',true);
+      status('● Central Database: Connected / Synced ('+remoteCount+' teachers)',true);
     }catch(e){console.error('Central sync:',e);status('● Central Database: '+e.message,false);}
     finally{syncing=false;}
   }
