@@ -4174,22 +4174,25 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
   }
   function normalizeRemote(r){
     const d=r.data&&typeof r.data==='object'?r.data:{};
-    const p=d.payload&&typeof d.payload==='object'?d.payload:(d.employee&&typeof d.employee==='object'?d.employee:d);
+    const outer=d.payload&&typeof d.payload==='object'?d.payload:(d.employee&&typeof d.employee==='object'?d.employee:d);
+    // Some older proforma rows were accidentally wrapped as employeeRecord -> payload -> payload.
+    // Flatten that inner employee object without losing the outer record fields.
+    const p=outer.payload&&typeof outer.payload==='object'?{...outer,...outer.payload}:outer;
     const out={...p};
     const aliases={
       name:['name','employee_name','employeeName','fullName','full_name','Name Of Employee','Full name','Name'],
-      father:['father','father_name','fatherName','Father Name',"Father's Name"],
-      cnic:['cnic','nic','CNIC Number','CNIC'], personal:['personal','pid','pidNumber','PID Number','Personal Number'],
+      father:['father','father_name','fatherName','Father Name',"Father's Name",'custom_1791301365566'],
+      cnic:['cnic','nic','CNIC Number','CNIC','custom_1791302911958'], personal:['personal','pid','pidNumber','PID Number','Personal Number','custom_1791302918642'],
       rid:['rid','RID'], gender:['gender','Gender'], cluster:['cluster','Cluster'],
-      designation:['designation','currentPostingBps','designation9Scale','Designation 9-Scale','Current Posting & BPS','Designation'],
-      school:['school','school_name','schoolName','Name Of School','Current Posting & BPS'],
-      semis:['semis','semisCode','semis_code','SEMIS CODE'], costCentre:['costCentre','cost_centre','Cost Centre'],
-      dob:['dob','date_of_birth','dateOfBirth','Date Of Birth','D.O.B'], joining:['joining','date_of_appointment','dateOfAppointment','Date Of Appointment','D.O.A'],
-      retirementDate:['retirementDate','dateOfRetirement','date_of_retirement','Date of Retirement'],
-      academicQualification:['academicQualification','academic_qualification','Academic Qualification'],
-      professionalQualification:['professionalQualification','professional_qualification','Professional Qualification'],
+      designation:['designation','currentPostingBps','designation9Scale','Designation 9-Scale','Current Posting & BPS','Designation','custom_1791302890881'],
+      school:['school','school_name','schoolName','Name Of School'],
+      semis:['semis','custom_1791302980494','semis_code','SEMIS CODE','semisCode'], costCentre:['costCentre','cost_centre','Cost Centre'],
+      dob:['dob','date_of_birth','dateOfBirth','Date Of Birth','D.O.B','custom_1791302927030'], joining:['joining','doa','date_of_appointment','dateOfAppointment','Date Of Appointment','D.O.A','custom_1791302934299'],
+      retirementDate:['retirementDate','retirement','dateOfRetirement','date_of_retirement','Date of Retirement','custom_1791302940390'],
+      academicQualification:['academicQualification','academic_qualification','Academic Qualification','custom_1791302965295'],
+      professionalQualification:['professionalQualification','professional_qualification','Professional Qualification','custom_1791302972948'],
       bedDeclarationDate:['bedDeclarationDate','bed_declaration_date','Date of Declaration of B.Ed'],
-      firstAppointmentDesignationGrade:['firstAppointmentDesignationGrade','first_appointment_designation_grade','First appointment designation and grade','Designation at the time of Joining','BPS at the time of Joining'],
+      firstAppointmentDesignationGrade:['firstAppointmentDesignationGrade','first_appointment_designation_grade','First appointment designation and grade'],
       firstAppointmentPlace:['firstAppointmentPlace','first_appointment_place','First appointment place of posting'],
       regularisationDate:['regularisationDate','regularisation_date','Date of Regularisation'],
       lastPromotionAs:['lastPromotionAs','last_promotion_as','Last promotion as'], lastPromotionDate:['lastPromotionDate','last_promotion_date','Date of Last Promotion'],
@@ -4197,15 +4200,21 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
       testMarks:['testMarks','test_marks','Marks in test'], meritNumber:['meritNumber','merit_number','Merit Number'],
       quota:['quota','Quota/Disable/Son Quota'], workingAsPerSTR:['workingAsPerSTR','working_as_per_str','Working as per STR or Original?'],
       email:['email','Email'], mobile:['mobile','contactNumber','contact_number','Contact Number'], remarks:['remarks','Remarks if any','remarksIfAny'],
-      currentPostingBps:['currentPostingBps','current_posting_bps','Current Posting & BPS'],
-      joiningDesignation:['joiningDesignation','designationAtJoining','Designation at the time of Joining'],
-      joiningBps:['joiningBps','bpsAtJoining','BPS at the time of Joining'], salaryCode:['salaryCode','clusterCodeSalaryCode','Cluster Code/Salary Code']
+      currentPostingBps:['currentPostingBps','current_posting_bps','Current Posting & BPS','currentPosting','custom_1791302946357'],
+      joiningDesignation:['joiningDesignation','designationAtJoining','Designation at the time of Joining','custom_1791302890881'],
+      joiningBps:['joiningBps','bpsAtJoining','BPS at the time of Joining','custom_1791302903187'], salaryCode:['salaryCode','clusterCodeSalaryCode','Cluster Code/Salary Code','clusterCode','custom_1791302953412']
     };
     for(const [key,keys] of Object.entries(aliases)){
       const v=first(p,keys); if(v!=='' && (out[key]===undefined || out[key]===null || String(out[key]).trim()===''))out[key]=v;
     }
     const fallback={name:r.employee_name,cnic:r.nic,personal:r.pid,father:r.father_name,designation:r.designation,school:r.school,semis:r.semis,cluster:r.cluster,dob:r.date_of_birth,joining:r.date_of_appointment};
-    for(const [k,v] of Object.entries(fallback))if((out[k]===undefined||out[k]===null||String(out[k]).trim()==='')&&v)out[k]=v;
+    for(const [k,v] of Object.entries(fallback))if((out[k]===undefined||out[k]===null||String(out[k]).trim()===''||String(out[k]).trim()==='-')&&v)out[k]=v;
+    // Normalize the non-standard keys used by existing Supabase payloads.
+    if(!out.name && r.employee_name)out.name=r.employee_name;
+    if((!out.semis || String(out.semis).trim()==='' || String(out.semis).trim()===String(out.name||'').trim()) && first(p,['custom_1791302980494']))out.semis=first(p,['custom_1791302980494']);
+    if(!out.retirementDate)out.retirementDate=first(p,['retirement','custom_1791302940390']);
+    if(!out.currentPostingBps)out.currentPostingBps=first(p,['currentPosting','custom_1791302946357']);
+    if(!out.salaryCode)out.salaryCode=first(p,['clusterCode','custom_1791302953412']);
     // Preserve values for whichever column keys are currently configured in this browser.
     try{
       const cols=typeof getColumns==='function'?getColumns():[];
@@ -4232,7 +4241,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     const txt=await request(q,{headers:headers()});
     const rows=JSON.parse(txt||'[]');
     if(!Array.isArray(rows)||!rows.length)return 0;
-    const remote=rows.map(normalizeRemote).filter(meaningful);
+    const remote=rows.map(normalizeRemote).filter(e=>meaningful(e)&&String(e.name||e.employee_name||'').trim()!=='' && String(e.name||e.employee_name||'').trim()!=='-');
     const local=typeof records==='function'?records():[];
     const map=new Map();
     // Start with authoritative central rows; merge only useful local values into matching rows.
