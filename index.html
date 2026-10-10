@@ -2415,6 +2415,39 @@ function renderClusterGraph(all){
  const tm=data.reduce((a,x)=>a+x.male,0),tf=data.reduce((a,x)=>a+x.female,0),gt=document.getElementById('clusterGrand');if(gt)gt.innerHTML=`Cluster Employee Grand Total: ${source.length}<small>Male: ${tm} &nbsp; • &nbsp; Female: ${tf}</small>`;
 }
 
+function employeeDisplayValue(record,column){
+  // Resolve the value by either the stored key or the administrator's visible column title.
+  // This keeps older Excel headers, newer camelCase keys, and Supabase payloads compatible.
+  const e=record&&typeof record==='object'?record:{};
+  const c=column&&typeof column==='object'?column:{};
+  const normKey=v=>String(v??'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const aliases={
+    name:['name','fullname','employee_name','employeename','nameofemployee','teachername'],
+    father:['father','fathername','father_name'], designation:['designation','designation9scale','currentpostingbps','designationatjoining','joiningdesignation'],
+    joiningBps:['joiningbps','bpsatjoining','bpsatthetimeofjoining'], joiningDesignation:['joiningdesignation','designationatjoining','designationatthetimeofjoining'],
+    cnic:['cnic','nic','cnicnumber'], personal:['personal','pid','pidnumber','personalnumber'], dob:['dob','dateofbirth'],
+    joining:['joining','doa','dateofappointment','dateofjoining','appointmentdate'], retirementDate:['retirementdate','dateofretirement'],
+    currentPostingBps:['currentpostingbps','currentposting','currentpostingandbps'], salaryCode:['salarycode','clustercodesalarycode','clustercode','salarycode'],
+    cluster:['cluster','clustercodesalarycode','salarycode'], academicQualification:['academicqualification'],
+    professionalQualification:['professionalqualification'], remarks:['remarks','remarksifany']
+  };
+  const keys=[c.key,c.label];
+  const k=normKey(c.key), l=normKey(c.label);
+  for(const [canonical,alts] of Object.entries(aliases)){
+    const set=[normKey(canonical),...alts.map(normKey)];
+    if(set.includes(k)||set.includes(l))keys.push(canonical,...alts);
+  }
+  // If the label is a common column name, include its known alternate spellings.
+  const all=[e,e.data,e.payload,e.data&&e.data.payload,e.data&&e.data.employee].filter(x=>x&&typeof x==='object'&&!Array.isArray(x));
+  for(const obj of all){
+    for(const key of keys){if(key&&obj[key]!==undefined&&obj[key]!==null&&String(obj[key]).trim()!==''&&String(obj[key]).trim()!=='-')return obj[key];}
+    const wanted=new Set(keys.map(normKey).filter(Boolean));
+    for(const [key,value] of Object.entries(obj)){
+      if(wanted.has(normKey(key))&&value!==undefined&&value!==null&&String(value).trim()!==''&&String(value).trim()!=='-')return value;
+    }
+  }
+  return '';
+}
 function renderTable(){
   const cols=visibleColumns();
   const searchEl=document.getElementById('adminSearch');
@@ -2443,7 +2476,7 @@ function renderTable(){
   const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(c.label)+'</th>').join('')+'<th>Actions</th></tr>';
   const th=document.getElementById('tableHead'),body=document.getElementById('rows');
   if(th)th.innerHTML=head;
-  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(x.e[c.key]||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
+  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(employeeDisplayValue(x.e,c)||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
   const info=document.getElementById('employeePageInfo');
   if(info)info.textContent=filtered.length?`Showing ${from+1}-${Math.min(from+size,filtered.length)} of ${filtered.length}`:'Showing 0 of 0';
   const pg=document.getElementById('employeePagination');
@@ -4173,6 +4206,24 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     }
     const fallback={name:r.employee_name,cnic:r.nic,personal:r.pid,father:r.father_name,designation:r.designation,school:r.school,semis:r.semis,cluster:r.cluster,dob:r.date_of_birth,joining:r.date_of_appointment};
     for(const [k,v] of Object.entries(fallback))if((out[k]===undefined||out[k]===null||String(out[k]).trim()==='')&&v)out[k]=v;
+    // Preserve values for whichever column keys are currently configured in this browser.
+    try{
+      const cols=typeof getColumns==='function'?getColumns():[];
+      for(const c of cols){
+        if(!c||!c.key)continue;
+        const current=out[c.key];
+        if(current!==undefined&&current!==null&&String(current).trim()!==''&&String(current).trim()!=='-')continue;
+        const labelKey=String(c.label||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+        const sourceObjects=[p,d,r]; let found='';
+        for(const obj of sourceObjects){if(!obj||typeof obj!=='object')continue;
+          for(const [key,value] of Object.entries(obj)){
+            if(String(key).toLowerCase().replace(/[^a-z0-9]/g,'')===labelKey&&value!==undefined&&value!==null&&String(value).trim()!==''&&String(value).trim()!=='-'){found=value;break;}
+          }
+          if(found!=='')break;
+        }
+        if(found!=='')out[c.key]=found;
+      }
+    }catch(_){}
     return out;
   }
   function meaningful(e){return !!(e && Object.values(e).some(v=>v!==null && v!==undefined && String(v).trim()!=='' && String(v).trim()!=='-'));}
