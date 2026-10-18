@@ -2352,6 +2352,47 @@ function renderClusterGraph(all){
  const tm=data.reduce((a,x)=>a+x.male,0),tf=data.reduce((a,x)=>a+x.female,0),gt=document.getElementById('clusterGrand');if(gt)gt.innerHTML=`Cluster Employee Grand Total: ${source.length}<small>Male: ${tm} &nbsp; • &nbsp; Female: ${tf}</small>`;
 }
 
+function recordFieldValue(e,key,label){
+  e=e||{};
+  const aliases={
+    name:['name','employee_name','employeeName','full_name','fullName','teacherName','Name Of Employee','Name'],
+    father:['father','father_name','fatherName','Father Name'],
+    designation:['designation','post','designation_at_joining','designationAtJoining'],
+    joiningDesignation:['joiningDesignation','designation_at_joining','firstAppointmentDesignationGrade'],
+    joiningBps:['joiningBps','bps_at_joining','bpsAtJoining'],
+    cnic:['cnic','nic','CNIC','NIC'],
+    personal:['personal','pid','PID','personal_number','personalNumber'],
+    pid:['pid','personal','PID','personal_number'],
+    dob:['dob','date_of_birth','dateOfBirth','DOB'],
+    joining:['joining','date_of_appointment','date_of_joining','appointmentDate'],
+    appointmentDate:['appointmentDate','joining','date_of_appointment','date_of_joining'],
+    retirement:['retirement','date_of_retirement','retirementDate'],
+    currentPosting:['currentPosting','current_posting','school','school_name'],
+    school:['school','school_name','current_posting','Name Of School'],
+    semisCode:['semisCode','semis','semis_code','SEMIS CODE'],
+    semis:['semis','semisCode','semis_code'],
+    costCentre:['costCentre','cost_centre','cost_center'],
+    cluster:['cluster','cluster_code','salary_code'],
+    remarks:['remarks','remark','notes']
+  };
+  const keys=[key,...(aliases[key]||[])];
+  for(const k of keys){const v=e[k];if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}
+  const normalized=String(label||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+  const labelAliases={
+    fullname:['name','employee_name','employeeName','full_name','fullName'],
+    fathername:['father','father_name','fatherName'],
+    cnic:['cnic','nic'],
+    pid:['pid','personal','personal_number'],
+    dateofbirth:['dob','date_of_birth','dateOfBirth'],
+    dateofappointment:['joining','date_of_appointment','date_of_joining'],
+    dateofretirement:['retirement','date_of_retirement','retirementDate'],
+    currentpostingbps:['currentPosting','current_posting','school'],
+    clustercodesalarycode:['cluster','cluster_code','salary_code'],
+    remarks:['remarks','remark','notes']
+  };
+  for(const k of (labelAliases[normalized]||[])){const v=e[k];if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}
+  return '';
+}
 function renderTable(){
   const cols=visibleColumns();
   const searchEl=document.getElementById('adminSearch');
@@ -2380,7 +2421,7 @@ function renderTable(){
   const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(c.label)+'</th>').join('')+'<th>Actions</th></tr>';
   const th=document.getElementById('tableHead'),body=document.getElementById('rows');
   if(th)th.innerHTML=head;
-  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(x.e[c.key]||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
+  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(recordFieldValue(x.e,c.key,c.label)||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
   const info=document.getElementById('employeePageInfo');
   if(info)info.textContent=filtered.length?`Showing ${from+1}-${Math.min(from+size,filtered.length)} of ${filtered.length}`:'Showing 0 of 0';
   const pg=document.getElementById('employeePagination');
