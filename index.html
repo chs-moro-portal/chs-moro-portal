@@ -892,7 +892,11 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 .chs-v41-panel button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-height:40px!important;white-space:nowrap!important;padding:9px 11px!important;}
 @media(max-width:900px){.chs-v41-panel{justify-content:flex-start!important;overflow-x:auto!important}.chs-v41-panel button{font-size:12px!important;padding:8px 10px!important}}
 </style>
-<style id="chs-menu-width-fix">.chs-v41-panel{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;max-width:none!important;padding:3px!important;overflow-x:auto!important}.chs-v41-panel button{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:max-content!important;padding:4px 7px!important;margin:0!important;height:30px!important;min-height:30px!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}.chs-v41-panel button span{display:inline!important;width:auto!important;max-width:max-content!important}@media(max-width:900px){.chs-v41-panel{gap:2px!important}.chs-v41-panel button{padding:4px 6px!important;height:29px!important;min-height:29px!important;font-size:10px!important}}</style></head>
+<style id="chs-menu-width-fix">.chs-v41-panel{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;max-width:none!important;padding:3px!important;overflow-x:auto!important}.chs-v41-panel button{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:max-content!important;padding:4px 7px!important;margin:0!important;height:30px!important;min-height:30px!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}.chs-v41-panel button span{display:inline!important;width:auto!important;max-width:max-content!important}@media(max-width:900px){.chs-v41-panel{gap:2px!important}.chs-v41-panel button{padding:4px 6px!important;height:29px!important;min-height:29px!important;font-size:10px!important}}</style>
+<style id="chs-mobile-table-fix">
+@media(max-width:600px){html,body{max-width:100%;overflow-x:hidden}.container,.card{max-width:100%;min-width:0}.card{padding:14px}table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}th,td{white-space:nowrap}input,select,textarea{min-width:0;max-width:100%}button{max-width:100%;white-space:normal}.data-tools,.nav,.left-nav{max-width:100%;flex-wrap:wrap}}
+</style>
+</head>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
 <header class="site-header">
@@ -4069,24 +4073,46 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
   }
   async function pullEmployees(){
-    const q=TABLE+'?select=id,pid,nic,employee_name,father_name,designation,school,semis,cluster,date_of_birth,date_of_appointment,data&data->>source=eq.employeeRecord&order=created_at.asc&limit=5000';
+    // Read employee rows regardless of source marker; older portal versions may
+    // have saved valid teachers using a legacy/missing data.source value.
+    const q=TABLE+'?select=id,pid,nic,employee_name,father_name,designation,school,semis,cluster,date_of_birth,date_of_appointment,data&order=created_at.asc&limit=5000';
     const txt=await request(q,{headers:headers()});
     const rows=JSON.parse(txt||'[]');
     if(!Array.isArray(rows)||!rows.length)return 0;
-    const remote=rows.map(r=>{
-      const p=r.data?.payload||{};
-      return {...p,name:p.name||r.employee_name||'',cnic:p.cnic||r.nic||'',personal:p.personal||r.pid||'',father:p.father||r.father_name||'',designation:p.designation||r.designation||'',school:p.school||r.school||'',semis:p.semis||r.semis||'',cluster:p.cluster||r.cluster||'',dob:p.dob||r.date_of_birth||'',joining:p.joining||r.date_of_appointment||''};
-    });
+    const remote=[];
+    for(const r of rows){
+      const d=(r&&r.data&&typeof r.data==='object')?r.data:{};
+      const source=String(d.source||'').toLowerCase();
+      if(source&&!['employeerecord','teacher','teachers','legacyemployee'].includes(source))continue;
+      const p=(d.payload&&typeof d.payload==='object')?d.payload:d;
+      const first=(...vals)=>{for(const v of vals){if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}return '';};
+      const e={...p,
+        name:first(p.name,p.employee_name,p.full_name,p.teacherName,r.employee_name),
+        cnic:first(p.cnic,p.nic,p.CNIC,p.NIC,r.nic),
+        personal:first(p.personal,p.pid,p.PID,p.personal_number,r.pid),
+        father:first(p.father,p.father_name,p.fatherName,r.father_name),
+        designation:first(p.designation,p.designation_at_joining,r.designation),
+        school:first(p.school,p.school_name,p.current_posting,r.school),
+        semis:first(p.semis,p.semis_code,p.school_semis,r.semis),
+        cluster:first(p.cluster,p.cluster_code,p.salary_code,r.cluster),
+        dob:first(p.dob,p.date_of_birth,p.dateOfBirth,r.date_of_birth),
+        joining:first(p.joining,p.date_of_appointment,p.date_of_joining,p.appointmentDate,r.date_of_appointment)
+      };
+      if(!String(e.name||'').trim()&&!String(e.personal||'').trim()&&!String(e.cnic||'').trim())continue;
+      remote.push(e);
+    }
+    if(!remote.length)return 0;
     const local=typeof records==='function'?records():[];
     const map=new Map();
     local.forEach(e=>map.set(employeeKey(e),e));
-    remote.forEach(e=>{const key=employeeKey(e);const old=map.get(key);map.set(key,old?{...old,...e}:e);});
-    const merged=[...map.values()];
-    if(typeof setRecords==='function'){
-      // Avoid recursive queueing while applying remote data.
-      const raw=localStorage.getItem('employeeRecords');
-      localStorage.setItem('employeeRecords',JSON.stringify(merged));
-    }
+    remote.forEach(e=>{
+      const key=employeeKey(e),old=map.get(key);
+      if(!old){map.set(key,e);return;}
+      const merged={...old};
+      Object.keys(e).forEach(k=>{if(e[k]!==undefined&&e[k]!==null&&String(e[k]).trim()!=='')merged[k]=e[k];});
+      map.set(key,merged);
+    });
+    localStorage.setItem('employeeRecords',JSON.stringify([...map.values()]));
     return remote.length;
   }
   async function queueEmployees(arr){
