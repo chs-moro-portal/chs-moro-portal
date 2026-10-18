@@ -4159,29 +4159,42 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
   async function queueEmployees(arr){
     clearTimeout(employeeQueue);
     employeeQueue=setTimeout(async()=>{
-      if(!booted||syncing)return;
-      const list=Array.isArray(arr)?arr:[];
-      if(!list.length)return;
+      if(!booted)return;
+      const list=Array.isArray(arr)?arr:[];if(!list.length)return;
+      // If startup sync is busy, retry after it finishes instead of silently dropping the save.
+      if(syncing){queueEmployees(list);return;}
       status('● Saving employee records…',null);
       try{
         syncing=true;
-        // Only send the records; do not upload the whole localStorage/photo state.
         for(const e of list) await saveEmployee(e);
         status('● Central Database: Saved',true);
       }catch(e){console.error('Central employee sync:',e);status('● Central Database: Save failed — '+e.message,false);}
       finally{syncing=false;}
-    },350);
+    },700);
   }
   async function syncNow(){
     if(syncing)return;
     status('● Central Database: Syncing…',null);
     try{
       syncing=true;
+      const before=typeof records==='function'?records():[];
       const remoteCount=await pullEmployees();
       const local=typeof records==='function'?records():[];
-      // Bootstrap only when the central table has no employeeRecord rows.
-      if(remoteCount===0 && local.length){
-        for(const e of local) await saveEmployee(e);
+      // When this device has the full local dataset (including when Supabase
+      // already has blank/incomplete rows), upload local records to repair those rows.
+      // Avoid bootstrapping a small seed list onto a device that has fewer rows than central.
+      if(local.length && (remoteCount===0 || local.length>=remoteCount)){
+        for(const e of local){
+          const hasIdentity=clean(e.name||e.employee_name||e.full_name||e.personal||e.pid||e.cnic||e.nic);
+          if(hasIdentity) await saveEmployee(e);
+        }
+        await pullEmployees();
+      } else if(!remoteCount && before.length){
+        for(const e of before){
+          const hasIdentity=clean(e.name||e.employee_name||e.full_name||e.personal||e.pid||e.cnic||e.nic);
+          if(hasIdentity) await saveEmployee(e);
+        }
+        await pullEmployees();
       }
       status('● Central Database: Connected / Synced',true);
     }catch(e){console.error('Central sync:',e);status('● Central Database: '+e.message,false);}
