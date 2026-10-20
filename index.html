@@ -5093,7 +5093,7 @@ function submitSponsorInquiry(ev){
  async function saveKey(k,v){
   if(typeof v!=='string')v=String(v??'');
   if(v.length>650000){say('Central sync: '+k+' is too large to upload ('+Math.round(v.length/1024)+' KB). Use online image/video links.',false);return false;}
-  var body={id:idFor(k),pid:'portal-setting:'+k,nic:'',employee_name:'CHS Portal Setting',father_name:'',designation:'',school:'',semis:'',cluster:'',data:{source:'portalSharedSetting',key:k,value:v,updatedAt:new Date().toISOString()}};
+  var body={id:idFor(k),'PID':'portal-setting:'+k,'CNIC':'','Full name':'CHS Portal Setting',"Father's Name":'','Designation at the time of Joining':'','BPS at the time of Joining':'','D.O.B':null,'D.O.A':null,date_of_appointment:null,'Date of Retirement':null,'Current Posting & BPS':'','Cluster Code/Salary Code':'','Academic Qualification':'','Professional Qualification':'','Remarks':'Shared portal setting: '+k,data:{source:'portalSharedSetting',key:k,value:v,updatedAt:new Date().toISOString()}};
   await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});return true;
  }
  function refresh(k){
