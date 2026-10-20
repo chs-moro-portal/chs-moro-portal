@@ -4116,7 +4116,8 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
   async function pullEmployees(){
     // Read employee rows regardless of source marker; older portal versions may
     // have saved valid teachers using a legacy/missing data.source value.
-    const q=TABLE+'?select=id,pid,nic,employee_name,father_name,designation,school,semis,cluster,date_of_birth,date_of_appointment,data&order=created_at.asc&limit=5000';
+    const columns=['id','PID','CNIC','Full name',"Father's Name",'Designation at the time of Joining','BPS at the time of Joining','D.O.B','D.O.A','Date of Retirement','Current Posting & BPS','Cluster Code/Salary Code','Academic Qualification','Professional Qualification','Remarks','date_of_appointment','data'];
+    const q=TABLE+'?select='+encodeURIComponent(columns.map(c=>['id','date_of_appointment','data'].includes(c)?c:'"'+c+'"').join(','))+'&order=id.asc&limit=5000';
     const txt=await request(q,{headers:headers()});
     const rows=JSON.parse(txt||'[]');
     if(!Array.isArray(rows)||!rows.length)return 0;
@@ -4128,16 +4129,21 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
       const p=(d.payload&&typeof d.payload==='object')?d.payload:d;
       const first=(...vals)=>{for(const v of vals){if(v!==undefined&&v!==null&&String(v).trim()!=='')return v;}return '';};
       const e={...p,
-        name:first(p.name,p.employee_name,p.full_name,p.teacherName,r.employee_name),
-        cnic:first(p.cnic,p.nic,p.CNIC,p.NIC,r.nic),
-        personal:first(p.personal,p.pid,p.PID,p.personal_number,r.pid),
-        father:first(p.father,p.father_name,p.fatherName,r.father_name),
-        designation:first(p.designation,p.designation_at_joining,r.designation),
-        school:first(p.school,p.school_name,p.current_posting,r.school),
-        semis:first(p.semis,p.semis_code,p.school_semis,r.semis),
-        cluster:first(p.cluster,p.cluster_code,p.salary_code,r.cluster),
-        dob:first(p.dob,p.date_of_birth,p.dateOfBirth,r.date_of_birth),
-        joining:first(p.joining,p.date_of_appointment,p.date_of_joining,p.appointmentDate,r.date_of_appointment)
+        name:first(p.name,p.employee_name,p.full_name,p.teacherName,r['Full name']),
+        cnic:first(p.cnic,p.nic,p.CNIC,p.NIC,r.CNIC),
+        personal:first(p.personal,p.pid,p.PID,p.personal_number,r.PID),
+        father:first(p.father,p.father_name,p.fatherName,r["Father's Name"]),
+        designation:first(p.designation,p.designation_at_joining,r['Designation at the time of Joining']),
+        bps:first(p.bps,p.bpsAtJoining,r['BPS at the time of Joining']),
+        school:first(p.school,p.school_name,p.current_posting,r['Current Posting & BPS']),
+        semis:first(p.semis,p.semis_code,p.school_semis,r['Cluster Code/Salary Code']),
+        cluster:first(p.cluster,p.cluster_code,p.salary_code,r['Cluster Code/Salary Code']),
+        dob:first(p.dob,p.date_of_birth,p.dateOfBirth,r['D.O.B']),
+        joining:first(p.joining,p.date_of_appointment,p.date_of_joining,p.appointmentDate,r['D.O.A'],r.date_of_appointment),
+        retirementDate:first(p.retirementDate,p.date_of_retirement,r['Date of Retirement']),
+        academicQualification:first(p.academicQualification,p.academic,r['Academic Qualification']),
+        professionalQualification:first(p.professionalQualification,p.professional,r['Professional Qualification']),
+        remarks:first(p.remarks,r.Remarks)
       };
       if(!String(e.name||'').trim()&&!String(e.personal||'').trim()&&!String(e.cnic||'').trim())continue;
       remote.push(e);
@@ -4183,7 +4189,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
       // When this device has the full local dataset (including when Supabase
       // already has blank/incomplete rows), upload local records to repair those rows.
       // Avoid bootstrapping a small seed list onto a device that has fewer rows than central.
-      if(local.length && (remoteCount===0 || local.length>=remoteCount)){
+      if(local.length && remoteCount===0){
         for(const e of local){
           const hasIdentity=clean(e.name||e.employee_name||e.full_name||e.personal||e.pid||e.cnic||e.nic);
           if(hasIdentity) await saveEmployee(e);
