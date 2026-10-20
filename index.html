@@ -3715,7 +3715,7 @@ function searchFrontSchoolComplete(){
     const d=submission.data||{};
     // Supply an explicit id so browser inserts do not depend on the identity sequence privilege.
     const rowId=Date.now();
-    const body={id:rowId,pid:String(d.cnicPid||''),nic:String(d.cnicPid||''),employee_name:String(d.teacherName||d.name||''),school:String(d.schoolName||''),semis:String(d.semis||''),designation:String(d.designation||''),date_of_birth:d.dob||null,date_of_appointment:d.appointmentDate||null,data:{source:'dynamicSubmission',submission:submission}};
+    const body={id:rowId,'PID':String(d.pid||d.cnicPid||''),'CNIC':String(d.cnic||d.cnicPid||''),'Full name':String(d.teacherName||d.name||''),"Father's Name":String(d.fatherName||d.father||''),'Designation at the time of Joining':String(d.designation||''),'D.O.B':d.dob||null,'D.O.A':d.appointmentDate||null,date_of_appointment:d.appointmentDate||null,'Current Posting & BPS':String(d.schoolName||''),'Cluster Code/Salary Code':String(d.clusterCode||d.salaryCode||d.semis||''),data:{source:'dynamicSubmission',submission:submission}};
     const r=await fetch(url,{method:'POST',headers:{'apikey':key,'Content-Type':'application/json','Accept':'application/json','Prefer':'return=representation'},body:JSON.stringify(body),cache:'no-store'});
     const txt=await r.text();
     if(!r.ok){let t='HTTP '+r.status; if(txt)t+=' '+txt.slice(0,800); throw new Error(t);}
@@ -4078,17 +4078,22 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
   async function saveEmployee(e){
     const key=employeeKey(e);
     const body={
-      id:hashId('employeeRecord',key),
-      pid:clean(e.pid||e.personal),
-      nic:clean(e.cnic),
-      employee_name:clean(e.name),
-      father_name:clean(e.father),
-      designation:clean(e.designation),
-      school:clean(e.school),
-      semis:clean(e.semis),
-      cluster:clean(e.cluster),
-      date_of_birth:clean(e.dob)||null,
+      id:Number(e.id)||hashId('employeeRecord',key),
+      'PID':clean(e.pid||e.personal),
+      'CNIC':clean(e.cnic),
+      'Full name':clean(e.name),
+      "Father's Name":clean(e.father),
+      'Designation at the time of Joining':clean(e.designation),
+      'BPS at the time of Joining':clean(e.bps||e.bpsAtJoining),
+      'D.O.B':clean(e.dob)||null,
+      'D.O.A':clean(e.joining)||clean(e.appointmentDate)||null,
       date_of_appointment:clean(e.joining)||clean(e.appointmentDate)||null,
+      'Date of Retirement':clean(e.retirementDate)||null,
+      'Current Posting & BPS':clean(e.currentPosting||e.school),
+      'Cluster Code/Salary Code':clean(e.clusterCode||e.salaryCode||e.cluster||e.semis),
+      'Academic Qualification':clean(e.academicQualification||e.academic),
+      'Professional Qualification':clean(e.professionalQualification||e.professional),
+      'Remarks':clean(e.remarks),
       data:{source:'employeeRecord',key,payload:stripPhoto(e)}
     };
     const txt=await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
@@ -4105,12 +4110,12 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     return true;
   }
     async function saveProforma(rec){
-    const body={id:hashId('proforma',rec.id),employee_name:clean(rec.key),school:clean(rec.data?.school),semis:clean(rec.data?.semis),data:{source:'proforma',submission:rec}};
+    const body={id:hashId('proforma',rec.id),'Full name':clean(rec.key),'Current Posting & BPS':clean(rec.data?.school),'Cluster Code/Salary Code':clean(rec.data?.semis),data:{source:'proforma',submission:rec}};
     await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
   }
   async function saveSubmission(sub){
     const d=sub?.data||{};
-    const body={id:hashId('dynamicSubmission',sub.id),pid:clean(d.cnicPid),nic:clean(d.cnicPid),employee_name:clean(d.teacherName||d.name),school:clean(d.schoolName),semis:clean(d.semis),designation:clean(d.designation),date_of_birth:clean(d.dob)||null,date_of_appointment:clean(d.appointmentDate)||null,data:{source:'dynamicSubmission',submission:sub}};
+    const body={id:hashId('dynamicSubmission',sub.id),'PID':clean(d.pid||d.cnicPid),'CNIC':clean(d.cnic||d.cnicPid),'Full name':clean(d.teacherName||d.name),"Father's Name":clean(d.fatherName||d.father),'Designation at the time of Joining':clean(d.designation),'D.O.B':clean(d.dob)||null,'D.O.A':clean(d.appointmentDate)||null,date_of_appointment:clean(d.appointmentDate)||null,'Current Posting & BPS':clean(d.schoolName),'Cluster Code/Salary Code':clean(d.clusterCode||d.salaryCode||d.semis),data:{source:'dynamicSubmission',submission:sub}};
     await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
   }
   async function pullEmployees(){
