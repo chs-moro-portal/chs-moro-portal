@@ -4059,7 +4059,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
     if(!el){el=document.createElement('div');el.id='chsCentralStatus';el.style.cssText='position:fixed;right:12px;bottom:12px;z-index:99999;padding:7px 11px;border-radius:18px;font:600 12px Arial,sans-serif;background:#fff;border:1px solid rgba(0,0,0,.12);box-shadow:0 2px 10px rgba(0,0,0,.12);cursor:pointer;';el.title='Click to sync now';el.onclick=()=>window.CHS_LIVE_DB&&window.CHS_LIVE_DB.syncNow();document.body.appendChild(el);}
     el.textContent=text;el.style.borderColor=ok===true?'#2e7d32':ok===false?'#b71c1c':'rgba(0,0,0,.12)';
   }
-  async function request(url,opts){let r;try{r=await fetch(url,Object.assign({cache:'no-store'},opts||{}));}catch(e){throw new Error('Network/CORS error: '+e.message);}const txt=await r.text();if(!r.ok){let msg='HTTP '+r.status;if(txt)msg+=' '+txt.slice(0,700);throw new Error(msg);}return txt;}
+  async function request(url,opts){let r,txt;const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),15000);try{r=await fetch(url,Object.assign({cache:'no-store'},opts||{},{signal:controller.signal}));txt=await r.text();}catch(e){if(e&&e.name==='AbortError')throw new Error('Supabase request timed out after 15 seconds. Check internet or database connection.');throw new Error('Network/CORS error: '+e.message);}finally{clearTimeout(timer);}if(!r.ok){let msg='HTTP '+r.status;if(txt)msg+=' '+txt.slice(0,700);throw new Error(msg);}return txt;}
   function clean(v){return String(v??'').trim();}
   function norm(v){return clean(v).replace(/\s+/g,'').toLowerCase();}
   function hashId(source,key){const str=source+'|'+clean(key);let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return 1000000000+(h%800000000);}
@@ -4783,3 +4783,12 @@ function submitSponsorInquiry(ev){
  .table-wrap table thead th,#tableHead th{font-size:11px!important;padding:7px 6px!important;min-height:34px!important}
 }
 </style>
+
+<!-- CHS Moro welcome rotation and sync timeout follow-up -->
+<style id="chs-moro-welcome-rotation-timing-fix">
+#chsV41Welcome{animation:chsV41FadeReal .42s ease 8.5s forwards!important}
+#chsV41Welcome .chs-v41-wtitle{display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important}
+</style>
+<script id="chs-moro-welcome-rotation-timing-fix-script">
+(function(){try{var notes=['Welcome to Cluster Head School','Welcome to CHS Moro Digital Education Portal','Taleem Roshni — تعليم روشني','Employee Seniority Data Verification Portal • Taluka Moro'];var index=0;function update(){var nodes=document.querySelectorAll('#chsV41WelcomeNote');if(!nodes.length)return;nodes.forEach(function(n){n.textContent=notes[index%notes.length]});index++;}update();setInterval(update,2000);}catch(e){console.warn('Welcome note rotation:',e);}})();
+</script>
