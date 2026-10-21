@@ -4707,3 +4707,36 @@ function submitSponsorInquiry(ev){
 </script>
 
 </body></html>
+
+<!-- CHS Moro narrow welcome/title visibility fix -->
+<style id="chs-moro-title-visibility-fix">
+/* Keep existing labels readable on mobile; no employee columns or data are changed. */
+.gender-line span:first-child,.cluster-name,.cluster-total,.cluster-grand,.stats-title,.stat-label{
+  visibility:visible!important;opacity:1!important;
+}
+.gender-line span:first-child{color:#24352d!important}
+.cluster-name{color:#075c3b!important}
+.cluster-total{color:#344054!important}
+</style>
+<script id="chs-moro-single-rotating-welcome-fix">
+(function(){
+ function repair(){
+  try{
+   var cards=Array.prototype.slice.call(document.querySelectorAll('#chsV41Welcome'));
+   if(!cards.length)return;
+   var welcome=cards[0];
+   cards.slice(1).forEach(function(el){el.remove();});
+   var note=welcome.querySelector('#chsV41WelcomeNote')||welcome.querySelector('.chs-v41-wtitle');
+   if(!note||welcome.getAttribute('data-chs-note-rotation'))return;
+   welcome.setAttribute('data-chs-note-rotation','1');
+   var notes=['Welcome','تعليم روشني آهي','علم روشني آهي، تعليم ترقيءَ جو رستو آهي','اڄ جي محنت، سڀاڻي جي ڪاميابي','استاد قوم جي مستقبل جا معمار آهن','تعليم هر ٻار جو بنيادي حق آهي'];
+   var i=0;note.textContent=notes[0];
+   window.setInterval(function(){
+    if(!document.documentElement.contains(note))return;
+    i=(i+1)%notes.length;note.textContent=notes[i];
+   },2000);
+  }catch(e){}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',repair);else repair();
+})();
+</script>
