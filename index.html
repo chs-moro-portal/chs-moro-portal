@@ -4790,3 +4790,14 @@ function submitSponsorInquiry(ev){
 #chsV41Welcome .chs-v41-wtitle{display:block!important;visibility:visible!important;opacity:1!important;color:#fff!important}
 </style>
 <!-- Removed continuous welcome-note rotation: one note per page load -->
+
+<!-- CHS Moro mobile gender-bar title and width repair -->
+<style id="chs-moro-mobile-bar-title-repair">
+/* Keep the Male/Female labels visible and stop the colored bars from stretching beyond their card on phones. */
+.cluster-graph,.cluster-graph-list,.cluster-row,.gender-bars,.gender-line{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.gender-line{grid-template-columns:minmax(58px,68px) minmax(0,1fr) 28px!important;gap:6px!important;width:100%!important}
+.gender-line span:first-child{display:block!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;font-size:11px!important;font-weight:800!important;line-height:1.2!important;color:#24352d!important;-webkit-text-fill-color:#24352d!important}
+.gender-line .bar-wrap{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.gender-line span:last-child{display:block!important;min-width:0!important;white-space:nowrap!important}
+@media(max-width:760px){.cluster-graph-list{grid-template-columns:minmax(0,1fr)!important}.cluster-row{width:100%!important;padding:10px!important}.cluster-name,.cluster-total{visibility:visible!important;opacity:1!important;white-space:normal!important;overflow-wrap:anywhere!important}}
+</style>
