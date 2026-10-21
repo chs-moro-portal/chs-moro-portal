@@ -4131,6 +4131,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
       'Academic Qualification':clean(e.academicQualification||e.academic),
       'Professional Qualification':clean(e.professionalQualification||e.professional),
       'Remarks':clean(e.remarks),
+      'gender':clean(e.gender),
       data:{source:'employeeRecord',key,payload:stripPhoto(e)}
     };
     const txt=await request(TABLE,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(body)});
@@ -4158,7 +4159,7 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
   async function pullEmployees(){
     // Read employee rows regardless of source marker; older portal versions may
     // have saved valid teachers using a legacy/missing data.source value.
-    const columns=['id','PID','CNIC','Full name',"Father's Name",'Designation at the time of Joining','BPS at the time of Joining','D.O.B','D.O.A','Date of Retirement','Current Posting & BPS','Cluster Code/Salary Code','Academic Qualification','Professional Qualification','Remarks','date_of_appointment','data'];
+    const columns=['id','PID','CNIC','Full name',"Father's Name",'Designation at the time of Joining','BPS at the time of Joining','D.O.B','D.O.A','Date of Retirement','Current Posting & BPS','Cluster Code/Salary Code','Academic Qualification','Professional Qualification','Remarks','gender','date_of_appointment','data'];
     const q=TABLE+'?select='+encodeURIComponent(columns.map(c=>['id','date_of_appointment','data'].includes(c)?c:'"'+c+'"').join(','))+'&order=id.asc&limit=5000';
     const txt=await request(q,{headers:headers()});
     const rows=JSON.parse(txt||'[]');
@@ -4187,7 +4188,8 @@ document.addEventListener('DOMContentLoaded',()=>{inject();refresh();setInterval
         retirementDate:first(p.retirementDate,p.date_of_retirement,p['Date of Retirement'],r['Date of Retirement']),
         academicQualification:first(p.academicQualification,p.academic,p['Academic Qualification'],r['Academic Qualification']),
         professionalQualification:first(p.professionalQualification,p.professional,p['Professional Qualification'],r['Professional Qualification']),
-        remarks:first(p.remarks,p.Remarks,r.Remarks)
+        remarks:first(p.remarks,p.Remarks,r.Remarks),
+        gender:first(p.gender,p.Gender,p.sex,r.gender,r.Gender)
       };
       if(!String(e.name||'').trim()&&!String(e.personal||'').trim()&&!String(e.cnic||'').trim())continue;
       remote.push(e);
