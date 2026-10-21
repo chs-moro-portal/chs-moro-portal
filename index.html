@@ -2445,7 +2445,7 @@ function renderTable(){
   employeePage=Math.min(Math.max(1,employeePage),totalPages);
   const from=(employeePage-1)*size;
   const slice=filtered.slice(from,from+size);
-  const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(c.label)+'</th>').join('')+'<th>Actions</th></tr>';
+  const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(String(c.label||((DEFAULT_COLUMNS.find(d=>d.key===c.key)||{}).label)||c.key||'Column').trim())+'</th>').join('')+'<th>Actions</th></tr>';
   const th=document.getElementById('tableHead'),body=document.getElementById('rows');
   if(th)th.innerHTML=head;
   if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(x.e[c.key]||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
@@ -4766,3 +4766,20 @@ function submitSponsorInquiry(ev){
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',restore);else restore();
 })();
 </script>
+
+<!-- CHS Moro compact employee header-title visibility fix -->
+<style id="chs-moro-employee-header-title-fix">
+/* Only employee-table heading appearance; preserves the existing column list and records. */
+.table-wrap{max-width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+.table-wrap table{border-collapse:collapse!important;min-width:850px}
+.table-wrap table thead th,#tableHead th{
+ background:#075c3b!important;color:#fff!important;
+ -webkit-text-fill-color:#fff!important;opacity:1!important;visibility:visible!important;
+ font-size:12px!important;font-weight:800!important;line-height:1.25!important;
+ padding:8px 7px!important;height:auto!important;min-height:36px!important;
+ white-space:normal!important;overflow:visible!important;text-indent:0!important;
+}
+@media(max-width:760px){
+ .table-wrap table thead th,#tableHead th{font-size:11px!important;padding:7px 6px!important;min-height:34px!important}
+}
+</style>
