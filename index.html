@@ -896,6 +896,43 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <style id="chs-mobile-table-fix">
 @media(max-width:600px){html,body{max-width:100%;overflow-x:hidden}.container,.card{max-width:100%;min-width:0}.card{padding:14px}table{display:block;width:100%;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}th,td{white-space:nowrap}input,select,textarea{min-width:0;max-width:100%}button{max-width:100%;white-space:normal}.data-tools,.nav,.left-nav{max-width:100%;flex-wrap:wrap}}
 </style>
+
+<!-- CHS MOBILE LAYOUT + FRONT ACTION LABEL FIX -->
+<style id="chs-mobile-layout-label-fix">
+html,body{max-width:100%;overflow-x:hidden!important}
+img,video,iframe{max-width:100%}
+.front-container,.front-card,.front-body,.front-info,.lookup-panel,#frontSchoolSearchPanel{min-width:0!important;max-width:100%!important}
+.front-body{grid-template-columns:190px minmax(0,1fr)}
+.front-info h1{overflow-wrap:anywhere}
+.front-info .full,.front-info button,.front-info .continue-button,#frontSchoolSearchPanel button{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:14px!important;font-weight:800!important;
+ white-space:normal!important;line-height:1.35!important;min-height:40px!important;
+}
+#frontSchoolSearchPanel input,.input-row input{width:100%!important;min-width:0!important;max-width:100%!important}
+@media(max-width:760px){
+ .front-container{padding:18px 8px!important}
+ .front-card{width:100%!important;border-radius:16px!important}
+ .front-top{padding:12px!important;gap:8px!important;min-width:0!important;flex-wrap:wrap!important}
+ .front-top>div{min-width:0!important}
+ .front-body{display:grid!important;grid-template-columns:82px minmax(0,1fr)!important;gap:12px!important;padding:18px 12px!important}
+ .emblem-column{min-width:0!important;width:100%!important}
+ .emblem-core{width:76px!important;height:76px!important;font-size:14px!important}
+ .logo-photo-card{width:82px!important;max-width:100%!important}
+ .logo-photo-placeholder{height:120px!important}
+ .logo-photo-card img{width:100%!important;height:auto!important;object-fit:cover!important}
+ .front-info{min-width:0!important;width:100%!important}
+ .front-info h1{font-size:clamp(24px,6vw,32px)!important;line-height:1.08!important}
+ .front-text{font-size:14px!important;line-height:1.5!important;overflow-wrap:anywhere}
+ .lookup-panel{padding:10px!important;width:100%!important}
+ .front-info .full,.front-info button,.front-info .continue-button{width:100%!important;display:flex!important;justify-content:center!important;align-items:center!important}
+ #frontSchoolSearchPanel{padding:10px!important;overflow:hidden!important}
+ #frontSchoolSearchPanel>div[style*="display:flex"]{display:flex!important;flex-direction:column!important}
+ #frontSchoolSearchPanel input,#frontSchoolSearchPanel button{width:100%!important;min-width:0!important}
+ .cluster-schools-frame,.stats-section,.stats-grid{max-width:100%!important;min-width:0!important}
+ .cluster-schools-title,.stats-title,.hc-branch-title{color:#075c3b!important;-webkit-text-fill-color:#075c3b!important;visibility:visible!important;opacity:1!important}
+}
+</style>
+
 </head>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
