@@ -4928,6 +4928,30 @@ function submitSponsorInquiry(ev){
 </script>
 
 
+<style id="chs-moro-physical-mobile-layout">
+/* Apply phone-sized layout even when Chrome's Desktop site option is enabled. */
+@media(max-device-width:760px){
+ header{padding-left:8px!important;padding-right:8px!important}
+ header .nav{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:6px!important;width:100%!important;max-width:100%!important}
+ header .nav button{flex:1 1 125px!important;min-width:0!important;max-width:100%!important;padding:9px 7px!important;font-size:12px!important;white-space:normal!important;line-height:1.25!important}
+ .front-container,.front-card,.front-body,.front-info{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ .front-container{padding-left:8px!important;padding-right:8px!important}
+ .front-body{grid-template-columns:minmax(0,1fr)!important}
+ #home .front-info > button.full,#home .front-info > a.full,#home .front-info > button.primary,#home .front-info > .google-form-front-btn,#home .front-info > .heads-front-btn{
+  display:flex!important;visibility:visible!important;opacity:1!important;width:100%!important;max-width:100%!important;min-width:0!important;
+  height:auto!important;min-height:42px!important;padding:10px 8px!important;margin:8px 0 0!important;
+  align-items:center!important;justify-content:center!important;white-space:normal!important;overflow:visible!important;
+  box-sizing:border-box!important;font-size:12px!important;line-height:1.3!important;color:#fff!important;-webkit-text-fill-color:#fff!important
+ }
+ #home .front-info > button.full *,#home .front-info > a.full *,#home .front-info > button.primary *{display:inline!important;visibility:visible!important;opacity:1!important;color:#fff!important;-webkit-text-fill-color:#fff!important}
+ #clusterGraphList{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ #clusterGraphList .cluster-row{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+ #clusterGraphList .cluster-name,#clusterGraphList .cluster-total,#clusterGraphList .bar-label,#clusterGraphList .bar-value{display:block!important;visibility:visible!important;opacity:1!important}
+ #clusterGraphList .gender-line{width:100%!important;max-width:100%!important;min-width:0!important;grid-template-columns:60px minmax(0,1fr) 24px!important;gap:4px!important;box-sizing:border-box!important}
+ #clusterGraphList .bar-label{font-size:11px!important;white-space:nowrap!important}
+}
+</style>
+
 <style id="chs-moro-final-home-buttons-visible">
 @media(max-width:760px){
  #home .front-info > button.full,
