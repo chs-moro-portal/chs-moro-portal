@@ -968,7 +968,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div><div class="gov-title">GOVERNMENT OF SINDH</div><div class="gov-sub">SINDH EDUCATION &amp; LITERACY DEPARTMENT</div></div>
 </div>
 <div class="header-center"><h1>CLUSTER HEAD SCHOOL</h1><h2>Taluka Moro District NAUSHAHRO FEROZE</h2><div class="version"></div></div>
-<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
+<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showLearningVideos()">🎬 <span>Learning Videos</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
 </header>
 <div aria-label="Latest News and Updates" class="news-marquee top-latest-marquee"><div class="bell-box" title="Notifications">🔔</div><div class="news-label">📢 Latest Updates</div><div class="news-track"><div class="news-scroll" id="newsScroll"></div></div></div>
 <section class="page active" id="home">
@@ -1191,6 +1191,16 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
     </div>
   </div>
 </section>
+
+<section class="page" id="learning-videos"><div class="container"><div class="card">
+<div class="topbar"><h2>🎬 Learning Videos</h2><button class="gray" type="button" onclick="show('home')">⌂ Home</button></div>
+<p>Learning videos are loaded from the shared Supabase <b>learning-videos</b> storage bucket, so the same public videos can appear on different devices.</p>
+<div id="learningVideoAdmin" style="display:none;border:1px solid #c9e4d5;background:#f1faf5;padding:14px;border-radius:10px;margin:14px 0">
+<h3>Upload Learning Video (Admin)</h3><label for="learningVideoTitle">Video title</label><input id="learningVideoTitle" type="text" placeholder="Enter video title"/>
+<label for="learningVideoFile">Choose video file (up to 50 MB)</label><input id="learningVideoFile" type="file" accept="video/*"/>
+<button type="button" onclick="uploadLearningVideo()">⬆ Upload to Central Database</button><p id="learningVideoUploadStatus" role="status"></p>
+</div><div id="learningVideoStatus" role="status">Loading shared videos…</div><div id="learningVideoList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:14px"></div>
+</div></div></section>
 
 <section class="page" id="schools"><div class="container"><div class="card schools-card">
 <div class="topbar"><h2>Schools — Cluster Head School Taluka Moro</h2><button class="gray" onclick="show('home')">⌂ Home</button></div>
@@ -1831,6 +1841,45 @@ function addNews(){if(!isAdmin()){alert('Admin login required. Please login firs
 function saveNews(i){if(!isAdmin()){alert('Admin login required. Please login first.');return}const el=document.getElementById('news_'+i);const text=el?el.value.trim():'';if(!text){alert('News message cannot be empty.');return}const a=getNews();if(!a[i])return;a[i]={text};setNews(a);msg('News updated successfully.')}
 function removeNews(i){if(!isAdmin()){alert('Admin login required. Please login first.');return}if(!confirm('Remove this news update?'))return;const a=getNews();a.splice(i,1);setNews(a);msg('News removed successfully.')}
 let pageHistory=['home'];
+const LEARNING_VIDEO_SUPABASE='https://khyrdadphbyhypxjsgsa.supabase.co';
+const LEARNING_VIDEO_KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+function showLearningVideos(){show('learning-videos');renderLearningVideos()}
+function learningVideoHeaders(extra={}){return Object.assign({'apikey':LEARNING_VIDEO_KEY,'Authorization':'Bearer '+LEARNING_VIDEO_KEY},extra)}
+async function renderLearningVideos(){
+ const list=document.getElementById('learningVideoList'),status=document.getElementById('learningVideoStatus'),admin=document.getElementById('learningVideoAdmin');
+ if(!list||!status)return;
+ if(admin)admin.style.display=(typeof isAdmin==='function'&&isAdmin())?'block':'none';
+ status.textContent='Loading shared videos…';list.innerHTML='';
+ try{
+  const response=await fetch(LEARNING_VIDEO_SUPABASE+'/storage/v1/object/list/learning-videos',{method:'POST',headers:learningVideoHeaders({'Content-Type':'application/json'}),body:JSON.stringify({prefix:'',limit:100,offset:0,sortBy:{column:'name',order:'asc'}})});
+  if(!response.ok)throw new Error('Supabase storage returned '+response.status+'. Check that the learning-videos bucket is public and accessible.');
+  const files=await response.json(),videos=files.filter(f=>f&&f.name&&!f.name.endsWith('/'));
+  if(!videos.length){status.textContent='No learning videos found in the shared bucket yet.';return}
+  status.textContent=videos.length+' shared video file(s)';
+  videos.forEach(file=>{
+   const url=LEARNING_VIDEO_SUPABASE+'/storage/v1/object/public/learning-videos/'+file.name.split('/').map(encodeURIComponent).join('/');
+   const card=document.createElement('article');card.style.cssText='border:1px solid #d8e7de;border-radius:12px;padding:12px;background:#fff;min-width:0';
+   const title=document.createElement('h3');title.textContent=file.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');title.style.cssText='font-size:16px;margin:4px 0 10px;overflow-wrap:anywhere';
+   const video=document.createElement('video');video.controls=true;video.preload='metadata';video.playsInline=true;video.src=url;video.style.cssText='width:100%;max-height:320px;border-radius:8px;background:#111';
+   const link=document.createElement('a');link.href=url;link.target='_blank';link.rel='noopener';link.textContent='Open / download video';link.style.cssText='display:inline-block;margin-top:9px;color:#075c3b;font-weight:bold';
+   card.append(title,video,link);list.appendChild(card);
+  });
+ }catch(e){status.textContent='Could not load shared videos: '+e.message}
+}
+async function uploadLearningVideo(){
+ if(typeof isAdmin!=='function'||!isAdmin()){alert('Admin login is required to upload videos.');return}
+ const input=document.getElementById('learningVideoFile'),titleInput=document.getElementById('learningVideoTitle'),status=document.getElementById('learningVideoUploadStatus');
+ const file=input&&input.files&&input.files[0];if(!file){alert('Please choose a video file first.');return}
+ if(file.size>50*1024*1024){alert('Video file is over 50 MB. Please choose a smaller file.');return}
+ const safeBase=(titleInput.value.trim()||file.name.replace(/\.[^.]+$/,'')).replace(/[^\w\-. ]+/g,'').trim().replace(/\s+/g,'-').slice(0,90)||'learning-video';
+ const ext=(file.name.match(/\.[a-zA-Z0-9]{1,8}$/)||[''])[0],objectName=Date.now()+'-'+safeBase+ext;
+ status.textContent='Uploading video to shared Supabase storage…';
+ try{
+  const response=await fetch(LEARNING_VIDEO_SUPABASE+'/storage/v1/object/learning-videos/'+encodeURIComponent(objectName),{method:'POST',headers:learningVideoHeaders({'Content-Type':file.type||'application/octet-stream','x-upsert':'false'}),body:file});
+  if(!response.ok){let detail='';try{detail=(await response.text()).slice(0,300)}catch(e){}throw new Error('Upload failed ('+response.status+'). '+detail)}
+  status.textContent='Upload complete. Video is stored centrally.';input.value='';titleInput.value='';await renderLearningVideos();
+ }catch(e){status.textContent='Upload failed: '+e.message}
+}
 function show(id,fromHistory=false){
   const target=document.getElementById(id);if(!target)return;
   const current=document.querySelector('.page.active')?.id||'home';
