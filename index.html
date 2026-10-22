@@ -4898,3 +4898,31 @@ function submitSponsorInquiry(ev){
 #clusterGraphList .gender-line .bar-value{display:block!important;visibility:visible!important;opacity:1!important;text-align:right!important;color:#24352d!important;-webkit-text-fill-color:#24352d!important;font-size:11px!important;white-space:nowrap!important}
 @media(max-width:560px){#clusterGraphList{max-width:100%!important;padding:0!important}#clusterGraphList .cluster-row{padding:9px!important}#clusterGraphList .gender-line{grid-template-columns:62px minmax(0,1fr) 25px!important;gap:4px!important}}
 </style>
+
+
+<style id="chs-moro-final-mobile-title-width">
+#clusterGraphList{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#clusterGraphList .cluster-row{width:100%!important;max-width:100%!important;min-width:0!important;box-sizing:border-box!important}
+#clusterGraphList .cluster-name,#clusterGraphList .cluster-total,#clusterGraphList .bar-label,#clusterGraphList .bar-value{display:block!important;visibility:visible!important;opacity:1!important}
+#clusterGraphList .gender-line{width:100%!important;max-width:100%!important;min-width:0!important;grid-template-columns:64px minmax(0,1fr) 25px!important;box-sizing:border-box!important}
+#clusterGraphList .bar-label{font-size:11px!important;color:#24352d!important;-webkit-text-fill-color:#24352d!important;white-space:nowrap!important}
+@media(max-width:560px){#clusterGraphList .cluster-row{padding:8px!important}#clusterGraphList .gender-line{grid-template-columns:60px minmax(0,1fr) 24px!important;gap:4px!important}}
+</style>
+<script id="chs-moro-one-welcome-per-refresh">
+(function(){
+ try{
+  var notes=['Welcome','Taleem Roshni — تعليم روشني','علم روشني آهي، تعليم ترقيءَ جو رستو آهي','استاد قوم جي مستقبل جا معمار آهن','تعليم هر ٻار جو بنيادي حق آهي'];
+  var key='chsMoroWelcomeNoteIndex';
+  var index=0;
+  try{index=parseInt(localStorage.getItem(key)||'0',10)||0;localStorage.setItem(key,String((index+1)%notes.length));}catch(e){}
+  var chosen=notes[index%notes.length];
+  function setOne(){
+   var els=document.querySelectorAll('#chsV41Welcome .chs-v41-wtitle,#chsV41WelcomeNote');
+   els.forEach(function(el){if(el.textContent!==chosen)el.textContent=chosen;});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setOne);else setOne();
+  var observer=new MutationObserver(setOne);observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+  setTimeout(function(){observer.disconnect();},15000);
+ }catch(e){}
+})();
+</script>
