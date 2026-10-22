@@ -4781,6 +4781,23 @@ function submitSponsorInquiry(ev){
 })();
 </script>
 
+<script id="chs-paper-school-selector-global-fix">
+(function(){
+ function safe(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+ window.initPaperSchools=function(){
+  var sel=document.getElementById('paperSchoolSelect'); if(!sel)return;
+  var schools=[];
+  try{if(typeof getSchools==='function')schools=getSchools()||[]}catch(e){}
+  schools=schools.filter(function(x){return x&&x.name&&x.semis});
+  if(!schools.length){try{if(typeof MORO_SCHOOLS!=='undefined'&&Array.isArray(MORO_SCHOOLS))schools=MORO_SCHOOLS.filter(function(x){return x&&x.name&&x.semis})}catch(e){}}
+  function gender(x){return /(^|[^a-z])gg[a-z]*|girls|female|women/i.test(String(x.name||''))?'female':'male'}
+  schools.sort(function(a,b){var ga=gender(a)==='female'?0:1,gb=gender(b)==='female'?0:1;return ga-gb||String(a.name).localeCompare(String(b.name))});
+  sel.innerHTML='<option value="">Select School</option>'+schools.map(function(x){return '<option value="'+safe(x.semis)+'" data-name="'+safe(x.name)+'">'+(gender(x)==='female'?'👩 Female':'👨 Male')+' — '+safe(x.name)+' — '+safe(x.semis)+'</option>'}).join('');
+  sel.onchange=function(){var o=sel.options[sel.selectedIndex];var name=document.getElementById('paperSchool'),code=document.getElementById('paperSemis');if(name)name.value=o?o.getAttribute('data-name')||'':'';if(code)code.value=o?o.value||'':''};
+ }
+ document.addEventListener('DOMContentLoaded',function(){window.initPaperSchools();});
+})();
+</script>
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
