@@ -4798,6 +4798,33 @@ function submitSponsorInquiry(ev){
  document.addEventListener('DOMContentLoaded',function(){window.initPaperSchools();});
 })();
 </script>
+<style id="chs-moro-menu-fit-final">
+/* Menu-only fix: show every navigation button on phone and desktop-site modes. */
+.site-header .chs-v41-menu{
+ position:relative!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+ transform:none!important;width:100%!important;max-width:100%!important;margin:8px 0 0!important;
+ padding:0 6px!important;box-sizing:border-box!important;overflow:visible!important;text-align:center!important;
+}
+.site-header #chsV41Panel,.site-header .chs-v41-panel{
+ position:static!important;left:auto!important;right:auto!important;top:auto!important;transform:none!important;
+ display:flex!important;visibility:visible!important;opacity:1!important;
+ flex-flow:row wrap!important;align-items:center!important;justify-content:center!important;
+ gap:5px!important;width:100%!important;max-width:100%!important;max-height:none!important;
+ overflow:visible!important;padding:5px 0!important;margin:0!important;box-sizing:border-box!important;
+}
+.site-header .chs-v41-toggle{display:none!important}
+.site-header .chs-v41-panel button{
+ display:inline-flex!important;flex:0 1 auto!important;align-items:center!important;justify-content:center!important;
+ width:auto!important;min-width:0!important;max-width:100%!important;height:auto!important;min-height:34px!important;
+ margin:0!important;padding:7px 9px!important;white-space:normal!important;overflow-wrap:anywhere!important;
+ font-size:12px!important;line-height:1.2!important;box-sizing:border-box!important;
+}
+@media(max-device-width:760px){
+ .site-header .chs-v41-menu{padding-left:4px!important;padding-right:4px!important}
+ .site-header .chs-v41-panel{justify-content:center!important;gap:4px!important}
+ .site-header .chs-v41-panel button{flex:0 1 auto!important;padding:7px 6px!important;font-size:11px!important;min-height:34px!important}
+}
+</style>
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
