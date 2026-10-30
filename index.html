@@ -1752,6 +1752,34 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="employee-form-actions"><button class="blue" onclick="saveRecord()">💾 Save Record</button><button class="gray hidden" id="cancel" onclick="cancelEdit()">Cancel</button></div>
 <div class="message" id="employeeFormMsg"></div>
 </div></div></section>
+<section class="page" id="privacyPolicy">
+<div class="container"><div class="card" style="max-width:900px;margin:auto;line-height:1.7">
+<div class="topbar"><h2>Privacy Policy</h2><button class="gray" type="button" onclick="show('home')">⌂ Home</button></div>
+<p><b>CHS Moro Portal</b> — Cluster Head School, Taluka Moro, District Naushahro Feroze, Sindh, Pakistan.</p>
+<p><i>Last updated: 31 October 2026</i></p>
+<h3>1. About this policy</h3>
+<p>This policy explains how CHS Moro Portal handles information when visitors use this website. The portal provides educational and school-administration information and digital tools.</p>
+<h3>2. Information handled by the portal</h3>
+<p>Depending on the feature used, the portal may process information entered by visitors, teachers, school representatives or administrators, as well as technical information such as browser type, device information and basic usage data. Employee or school records are intended for legitimate educational and administrative purposes. Access to records should be limited according to the portal's roles and permissions.</p>
+<p>Please do not submit passwords, authentication codes, or information that you are not authorized to share. Users should contact the portal administrator if they believe information is inaccurate or has been exposed.</p>
+<h3>3. Storage and service providers</h3>
+<p>Some portal functions use third-party services, including Supabase, to store or synchronize information. Those services process data under their own terms and privacy policies. The portal administrator should configure access controls and security settings appropriately.</p>
+<h3>4. Cookies and similar technologies</h3>
+<p>The website or its service providers may use cookies or similar technologies for essential functions, preferences, security and usage measurement. Browser settings may allow you to control cookies, although some website functions may not work properly if they are blocked.</p>
+<h3>5. Advertising</h3>
+<p>If third-party advertising, including Google AdSense, is enabled on this website, advertising providers may use cookies or similar technologies to deliver, measure and personalize ads, subject to applicable settings and consent requirements. Visitors can review <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer" style="color:#075c3b">how Google uses information from sites or apps that use its services</a> and manage available ad-personalization settings through Google.</p>
+<h3>6. Sharing and disclosure</h3>
+<p>Information may be processed by service providers that support the portal, or disclosed when required by law or necessary to protect the website and its users. The portal does not offer employee records for sale to advertisers.</p>
+<h3>7. Data security and retention</h3>
+<p>Reasonable administrative and technical measures should be used to protect information. No internet service can guarantee absolute security. Information is retained only as long as needed for the relevant educational, administrative, legal or operational purpose.</p>
+<h3>8. External websites</h3>
+<p>This portal may link to external websites. Their content and privacy practices are controlled by those providers, not by CHS Moro Portal.</p>
+<h3>9. Contact</h3>
+<p>For questions or privacy requests, contact: <a href="mailto:faisaljan670@gmail.com" style="color:#075c3b">faisaljan670@gmail.com</a>.</p>
+<p style="font-size:13px;color:#64748b">Please review this policy against the portal's actual features, data practices, advertising setup and applicable requirements before requesting advertising approval.</p>
+<button type="button" onclick="show('home')">← Back to Home</button>
+</div></div></section>
+
 <div class="footer">
 <div>Developed by <b>Faisal Jan Thaheem</b>  •  <b>Focal Person (Cluster School)</b></div>
 <div>Employee Data Centre • Taluka Moro</div>
@@ -1764,6 +1792,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
     <button type="button" onclick="chsRM_open('approval')">✅ Forms Approval</button>
   </div>
 </div></div>
+<div style="margin:10px 0"><button type="button" onclick="show('privacyPolicy')" style="background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);padding:8px 14px">Privacy Policy</button></div>
 </div>
 <script>
 if(window.__CHS_SAVED_STATE__){try{const S=window.__CHS_SAVED_STATE__;Object.keys(S).forEach(k=>{if(S[k])localStorage.setItem(k,S[k])})}catch(e){console.error(e)}}
