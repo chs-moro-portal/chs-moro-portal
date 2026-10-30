@@ -1581,7 +1581,28 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </div>
 </div>
 </div></div>
-<style>@media(max-width:560px){#chsTrainingDetailsGrid{grid-template-columns:1fr!important}#chsTrainingResponseBox label{display:inline-block;margin:7px 8px 7px 0!important}}</style>
+<div class="card" style="max-width:1100px;margin:18px auto 0;border:1px solid #cfe4d8">
+<div class="topbar"><div><h3 style="margin:0;color:#075c3b">🔐 Training Administration</h3><p style="margin:5px 0;color:#64748b;font-size:13px">Private Training response controls.</p></div><button type="button" class="gray" onclick="chsTrainingAdminToggle()">Admin Login</button></div>
+<div id="chsTrainingAdminPanel" style="display:none;margin-top:12px">
+<div id="chsTrainingAdminLoginBox" style="max-width:480px"><p>Sign in with your Supabase administrator email and password.</p>
+<label><b>Admin Email</b></label><input id="chsTrainingAdminEmail" type="email" autocomplete="username" placeholder="Admin email">
+<label style="display:block;margin-top:8px"><b>Password</b></label><input id="chsTrainingAdminPassword" type="password" autocomplete="current-password" placeholder="Supabase password">
+<button type="button" class="full" id="chsTrainingAdminLoginBtn" onclick="chsTrainingAdminLogin()">🔐 Secure Admin Login</button></div>
+<div id="chsTrainingAdminDashboard" style="display:none">
+<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:8px 0 14px"><b id="chsTrainingAdminWelcome" style="color:#075c3b">Admin session active</b><div style="display:flex;gap:7px;flex-wrap:wrap"><button type="button" class="green" onclick="chsTrainingAdminRefresh()">↻ Refresh</button><button type="button" class="blue" onclick="chsTrainingAdminExport()">⬇ Export Excel CSV</button><button type="button" class="red" onclick="chsTrainingAdminLogout()">Logout</button></div></div>
+<div id="chsTrainingAdminStatus" class="message" style="display:none"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px;border:1px solid #dce9e2;border-radius:10px;background:#f7fbf8"><b>Training Form:</b><span id="chsTrainingAdminState" style="font-weight:800">Checking…</span><button type="button" class="green" id="chsTrainingAdminOpenBtn" onclick="chsTrainingAdminSetActive(true)">Open Training</button><button type="button" class="red" id="chsTrainingAdminCloseBtn" onclick="chsTrainingAdminSetActive(false)">Close Training</button></div>
+<div id="chsTrainingAdminStats" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0"></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0"><input id="chsTrainingAdminSearch" placeholder="Search name or PID" oninput="chsTrainingAdminRender()"><input id="chsTrainingAdminUCFilter" placeholder="Filter by UC" oninput="chsTrainingAdminRender()"><select id="chsTrainingAdminChoiceFilter" onchange="chsTrainingAdminRender()"><option value="">All responses</option><option value="Willing">Willing</option><option value="Not Willing">Not Willing</option><option value="Pending">Pending</option></select></div>
+<div style="overflow:auto;border:1px solid #dce9e2;border-radius:10px"><table style="width:100%;border-collapse:collapse;min-width:760px;font-size:13px"><thead><tr style="background:#eaf5ee;color:#075c3b;text-align:left"><th style="padding:9px">#</th><th style="padding:9px">Teacher Name</th><th style="padding:9px">PID</th><th style="padding:9px">School / Posting</th><th style="padding:9px">Response</th><th style="padding:9px">UC</th><th style="padding:9px">Action</th></tr></thead><tbody id="chsTrainingAdminRows"><tr><td colspan="7" style="padding:12px">Login to load responses.</td></tr></tbody></table></div>
+<p style="font-size:12px;color:#64748b;margin-top:8px">Edit or reset responses without deleting imported participant records. Export includes UC as a separate Excel-filterable column.</p>
+</div></div></div>
+<style>
+#chsTrainingAdminStats .chs-ta-stat{padding:10px;border:1px solid #dce9e2;border-radius:10px;background:#f7fbf8;text-align:center}
+#chsTrainingAdminStats b{display:block;font-size:22px;color:#075c3b}#chsTrainingAdminStats span{font-size:11px;color:#64748b}
+#chsTrainingAdminRows td{padding:8px;border-top:1px solid #e5eee9;vertical-align:top}
+@media(max-width:650px){#chsTrainingAdminStats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+</style><style>@media(max-width:560px){#chsTrainingDetailsGrid{grid-template-columns:1fr!important}#chsTrainingResponseBox label{display:inline-block;margin:7px 8px 7px 0!important}}</style>
 </section>
 <section class="page" id="admin"><div class="container"><div class="card">
 <div class="topbar"><h2>Admin Panel</h2><button class="red" onclick="adminLogout()">Logout</button></div>
@@ -4925,6 +4946,47 @@ function submitSponsorInquiry(ev){
       else status('Submission failed: '+m,'error');
     }finally{btn.disabled=false;btn.textContent='Submit Response';}
   };
+})();
+</script><script id="chs-moro-training-admin-v1">
+(function(){
+'use strict';
+const BASE='https://khyrdadphbyhypxjsgsa.supabase.co',KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+let token='',email='',rows=[],active=false;
+const el=id=>document.getElementById(id);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function say(t,k){const x=el('chsTrainingAdminStatus');if(x){x.textContent=t;x.className='message '+(k||'');x.style.display='block'}}
+function hdr(extra){return Object.assign({'apikey':KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'},extra||{})}
+async function req(path,opt){const r=await fetch(BASE+path,Object.assign({cache:'no-store'},opt||{}));const t=await r.text();let d;try{d=t?JSON.parse(t):null}catch(e){d=t}if(!r.ok)throw new Error((d&&d.message)||String(t||('HTTP '+r.status)));return d}
+window.chsTrainingAdminToggle=function(){const p=el('chsTrainingAdminPanel');p.style.display=p.style.display==='none'?'block':'none';if(p.style.display==='block'&&token)window.chsTrainingAdminRefresh()};
+window.chsTrainingAdminLogin=async function(){
+ const e=(el('chsTrainingAdminEmail').value||'').trim(),p=el('chsTrainingAdminPassword').value||'',b=el('chsTrainingAdminLoginBtn');
+ if(!e||!p){say('Enter admin email and password.','error');return}b.disabled=true;b.textContent='Checking…';
+ try{
+  const d=await req('/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify({email:e,password:p})});
+  if(!d||!d.access_token||!d.user)throw new Error('Supabase did not return a valid session.');
+  if(!d.user.app_metadata||d.user.app_metadata.role!=='admin')throw new Error('This account does not have app_metadata role=admin.');
+  token=d.access_token;email=d.user.email||e;el('chsTrainingAdminLoginBox').style.display='none';el('chsTrainingAdminDashboard').style.display='block';el('chsTrainingAdminWelcome').textContent='Signed in as '+email;el('chsTrainingAdminPassword').value='';
+  await window.chsTrainingAdminRefresh();
+ }catch(x){say('Admin login failed: '+x.message,'error')}finally{b.disabled=false;b.textContent='🔐 Secure Admin Login'}
+};
+window.chsTrainingAdminLogout=function(){token='';email='';rows=[];el('chsTrainingAdminDashboard').style.display='none';el('chsTrainingAdminLoginBox').style.display='block';el('chsTrainingAdminRows').innerHTML='<tr><td colspan="7">Logged out.</td></tr>';el('chsTrainingAdminStats').innerHTML='';say('Training Admin logged out.','success')};
+async function loadRows(){let all=[],off=0,lim=1000;while(true){const a=await req('/rest/v1/training_participants?select=id,serial_no,full_name,pid,designation_position,place_of_posting,willing_or_not_willing,uc&order=serial_no.asc&limit='+lim+'&offset='+off,{headers:hdr()});if(!Array.isArray(a))throw new Error('Unexpected participant list response.');all=all.concat(a);if(a.length<lim)break;off+=lim;if(off>20000)break}return all}
+async function loadActive(){const a=await req('/rest/v1/training_settings?select=is_active&id=eq.true&limit=1',{headers:hdr()});return !!(Array.isArray(a)&&a[0]&&a[0].is_active)}
+window.chsTrainingAdminRefresh=async function(){if(!token)return;say('Loading Training records…','');try{const a=await Promise.all([loadRows(),loadActive()]);rows=a[0];active=a[1];render();say('Loaded '+rows.length+' participant records.','success')}catch(x){say('Could not load admin data: '+x.message,'error')}};
+function render(){
+ const n=rows.filter(x=>x.willing_or_not_willing==='Willing').length,no=rows.filter(x=>x.willing_or_not_willing==='Not Willing').length,p=rows.length-n-no;
+ el('chsTrainingAdminStats').innerHTML=[['Total Teachers',rows.length],['Willing',n],['Not Willing',no],['Pending',p]].map(x=>'<div class="chs-ta-stat"><b>'+x[1].toLocaleString()+'</b><span>'+x[0]+'</span></div>').join('');
+ el('chsTrainingAdminState').textContent=active?'🟢 OPEN':'🔴 CLOSED';el('chsTrainingAdminOpenBtn').disabled=active;el('chsTrainingAdminCloseBtn').disabled=!active;window.chsTrainingAdminRender();
+}
+window.chsTrainingAdminRender=function(){
+ const q=(el('chsTrainingAdminSearch').value||'').toLowerCase().trim(),u=(el('chsTrainingAdminUCFilter').value||'').toLowerCase().trim(),f=el('chsTrainingAdminChoiceFilter').value;
+ const a=rows.filter(x=>(!q||(String(x.full_name||'').toLowerCase().includes(q)||String(x.pid||'').toLowerCase().includes(q)))&&(!u||String(x.uc||'').toLowerCase().includes(u))&&(!f||(f==='Pending'?!x.willing_or_not_willing:x.willing_or_not_willing===f)));
+ el('chsTrainingAdminRows').innerHTML=a.length?a.map((x,i)=>'<tr><td>'+ (i+1)+'</td><td><b>'+esc(x.full_name||'—')+'</b><br><small>'+esc(x.designation_position||'')+'</small></td><td>'+esc(x.pid||'')+'</td><td>'+esc(x.place_of_posting||'')+'</td><td>'+esc(x.willing_or_not_willing||'Pending')+'</td><td>'+esc(x.uc||'—')+'</td><td><button type="button" class="blue" onclick="chsTrainingAdminEdit('+Number(x.id)+')">Edit</button> <button type="button" class="gray" onclick="chsTrainingAdminReset('+Number(x.id)+')">Reset</button></td></tr>').join(''):'<tr><td colspan="7" style="padding:12px">No matching records.</td></tr>';
+};
+window.chsTrainingAdminEdit=async function(id){if(!token)return;const x=rows.find(v=>Number(v.id)===Number(id));if(!x)return;const c=prompt('Enter Willing or Not Willing. Leave blank for Pending.',x.willing_or_not_willing||'');if(c===null)return;const v=c.trim();if(v&&v!=='Willing'&&v!=='Not Willing'){alert('Only Willing, Not Willing, or blank is allowed.');return}const u=prompt('Union Council (UC):',x.uc||'');if(u===null)return;try{await req('/rest/v1/training_participants?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:hdr({'Prefer':'return=minimal'}),body:JSON.stringify({willing_or_not_willing:v||null,uc:u.trim()||null,updated_at:new Date().toISOString()})});await window.chsTrainingAdminRefresh();say('Response updated.','success')}catch(z){say('Update failed: '+z.message,'error')}};
+window.chsTrainingAdminReset=async function(id){if(!token)return;const x=rows.find(v=>Number(v.id)===Number(id));if(!x||!confirm('Clear response and UC for '+(x.full_name||x.pid)+'? The participant record will remain.'))return;try{await req('/rest/v1/training_participants?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:hdr({'Prefer':'return=minimal'}),body:JSON.stringify({willing_or_not_willing:null,uc:null,updated_at:new Date().toISOString()})});await window.chsTrainingAdminRefresh();say('Response reset; participant record kept.','success')}catch(z){say('Reset failed: '+z.message,'error')}};
+window.chsTrainingAdminSetActive=async function(v){if(!token||!confirm(v?'Open the Training form now?':'Close the Training form now?'))return;try{await req('/rest/v1/training_settings?id=eq.true',{method:'PATCH',headers:hdr({'Prefer':'return=minimal'}),body:JSON.stringify({is_active:!!v,updated_at:new Date().toISOString()})});active=!!v;render();say('Training is now '+(active?'OPEN':'CLOSED')+'.','success')}catch(z){say('Could not change status: '+z.message,'error')}};
+window.chsTrainingAdminExport=function(){if(!token)return;const heads=['Serial No','Posting District','Posting Tehsil','Full Name','PID','Gender','Designation / Position','Government / Non-Government','SEMIS ID','Place of Posting','Academic Qualifications','Academic Major','Teaching Subjects','Date of Appointment','Willing / Not Willing','UC'];const keys=['serial_no','posting_district','posting_tehsil','full_name','pid','gender','designation_position','government_non_government','semis_id','place_of_posting','academic_qualifications','academic_major','teaching_subjects','date_of_appointment','willing_or_not_willing','uc'];const csv='\uFEFF'+heads.map(x=>'"'+x+'"').join(',')+'\r\n'+rows.map(x=>keys.map(k=>{let v=String(x[k]==null?'':x[k]);if(/^[=+@\-]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')).join('\r\n');const b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='CHS_Moro_Training_Responses_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1200)};
 })();
 </script></body></html>
 
