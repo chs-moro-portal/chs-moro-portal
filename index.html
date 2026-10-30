@@ -1028,7 +1028,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <button onclick="searchFrontSchoolComplete()" type="button">🔍 Search School</button>
 </div>
 <div id="frontSchoolSearchResult" style="margin-top:12px"></div>
-</div><button class="primary" type="button" onclick="show('dataSubmit')" style="margin-top:14px">📋 Submit Data</button>
+</div><button class="primary" type="button" onclick="show('training')" style="margin-top:14px;background:linear-gradient(90deg,#075c3b,#0a8255)">🎓 Training</button>
 <!-- Front Page: Moro Cluster Schools Marquee -->
 <div class="cluster-schools-frame" id="clusterSchoolsFrame">
 <div class="cluster-schools-title">🏫 MORO CLUSTER SCHOOLS</div>
@@ -1559,7 +1559,31 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <button onclick="document.getElementById('dataSubmissionForm').reset()" type="button">↺ Clear</button>
 </div></form></div>
 
-</div></section><section class="page" id="admin"><div class="container"><div class="card">
+</div></section><section class="page" id="training">
+<div class="container"><div class="card" style="max-width:760px;margin:0 auto">
+<div class="topbar"><div><h2 style="margin:0;color:#075c3b">🎓 Teacher Training</h2><p style="margin:6px 0;color:#64748b">Enter your PID to view your details and submit your response.</p></div><button type="button" class="gray" onclick="goHome()">⌂ Home</button></div>
+<div id="chsTrainingLookupBox" style="margin-top:18px">
+<label for="chsTrainingPid"><b>Teacher PID</b></label>
+<input id="chsTrainingPid" inputmode="numeric" autocomplete="off" placeholder="Enter your PID" style="margin:6px 0 10px">
+<button type="button" class="full" id="chsTrainingLookupBtn" onclick="chsTrainingLookup()">🔍 Find My Record</button>
+</div>
+<div id="chsTrainingStatus" class="message" style="display:none"></div>
+<div id="chsTrainingDetails" style="display:none;margin-top:18px">
+<h3 style="color:#075c3b;margin-bottom:10px">Teacher Details</h3>
+<div id="chsTrainingDetailsGrid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"></div>
+<div id="chsTrainingResponseBox" style="display:none;margin-top:18px;padding:16px;border:1px solid #dce9e2;border-radius:12px;background:#f7fbf8">
+<h3 style="margin:0 0 12px;color:#075c3b">Training Response</h3>
+<label><input type="radio" name="chsTrainingChoice" value="Willing" style="width:auto;margin:0 7px 0 0"> Willing</label>
+<label style="margin-left:18px"><input type="radio" name="chsTrainingChoice" value="Not Willing" style="width:auto;margin:0 7px 0 0"> Not Willing</label>
+<div style="margin-top:14px"><label for="chsTrainingUC"><b>Union Council (UC)</b></label><input id="chsTrainingUC" placeholder="Enter UC according to your school posting" style="margin:6px 0 10px"></div>
+<button type="button" class="full" id="chsTrainingSubmitBtn" onclick="chsTrainingSubmit()">Submit Response</button>
+<p style="font-size:12px;color:#64748b;margin:10px 0 0">One response is allowed per PID.</p>
+</div>
+</div>
+</div></div>
+<style>@media(max-width:560px){#chsTrainingDetailsGrid{grid-template-columns:1fr!important}#chsTrainingResponseBox label{display:inline-block;margin:7px 8px 7px 0!important}}</style>
+</section>
+<section class="page" id="admin"><div class="container"><div class="card">
 <div class="topbar"><h2>Admin Panel</h2><button class="red" onclick="adminLogout()">Logout</button></div>
 <p>Admin can Add and Edit employee records. Records are saved automatically in this browser. Public users can only view records.</p>
 <div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">🔄 Sync Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
@@ -4825,7 +4849,84 @@ function submitSponsorInquiry(ev){
  .site-header .chs-v41-panel button{flex:0 1 auto!important;padding:7px 6px!important;font-size:11px!important;min-height:34px!important}
 }
 </style>
-</body></html>
+<script id="chs-moro-training-module">
+(function(){
+  const BASE='https://khyrdadphbyhypxjsgsa.supabase.co';
+  const KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+  function headers(){return {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};}
+  function status(message,type){
+    const el=document.getElementById('chsTrainingStatus');if(!el)return;
+    el.textContent=message;el.className='message '+(type||'');el.style.display='block';
+  }
+  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function field(label,value){
+    return '<div style="padding:10px;border:1px solid #e2ebe6;border-radius:9px;background:#fbfdfc;min-width:0"><small style="display:block;color:#64748b;font-weight:700">'+esc(label)+'</small><b style="display:block;color:#243b31;overflow-wrap:anywhere">'+esc(value||'—')+'</b></div>';
+  }
+  window.chsTrainingLookup=async function(){
+    const pid=(document.getElementById('chsTrainingPid').value||'').trim();
+    const btn=document.getElementById('chsTrainingLookupBtn');
+    if(!pid){status('Please enter your PID.','error');return;}
+    btn.disabled=true;btn.textContent='Searching…';
+    document.getElementById('chsTrainingDetails').style.display='none';
+    document.getElementById('chsTrainingResponseBox').style.display='none';
+    try{
+      const res=await fetch(BASE+'/rest/v1/rpc/training_lookup',{method:'POST',headers:headers(),body:JSON.stringify({p_pid:pid}),cache:'no-store'});
+      const raw=await res.text();let data;try{data=JSON.parse(raw)}catch(e){data=null}
+      if(!res.ok)throw new Error((data&&data.message)||raw||('Request failed '+res.status));
+      const row=Array.isArray(data)?data[0]:data;
+      if(!row){status('This PID was not found in the Training list. Please check the PID.','error');return;}
+      window.__chsTrainingCurrentPid=pid;
+      document.getElementById('chsTrainingDetailsGrid').innerHTML=[
+        field('Full Name',row.full_name),field('PID',row.pid),field('Gender',row.gender),
+        field('Designation',row.designation_position),field('Government / Non-Government',row.government_non_government),
+        field('SEMIS ID',row.semis_id),field('School / Place of Posting',row.place_of_posting),
+        field('Academic Qualification',row.academic_qualifications),field('Major Subject',row.academic_major),
+        field('Teaching Subjects',row.teaching_subjects),field('Date of Appointment',row.date_of_appointment)
+      ].join('');
+      document.getElementById('chsTrainingDetails').style.display='block';
+      if(row.already_submitted){
+        status('A response has already been submitted for this PID.','success');
+        document.getElementById('chsTrainingResponseBox').style.display='none';
+      }else{
+        status('Record found. Please check your details and submit your response.','success');
+        document.getElementById('chsTrainingResponseBox').style.display='block';
+      }
+    }catch(e){status('Could not load the record: '+e.message,'error');}
+    finally{btn.disabled=false;btn.textContent='🔍 Find My Record';}
+  };
+  window.chsTrainingSubmit=async function(){
+    const pid=window.__chsTrainingCurrentPid;
+    const choice=document.querySelector('input[name="chsTrainingChoice"]:checked');
+    const uc=(document.getElementById('chsTrainingUC').value||'').trim();
+    const btn=document.getElementById('chsTrainingSubmitBtn');
+    if(!pid){status('Please find your PID record first.','error');return;}
+    if(!choice){status('Please select Willing or Not Willing.','error');return;}
+    if(!uc){status('Please enter your Union Council (UC).','error');return;}
+    if(!confirm('Submit your Training response for PID '+pid+'? You can submit only once.'))return;
+    btn.disabled=true;btn.textContent='Submitting…';
+    try{
+      const res=await fetch(BASE+'/rest/v1/rpc/training_submit',{method:'POST',headers:headers(),body:JSON.stringify({p_pid:pid,p_choice:choice.value,p_uc:uc}),cache:'no-store'});
+      const raw=await res.text();let result;try{result=JSON.parse(raw)}catch(e){result=raw}
+      if(!res.ok)throw new Error((result&&result.message)||String(result)||('Request failed '+res.status));
+      if(result==='submitted'){
+        status('Your response has been submitted successfully. Thank you.','success');
+        document.getElementById('chsTrainingResponseBox').style.display='none';
+      }else if(result==='already_submitted'){
+        status('A response has already been submitted for this PID.','success');
+        document.getElementById('chsTrainingResponseBox').style.display='none';
+      }else if(result==='pid_not_found'){
+        status('PID was not found. Please check with the portal administrator.','error');
+      }else{
+        status('Training response: '+String(result),'success');
+      }
+    }catch(e){
+      const m=e.message||'';
+      if(m.toLowerCase().includes('currently closed'))status('Training form is not open yet. Please try again later.','error');
+      else status('Submission failed: '+m,'error');
+    }finally{btn.disabled=false;btn.textContent='Submit Response';}
+  };
+})();
+</script></body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
 <style id="chs-moro-title-visibility-fix">
