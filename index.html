@@ -5132,6 +5132,26 @@ document.addEventListener('DOMContentLoaded',chsShowIncrement);
 })();
 </script>
 
+
+<style id="chs-footer-single-line-layout">
+/* Keep developer credit, portrait, Management and Privacy links on one compact line */
+.footer{display:flex!important;flex-wrap:wrap!important;align-items:center!important;justify-content:center!important;column-gap:10px!important;row-gap:3px!important;padding:7px 8px!important;line-height:1.2!important}
+.footer>img.chs-faisal-footer-photo{order:0!important;width:30px!important;height:30px!important;margin:0 3px 0 0!important}
+.footer>div:first-of-type{order:1!important;display:flex!important;align-items:center!important;justify-content:center!important;flex-wrap:wrap!important;margin:0!important}
+.footer>div:nth-of-type(2){order:4!important;flex:0 0 100%!important;margin:0!important;font-size:10px!important}
+.footer>div:nth-of-type(3){order:2!important;margin:0!important}
+.footer>div:nth-of-type(4){order:3!important;margin:0!important}
+#chsReliableMgmt{margin:0!important}
+#chsReliableMgmtBtn,.footer>div>button{min-height:28px!important;padding:5px 8px!important;font-size:10px!important;border-radius:7px!important}
+.footer>div:nth-of-type(4) button{margin:0!important}
+@media(max-width:520px){
+ .footer{column-gap:5px!important;row-gap:3px!important}
+ .footer>img.chs-faisal-footer-photo{width:26px!important;height:26px!important}
+ .footer>div:first-of-type{font-size:10px!important}
+ #chsReliableMgmtBtn,.footer>div>button{font-size:9px!important;padding:4px 6px!important}
+}
+</style>
+
 <!-- CHS Moro compact employee header-title visibility fix -->
 <style id="chs-moro-employee-header-title-fix">
 /* Only employee-table heading appearance; preserves the existing column list and records. */
