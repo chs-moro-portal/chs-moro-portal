@@ -959,7 +959,21 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 .chs-v41-panel button{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;justify-content:center!important;min-height:40px!important;white-space:nowrap!important;padding:9px 11px!important;}
 @media(max-width:900px){.chs-v41-panel{justify-content:flex-start!important;overflow-x:auto!important}.chs-v41-panel button{font-size:12px!important;padding:8px 10px!important}}
 </style>
-<style id="chs-menu-width-fix">.chs-v41-panel{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;max-width:none!important;padding:3px!important;overflow-x:auto!important}.chs-v41-panel button{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:max-content!important;padding:4px 7px!important;margin:0!important;height:30px!important;min-height:30px!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}.chs-v41-panel button span{display:inline!important;width:auto!important;max-width:max-content!important}@media(max-width:900px){.chs-v41-panel{gap:2px!important}.chs-v41-panel button{padding:4px 6px!important;height:29px!important;min-height:29px!important;font-size:10px!important}}</style></head>
+<style id="chs-menu-width-fix">.chs-v41-panel{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:3px!important;width:max-content!important;max-width:none!important;padding:3px!important;overflow-x:auto!important}.chs-v41-panel button{flex:0 0 auto!important;width:auto!important;min-width:0!important;max-width:max-content!important;padding:4px 7px!important;margin:0!important;height:30px!important;min-height:30px!important;font-size:11px!important;line-height:1!important;white-space:nowrap!important}.chs-v41-panel button span{display:inline!important;width:auto!important;max-width:max-content!important}@media(max-width:900px){.chs-v41-panel{gap:2px!important}.chs-v41-panel button{padding:4px 6px!important;height:29px!important;min-height:29px!important;font-size:10px!important}}</style>
+<style id="chs-increment-compact-css">
+/* Two compact front-page tools in one row; keep existing service calculator intact */
+.restore-tools{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:8px!important;align-items:stretch!important}
+.restore-tools>.restore-tool{min-width:0!important;box-sizing:border-box!important;padding:8px 10px!important}
+.restore-tools .service-digital-card h3,.restore-tools>.chs-increment-tool h3{font-size:12px!important;line-height:1.15!important;margin:2px 0 6px!important}
+.chs-increment-tool label{display:block;font-size:10px;font-weight:700;margin:3px 0}
+.chs-increment-tool select{width:100%;height:28px;padding:3px 6px;margin:2px 0 5px;font-size:11px;box-sizing:border-box}
+.chs-increment-result{display:flex;justify-content:space-between;align-items:center;gap:5px;background:#eef8f2;border:1px solid #cde8d7;border-radius:7px;padding:5px 7px;margin:3px 0}
+.chs-increment-result span{font-size:10px;font-weight:700;color:#155b3d}
+.chs-increment-result strong{font-size:15px;color:#087344;white-space:nowrap}
+.chs-increment-tool small{display:block;font-size:8px;color:#557066;line-height:1.2}
+@media(max-width:520px){.restore-tools{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:5px!important}.restore-tools>.restore-tool{padding:6px!important}.restore-tools .service-digital-card h3,.restore-tools>.chs-increment-tool h3{font-size:10px!important}.chs-increment-result strong{font-size:12px!important}.chs-increment-result span{font-size:8px!important}}
+</style>
+</head>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
 <header class="site-header">
@@ -1093,10 +1107,14 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
     <button class="restore-btn service-calc-btn" type="button" onclick="restoreCalculateService()">⚡ CALCULATE</button>
     <div id="restoreServiceResult" class="restore-result service-digital-result" style="display:none"></div>
   </div>
-  <div class="restore-tool">
-    <h3>🌐 Offline / Online</h3>
-    <div id="restoreNetwork">Checking connection...</div>
-    <p style="margin-bottom:0;color:#557066">The original portal layout and saved browser data remain unchanged.</p>
+  <div class="restore-tool chs-increment-tool">
+    <h3>💰 Annual Increment 2026</h3>
+    <label for="chsIncrementGrade">Select BPS Grade</label>
+    <select id="chsIncrementGrade" onchange="chsShowIncrement()" aria-label="Select BPS Grade">
+      <option value="1">BPS-01</option><option value="2">BPS-02</option><option value="3">BPS-03</option><option value="4">BPS-04</option><option value="5">BPS-05</option><option value="6">BPS-06</option><option value="7">BPS-07</option><option value="8">BPS-08</option><option value="9">BPS-09</option><option value="10">BPS-10</option><option value="11">BPS-11</option><option value="12">BPS-12</option><option value="13">BPS-13</option><option value="14">BPS-14</option><option value="15">BPS-15</option><option value="16">BPS-16</option><option value="17">BPS-17</option><option value="18">BPS-18</option><option value="19">BPS-19</option><option value="20">BPS-20</option><option value="21">BPS-21</option><option value="22">BPS-22</option>
+    </select>
+    <div class="chs-increment-result"><span>Annual Increment</span><strong id="chsIncrementAmount">Rs. 520</strong></div>
+    <small>As per supplied 2026 chart • 1 December 2026</small>
   </div>
 </div>
 
@@ -5041,7 +5059,17 @@ window.chsTrainingAdminReset=async function(id){if(!token)return;const x=rows.fi
 window.chsTrainingAdminSetActive=async function(v){if(!token||!confirm(v?'Open the Training form now?':'Close the Training form now?'))return;try{await req('/rest/v1/training_settings?id=eq.true',{method:'PATCH',headers:hdr({'Prefer':'return=minimal'}),body:JSON.stringify({is_active:!!v,updated_at:new Date().toISOString()})});active=!!v;render();say('Training is now '+(active?'OPEN':'CLOSED')+'.','success')}catch(z){say('Could not change status: '+z.message,'error')}};
 window.chsTrainingAdminExport=function(){if(!token)return;const heads=['Serial No','Posting District','Posting Tehsil','Full Name','PID','Gender','Designation / Position','Government / Non-Government','SEMIS ID','Place of Posting','Academic Qualifications','Academic Major','Teaching Subjects','Date of Appointment','Willing / Not Willing','UC'];const keys=['serial_no','posting_district','posting_tehsil','full_name','pid','gender','designation_position','government_non_government','semis_id','place_of_posting','academic_qualifications','academic_major','teaching_subjects','date_of_appointment','willing_or_not_willing','uc'];const csv='\uFEFF'+heads.map(x=>'"'+x+'"').join(',')+'\r\n'+rows.map(x=>keys.map(k=>{let v=String(x[k]==null?'':x[k]);if(/^[=+@\-]/.test(v))v="'"+v;return '"'+v.replace(/"/g,'""')+'"'}).join(',')).join('\r\n');const b=new Blob([csv],{type:'text/csv;charset=utf-8;'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='CHS_Moro_Training_Responses_'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1200)};
 })();
-</script></body></html>
+</script>
+<script id="chs-increment-calculator-js">
+function chsShowIncrement(){
+  const amounts=[520,590,700,800,910,1010,1100,1210,1310,1430,1580,1720,1880,2090,2380,2720,4110,5120,5450,8040,8920,10470];
+  const grade=document.getElementById('chsIncrementGrade');
+  const output=document.getElementById('chsIncrementAmount');
+  if(grade&&output){const n=Number(grade.value);output.textContent='Rs. '+(amounts[n-1]||0).toLocaleString('en-PK');}
+}
+document.addEventListener('DOMContentLoaded',chsShowIncrement);
+</script>
+</body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
 <style id="chs-moro-title-visibility-fix">
