@@ -5107,7 +5107,9 @@ document.addEventListener('DOMContentLoaded',chsShowIncrement);
 
 <!-- CHS Moro personal portrait restore -->
 <style id="chs-faisal-footer-photo-css">
-.chs-faisal-footer-photo{width:76px;height:76px;object-fit:cover;object-position:center 28%;border-radius:50%;border:3px solid #d3ae58;display:block;margin:9px auto 2px;box-shadow:0 3px 12px #0003}
+.chs-faisal-footer-photo{width:34px;height:34px;object-fit:cover;object-position:center 28%;border-radius:50%;border:2px solid #d3ae58;display:inline-block;vertical-align:middle;margin:0 7px 0 0;box-shadow:0 2px 7px #0003;flex:0 0 auto}
+.footer{padding:8px 9px!important;line-height:1.25!important}
+.footer>div:first-child{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px}
 </style>
 <script id="chs-faisal-personal-photo-restore">
 (function(){
@@ -5122,7 +5124,7 @@ document.addEventListener('DOMContentLoaded',chsShowIncrement);
     var img=document.createElement('img');img.className='chs-faisal-footer-photo';img.alt='Faisal Jan Thaheem';
     img.src=personalPhoto;
     var first=footer.firstElementChild;
-    if(first&&first.nextSibling)footer.insertBefore(img,first.nextSibling);else footer.appendChild(img);
+    if(first)footer.insertBefore(img,first);else footer.appendChild(img);
    }
   }catch(e){}
  }
