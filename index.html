@@ -314,6 +314,28 @@ try{
     }
   }
   if(!localStorage.getItem('portalLinks')) localStorage.setItem('portalLinks',JSON.stringify([]));
+  // CHS Moro: seed official educational resources on every device, while preserving Admin links.
+  try{
+    const educationalDefaults=[
+      {label:'Sindh School Education & Literacy Department',url:'https://sindheducation.gov.pk/'},
+      {label:'SELD Employee Portal (eTransfer / eDocuments)',url:'https://eportal.sindheducation.gov.pk/'},
+      {label:'RSU / SEMIS Sindh Portal',url:'https://semis.rsusindh.gov.pk/'},
+      {label:'Sindh Textbook Board eBooks',url:'https://portal.stbb.edu.pk/ebooks/'},
+      {label:'PITE Sindh – Teacher Training',url:'https://www.pitesindh.edu.pk/'},
+      {label:'SIBA Testing Services (STS)',url:'https://sts.net.pk/'},
+      {label:'Government of Sindh',url:'https://www.sindh.gov.pk/'}
+    ];
+    const savedLinks=JSON.parse(localStorage.getItem('portalLinks')||'[]');
+    if(Array.isArray(savedLinks)){
+      educationalDefaults.forEach(function(item){
+        if(!savedLinks.some(function(x){return x&&String(x.url||'').replace(/\\/$/,'').toLowerCase()===item.url.replace(/\\/$/,'').toLowerCase();})){
+          savedLinks.push(item);
+        }
+      });
+      localStorage.setItem('portalLinks',JSON.stringify(savedLinks));
+    }
+  }catch(linkSeedError){console.warn('Educational links were not auto-added:',linkSeedError);}
+
   if(!localStorage.getItem('portalNotifications')) localStorage.setItem('portalNotifications',JSON.stringify([]));
   if(!localStorage.getItem('portalPublicFiles')) localStorage.setItem('portalPublicFiles',JSON.stringify([]));
 }catch(e){console.error(e)}
