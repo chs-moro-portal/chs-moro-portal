@@ -28,11 +28,12 @@ Deno.serve(async (req: Request) => {
   }
 
   const supplied = req.headers.get("x-gallery-admin-key") || "";
-  if (supplied.length !== expected.length ||
-      !crypto.subtle.timingSafeEqual(
-        new TextEncoder().encode(supplied),
-        new TextEncoder().encode(expected)
-      )) {
+  const encoder = new TextEncoder();
+  const suppliedHash = new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(supplied)));
+  const expectedHash = new Uint8Array(await crypto.subtle.digest("SHA-256", encoder.encode(expected)));
+  let mismatch = 0;
+  for (let i = 0; i < expectedHash.length; i++) mismatch |= suppliedHash[i] ^ expectedHash[i];
+  if (mismatch !== 0) {
     return json({ error: "Admin verification failed" }, 401);
   }
 
