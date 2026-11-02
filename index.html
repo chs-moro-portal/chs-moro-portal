@@ -1004,7 +1004,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div><div class="gov-title">GOVERNMENT OF SINDH</div><div class="gov-sub">SINDH EDUCATION &amp; LITERACY DEPARTMENT</div></div>
 </div>
 <div class="header-center"><h1>CLUSTER HEAD SCHOOL</h1><h2>Taluka Moro District NAUSHAHRO FEROZE</h2><div class="version"></div></div>
-<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showLearningVideos()">🎬 <span>Learning Videos</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
+<nav aria-label="Main navigation" class="chs-v41-menu"><div id="chsV41Panel" class="chs-v41-panel"><button type="button" onclick="goHome()">⌂ <span>Home</span></button><button type="button" onclick="if(window.show){window.show('schools');}if(window.renderSchools){window.renderSchools();}">🏫 <span>School</span></button><button type="button" onclick="show('dataSubmit')">📋 <span>Submit Data</span></button><button type="button" onclick="showLearningVideos()">🎬 <span>Learning Videos</span></button><button type="button" onclick="showLinks()">🔗 <span>Links</span></button><button type="button" onclick="showNotifications()">🔔 <span>Notifications</span></button><button type="button" onclick="showIntroduction()">📖 <span>Introduction</span></button><button type="button" onclick="show('gallery')">🖼️ <span>Gallery</span></button><button type="button" onclick="show('ebook-library')">📚 <span>eBooks</span></button><button type="button" onclick="show('knowledge-gallery');loadKnowledgeGallery()">📂 <span>Education Gallery</span></button><button type="button" onclick="show('examPaper')">📝 <span>Paper Tool</span></button><button type="button" onclick="show('download');if(window.renderPublicFiles)window.renderPublicFiles();">⇩ <span>Download</span></button><button type="button" onclick="show('sponsor')">🤝 <span>Sponsor / Advertise</span></button></div></nav>
 </header>
 <div aria-label="Latest News and Updates" class="news-marquee top-latest-marquee"><div class="bell-box" title="Notifications">🔔</div><div class="news-label">📢 Latest Updates</div><div class="news-track"><div class="news-scroll" id="newsScroll"></div></div></div>
 <section class="page active" id="home">
@@ -1429,6 +1429,129 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </button>
 <button onclick="closeDownloadSettings()" style="width:100%;padding:11px;border:0;border-radius:10px;cursor:pointer;margin-top:4px;" type="button">✕ Close</button>
 </div>
+
+<section class="page" id="knowledge-gallery">
+  <div class="kg-wrap">
+    <div class="kg-head">
+      <div><h2>📚 CHS Moro Education Gallery</h2><p>Digital Books • Educational Notes • Computer &amp; Excel • AI &amp; Technology • Teaching Resources</p></div>
+      <button type="button" class="kg-refresh" onclick="loadKnowledgeGallery()">↻ Refresh</button>
+    </div>
+    <div class="kg-tabs" id="kgTabs">
+      <button class="active" type="button" onclick="filterKnowledgeGallery('All',this)">All</button>
+      <button type="button" onclick="filterKnowledgeGallery('Digital Books',this)">📚 Books</button>
+      <button type="button" onclick="filterKnowledgeGallery('Educational Notes',this)">📝 Notes</button>
+      <button type="button" onclick="filterKnowledgeGallery('Computer &amp; Excel',this)">💻 Computer &amp; Excel</button>
+      <button type="button" onclick="filterKnowledgeGallery('AI &amp; Technology',this)">🤖 AI &amp; Tech</button>
+      <button type="button" onclick="filterKnowledgeGallery('Teaching Ideas',this)">🎓 Teaching</button>
+      <button type="button" onclick="filterKnowledgeGallery('General Knowledge',this)">🌍 General Knowledge</button>
+      <button type="button" onclick="filterKnowledgeGallery('Teacher Training',this)">👩‍🏫 Training</button>
+      <button type="button" onclick="filterKnowledgeGallery('PDFs',this)">📄 PDFs</button>
+      <button type="button" onclick="filterKnowledgeGallery('Educational Videos',this)">🎬 Videos</button>
+    </div>
+    <div id="kgStatus" class="kg-status">Loading educational resources…</div>
+    <div id="kgGrid" class="kg-grid"></div>
+    <div id="kgEmpty" class="kg-empty" style="display:none">No educational resources found in this category yet.</div>
+    <div id="kgAdmin" class="kg-admin" style="display:none">
+      <h3>🔐 Admin — Upload Educational Resource</h3>
+      <p>Only portal Admin can open this upload panel. Server-side Admin verification is also required.</p>
+      <div class="kg-upload-row">
+        <input type="file" id="kgFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.webp,.mp4,.webm,.txt">
+        <select id="kgCategory">
+          <option>Digital Books</option><option>Educational Notes</option><option>Computer &amp; Excel</option><option>AI &amp; Technology</option><option>Teaching Ideas</option><option>General Knowledge</option><option>Teacher Training</option><option>PDFs</option><option>Educational Videos</option>
+        </select>
+        <input id="kgCaption" type="text" maxlength="180" placeholder="Resource title / short description">
+        <button type="button" onclick="uploadKnowledgeResource()">⬆ Upload Resource</button>
+      </div>
+      <small>Maximum file size: 25 MB. Supported formats: PDF, Office files, images, MP4/WebM and TXT.</small>
+    </div>
+  </div>
+</section>
+<style id="chs-knowledge-gallery-style">
+#knowledge-gallery .kg-wrap{max-width:1180px;margin:18px auto;padding:clamp(12px,3vw,24px);background:#fff;border-radius:18px;box-shadow:0 8px 28px rgba(0,60,40,.09)}
+#knowledge-gallery .kg-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#knowledge-gallery .kg-head h2{margin:0;color:#075c3b;font-size:clamp(21px,4vw,30px)}
+#knowledge-gallery .kg-head p{margin:7px 0 15px;color:#64748b}
+#knowledge-gallery .kg-refresh,#knowledge-gallery .kg-upload-row button{border:0;border-radius:10px;background:#087443;color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}
+#knowledge-gallery .kg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+#knowledge-gallery .kg-tabs button{border:1px solid #cfe4d8;background:#f5fbf7;color:#075c3b;border-radius:22px;padding:8px 12px;font-weight:700;cursor:pointer}
+#knowledge-gallery .kg-tabs button.active{background:#075c3b;color:#fff}
+#knowledge-gallery .kg-status{font-size:13px;color:#64748b;margin:10px 0}
+#knowledge-gallery .kg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+#knowledge-gallery .kg-card{border:1px solid #e0ebe4;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(0,70,45,.06);min-width:0}
+#knowledge-gallery .kg-preview{height:130px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f7ee,#f5f8ff);font-size:48px;overflow:hidden}
+#knowledge-gallery .kg-preview img{width:100%;height:100%;object-fit:cover}
+#knowledge-gallery .kg-info{padding:12px}
+#knowledge-gallery .kg-info strong{display:block;color:#164e38;overflow-wrap:anywhere}
+#knowledge-gallery .kg-info small{display:block;color:#64748b;margin:6px 0 10px}
+#knowledge-gallery .kg-open{display:inline-block;text-decoration:none;background:#eaf6ef;color:#075c3b;padding:8px 11px;border-radius:9px;font-weight:800}
+#knowledge-gallery .kg-empty{padding:25px;text-align:center;color:#64748b}
+#knowledge-gallery .kg-admin{margin-top:24px;padding:16px;border:1px dashed #80b99a;border-radius:14px;background:#f5fbf7}
+#knowledge-gallery .kg-admin h3{margin:0 0 6px;color:#075c3b}
+#knowledge-gallery .kg-admin p,#knowledge-gallery .kg-admin small{color:#64748b;font-size:12px}
+#knowledge-gallery .kg-upload-row{display:grid;grid-template-columns:1.3fr 1fr 1.3fr auto;gap:8px;margin:12px 0}
+#knowledge-gallery .kg-upload-row input,#knowledge-gallery .kg-upload-row select{min-width:0;width:100%;padding:10px;border:1px solid #cbded2;border-radius:9px;background:#fff}
+@media(max-width:700px){#knowledge-gallery .kg-upload-row{grid-template-columns:1fr}#knowledge-gallery .kg-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){#knowledge-gallery .kg-grid{grid-template-columns:1fr}}
+</style>
+<script id="chs-knowledge-gallery-script">
+(function(){
+'use strict';
+const BASE='https://khyrdadphbyhypxjsgsa.supabase.co';
+const KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+const BUCKET='knowledge-gallery';
+const CATS=['Digital Books','Educational Notes','Computer & Excel','AI & Technology','Teaching Ideas','General Knowledge','Teacher Training','PDFs','Educational Videos'];
+let allItems=[],active='All',busy=false;
+const el=id=>document.getElementById(id);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function headers(){return {'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json'};}
+function publicUrl(path){return BASE+'/storage/v1/object/public/'+BUCKET+'/'+path.split('/').map(encodeURIComponent).join('/');}
+function niceName(name){return String(name||'').replace(/^[0-9a-f-]{20,}-/i,'').replace(/[_]/g,' ');}
+window.filterKnowledgeGallery=function(cat,btn){active=cat||'All';document.querySelectorAll('#kgTabs button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');render();};
+async function listCategory(cat){
+ const r=await fetch(BASE+'/storage/v1/object/list/'+BUCKET,{method:'POST',headers:headers(),body:JSON.stringify({prefix:cat,limit:100,offset:0,sortBy:{column:'created_at',order:'desc'}}),cache:'no-store'});
+ if(!r.ok)throw new Error('Could not read '+cat+' ('+r.status+')');
+ const rows=await r.json();
+ return (Array.isArray(rows)?rows:[]).filter(x=>x&&x.name&&!x.id===false).map(x=>({category:cat,name:x.name,path:cat+'/'+x.name,url:publicUrl(cat+'/'+x.name),metadata:x.metadata||{},created:x.created_at||x.updated_at||''}));
+}
+function render(){
+ const grid=el('kgGrid'),empty=el('kgEmpty');if(!grid)return;
+ const items=active==='All'?allItems:allItems.filter(x=>x.category===active);
+ grid.innerHTML=items.map(x=>{
+  const type=String(x.metadata.mimetype||'').toLowerCase(),isImg=type.startsWith('image/'),isVideo=type.startsWith('video/');
+  const preview=isImg?'<img loading="lazy" src="'+esc(x.url)+'" alt="'+esc(niceName(x.name))+'">':(isVideo?'🎬':(type==='application/pdf'?'📕':'📁'));
+  const size=x.metadata.size?Math.max(1,Math.round(Number(x.metadata.size)/1024))+' KB':'Resource';
+  return '<article class="kg-card"><div class="kg-preview">'+preview+'</div><div class="kg-info"><strong>'+esc(niceName(x.name))+'</strong><small>'+esc(x.category)+' • '+esc(size)+'</small><a class="kg-open" href="'+esc(x.url)+'" target="_blank" rel="noopener">Open / Download ↗</a></div></article>';
+ }).join('');
+ if(empty)empty.style.display=items.length?'none':'block';
+}
+window.loadKnowledgeGallery=async function(){
+ const status=el('kgStatus');if(!status||busy)return;busy=true;status.textContent='Loading resources from Supabase…';
+ try{const results=await Promise.all(CATS.map(listCategory));allItems=results.flat();status.textContent=allItems.length+' educational resources available from the central Gallery.';render();}
+ catch(e){status.textContent='Could not load the Supabase Gallery. Please check the bucket read policy and try Refresh.';console.error('Knowledge Gallery:',e);}
+ finally{busy=false;}
+ const box=el('kgAdmin');if(box)box.style.display=(typeof isAdmin==='function'&&isAdmin())?'block':'none';
+};
+window.uploadKnowledgeResource=async function(){
+ if(typeof isAdmin!=='function'||!isAdmin()){alert('Admin login required.');return;}
+ const file=el('kgFile')&&el('kgFile').files[0],category=el('kgCategory').value,caption=el('kgCaption').value.trim();
+ if(!file){alert('Please select a file.');return;}
+ if(CATS.indexOf(category)<0){alert('Select a valid category.');return;}
+ if(file.size>25*1024*1024){alert('Maximum file size is 25 MB.');return;}
+ const adminKey=prompt('Enter the secure Gallery upload key provided in Supabase Function Secrets:');
+ if(!adminKey)return;
+ const data=new FormData();data.append('file',file);data.append('category',category);data.append('caption',caption);
+ const status=el('kgStatus');status.textContent='Uploading securely…';
+ try{
+  const response=await fetch(BASE+'/functions/v1/knowledge-gallery-upload',{method:'POST',headers:{'apikey':KEY,'x-gallery-admin-key':adminKey},body:data});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||!result.ok)throw new Error(result.error||'Upload failed ('+response.status+')');
+  el('kgFile').value='';el('kgCaption').value='';status.textContent='Upload successful. Refreshing Gallery…';await window.loadKnowledgeGallery();
+ }catch(e){status.textContent='Upload not completed: '+e.message;alert('Gallery upload failed: '+e.message);}
+};
+document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge-gallery');if(page&&page.classList.contains('active'))window.loadKnowledgeGallery();});
+})();
+</script>
+
 <section class="page" id="gallery">
 <div class="gallery-hero">
 <h2>🖼️ CHS Moro Gallery</h2>
@@ -5108,6 +5231,8 @@ document.addEventListener('DOMContentLoaded',chsShowIncrement);
     'paper-tool': 'examPaper',
     training: 'training',
     gallery: 'gallery',
+    'education-gallery': 'knowledge-gallery',
+    'knowledge-gallery': 'knowledge-gallery',
     download: 'download',
     downloads: 'download'
   };
@@ -5115,7 +5240,8 @@ document.addEventListener('DOMContentLoaded',chsShowIncrement);
     schools: 'school',
     dataSubmit: 'submit',
     'learning-videos': 'videos',
-    examPaper: 'paper'
+    examPaper: 'paper',
+    'knowledge-gallery': 'education-gallery'
   };
   var originalShow = window.show;
 
