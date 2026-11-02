@@ -5091,6 +5091,73 @@ function chsShowIncrement(){
 }
 document.addEventListener('DOMContentLoaded',chsShowIncrement);
 </script>
+
+<!-- CHS Moro: shareable direct links for every single-file portal page -->
+<script id="chs-moro-deep-linking">
+(function () {
+  'use strict';
+  var aliases = {
+    home: 'home',
+    school: 'schools',
+    schools: 'schools',
+    submit: 'dataSubmit',
+    'submit-data': 'dataSubmit',
+    videos: 'learning-videos',
+    'learning-videos': 'learning-videos',
+    paper: 'examPaper',
+    'paper-tool': 'examPaper',
+    training: 'training',
+    download: 'download',
+    downloads: 'download'
+  };
+  var pageSlugs = {
+    schools: 'school',
+    dataSubmit: 'submit',
+    'learning-videos': 'videos',
+    examPaper: 'paper'
+  };
+  var originalShow = window.show;
+
+  function pageFromHash() {
+    var raw = (window.location.hash || '').replace(/^#/, '');
+    try { raw = decodeURIComponent(raw); } catch (e) {}
+    var id = aliases[raw.toLowerCase()] || raw;
+    var page = document.getElementById(id);
+    return page && page.classList.contains('page') ? id : '';
+  }
+
+  function writePageHash(id, replace) {
+    var slug = pageSlugs[id] || id;
+    var hash = '#' + encodeURIComponent(slug);
+    if (window.location.hash === hash) return;
+    if (replace) window.history.replaceState({ chsPage: id }, '', hash);
+    else window.history.pushState({ chsPage: id }, '', hash);
+  }
+
+  if (typeof originalShow === 'function') {
+    window.show = function (id, fromHistory) {
+      var result = originalShow.apply(this, arguments);
+      var page = document.getElementById(id);
+      if (page && page.classList.contains('page')) {
+        writePageHash(id, !!fromHistory);
+      }
+      return result;
+    };
+  }
+
+  function openLinkedPage() {
+    var id = pageFromHash();
+    if (!id || typeof originalShow !== 'function') return;
+    originalShow.call(window, id, true);
+    writePageHash(id, true);
+  }
+
+  window.addEventListener('hashchange', openLinkedPage);
+  window.addEventListener('popstate', openLinkedPage);
+  openLinkedPage();
+})();
+</script>
+
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
