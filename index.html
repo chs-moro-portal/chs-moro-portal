@@ -219,7 +219,7 @@
 .school-detail-save-all{margin:18px 0;text-align:right}.school-detail-save-all button{padding:11px 18px;border:0;border-radius:10px;cursor:pointer;font-weight:700}.green{background:#198754;color:#fff}.school-detail-edit-row{display:grid;grid-template-columns:1.1fr 2fr auto auto;gap:8px;align-items:center;margin:8px 0}.school-detail-edit-row label{font-weight:700}.school-detail-edit-row input{width:100%;box-sizing:border-box}@media(max-width:760px){.school-detail-edit-row{grid-template-columns:1fr}.school-detail-save-all{text-align:stretch}.school-detail-save-all button{width:100%}}
 
 .school-data-entry-hint{margin:12px 0 16px;padding:12px 14px;border:1px solid #b9dccb;border-radius:12px;background:#f1faf5;color:#175c3d;font-size:13px}.school-detail-save-all{position:sticky;bottom:10px;z-index:3;background:#fff;padding:10px 0;border-top:1px solid #e5ebe8}.school-edit-row{grid-template-columns:1.4fr 1fr auto auto!important}.school-edit-row button{white-space:nowrap}@media(max-width:800px){.school-edit-row{grid-template-columns:1fr!important}.school-edit-row button{width:100%}}
-</style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script>
+</style><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script><script>
 function goHome(){show('home')}
 function schoolInfo(){show('schools');renderSchools()}
 function contactUs(){alert('Contact Us\n\nCluster Head School Taluka Moro\nDistrict Naushahro Feroze\n\nFor portal assistance, please contact the Cluster Head School office.')}
@@ -5335,12 +5335,23 @@ window.strUploadPDF=async function(ev){
  if(!String(file.name||'').toLowerCase().endsWith('.pdf')||(file.type&&file.type!=='application/pdf')){strMsg('Please select a PDF file only.',true);ev.target.value='';return;}
  if(file.size>50*1024*1024){strMsg('PDF must be 50 MB or smaller.',true);ev.target.value='';return;}
  try{
-  strMsg('Uploading STR PDF to central storage…',false);
+  if(typeof PDFLib==='undefined')throw new Error('PDF watermark library did not load. Refresh the portal and try again.');
+  strMsg('Adding permanent name watermark to every PDF page…',false);
+  const pdfDoc=await PDFLib.PDFDocument.load(await file.arrayBuffer());
+  const font=await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const watermark='Developed by Faisal Jan Thaheem | CHS Moro Portal';
+  pdfDoc.getPages().forEach(page=>{
+   const size=page.getSize(),fontSize=Math.max(16,Math.min(30,size.width/25));
+   const textWidth=font.widthOfTextAtSize(watermark,fontSize);
+   page.drawText(watermark,{x:Math.max(12,(size.width-textWidth)/2),y:size.height/2,size,font,color:PDFLib.rgb(0.42,0.42,0.42),opacity:0.20,rotate:PDFLib.degrees(28)});
+  });
+  const uploadBlob=new Blob([await pdfDoc.save()],{type:'application/pdf'});
+  strMsg('Watermark added. Uploading PDF to central storage…',false);
   const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=Date.now()+'-'+safe;
-  const r=await fetch(STR_BASE+'/storage/v1/object/'+STR_PDF_BUCKET+'/'+encodeURIComponent(path),{method:'POST',headers:{'apikey':STR_KEY,'Authorization':'Bearer '+strToken,'Content-Type':'application/pdf','x-upsert':'false'},body:file});
+  const r=await fetch(STR_BASE+'/storage/v1/object/'+STR_PDF_BUCKET+'/'+encodeURIComponent(path),{method:'POST',headers:{'apikey':STR_KEY,'Authorization':'Bearer '+strToken,'Content-Type':'application/pdf','x-upsert':'false'},body:uploadBlob});
   const t=await r.text();if(!r.ok)throw new Error(t||'PDF upload failed');
-  ev.target.value='';await window.strLoadPDFs();strMsg('STR PDF uploaded successfully. It is now available in the STR PDF list.',false);
- }catch(e){strMsg('STR PDF upload failed: '+e.message+'. Confirm the Supabase storage setup has been run.',true);ev.target.value='';}
+  ev.target.value='';await window.strLoadPDFs();strMsg('STR PDF uploaded with permanent name watermark on every page.',false);
+ }catch(e){strMsg('STR PDF upload failed: '+e.message+'. Confirm the PDF is not password-protected and Supabase storage setup is complete.',true);ev.target.value='';}
 };
 
 window.strExportExcel=function(){if(!strToken){strMsg('Admin login required.',true);return;}if(typeof XLSX==='undefined'){strMsg('Excel library is not available.',true);return;}const data=strRows.map((r,i)=>({'S#':i+1,'Name':r.name||'','Payroll':r.payroll||'','Purana School SEMIS':r.old_school_semis||'','Naya School SEMIS':r.new_school_semis||'','PID':r.pid||''}));const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'STR List');XLSX.writeFile(wb,'CHS_Moro_STR_List.xlsx');};
