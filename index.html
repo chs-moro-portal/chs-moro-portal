@@ -2788,7 +2788,7 @@ function renderTable(){
   employeePage=Math.min(Math.max(1,employeePage),totalPages);
   const from=(employeePage-1)*size;
   const slice=filtered.slice(from,from+size);
-  const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(String(c.label||((DEFAULT_COLUMNS.find(d=>d.key===c.key)||{}).label)||c.key||'Column').trim())+'</th>').join('')+'<th>Actions</th></tr>';
+  const head='<tr><th>S#</th>'+cols.map(c=>'<th>'+esc(String(c.label||((DEFAULT_COLUMNS.find(d=>d.key===c.key)||{}).label)||c.key||'Column').trim())+'</th>').join('')+'<th>Actions</th></tr>';
   const th=document.getElementById('tableHead'),body=document.getElementById('rows');
   if(th)th.innerHTML=head;
   if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(fieldDisplayValue(x.e,c)||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
