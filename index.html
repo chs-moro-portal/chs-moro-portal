@@ -1812,7 +1812,7 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 <section class="page" id="admin"><div class="container"><div class="card">
 <div class="topbar"><h2>Admin Panel</h2><button class="red" onclick="adminLogout()">Logout</button></div>
 <p>Admin can Add and Edit employee records. Records are saved automatically in this browser. Public users can only view records.</p>
-<div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">🔄 Sync Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
+<div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">📥 Download Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
 <div class="manage-panel" id="columnManager">
 <h3 style="margin-top:0">Manage Employee Columns</h3>
 <div class="column-help">Edit changes the column title. Hide/Remove only removes it from the screen; existing employee data is kept. You can add it again later.</div>
@@ -1873,10 +1873,10 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 <div id="hmRequestManagerList"></div>
 </div>
 <div class="manage-panel" id="googleSyncManager">
-<h3 style="margin-top:0">🔄 Google Form → Employee Records</h3>
-<p class="column-help">Admin-only sync. New rows from the connected Google Sheet are imported into Employee Records. Existing teachers with the same CNIC/PID are skipped.</p>
+<h3 style="margin-top:0">📥 Google Form Responses (Separate Download)</h3>
+<p class="column-help">Admin-only download. Google Form responses are downloaded separately as Excel and are never added to Teachers Data.</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0">
-<button class="blue" onclick="syncGoogleFormData()" type="button">🔄 Sync Now</button>
+<button class="blue" onclick="downloadGoogleFormData()" type="button">📥 Download Responses (Excel)</button>
 <button class="gray" onclick="testGoogleSync()" type="button">🔎 Test Connection</button>
 <span class="message" id="googleSyncStatus" style="display:inline-block;margin:0"></span>
 </div>
@@ -3310,9 +3310,9 @@ function getHMRequests(){try{const a=JSON.parse(localStorage.getItem('hmRequests
       setStatus('Connection failed. Open the Web App URL in a browser and make sure access is set to Anyone.',true);
     }
   };
-  window.syncGoogleFormData=async function(){
+  window.downloadGoogleFormData=async function(){
     if(typeof isAdmin==='function' && !isAdmin()){alert('Admin login required.');return;}
-    setStatus('Syncing… please wait.',false);
+    setStatus('Fetching Google Form responses…',false);
     const result=document.getElementById('googleSyncResult'); if(result)result.innerHTML='';
     try{
       const res=await fetch(GOOGLE_SYNC_URL,{cache:'no-store'});
@@ -3320,29 +3320,22 @@ function getHMRequests(){try{const a=JSON.parse(localStorage.getItem('hmRequests
       const json=await res.json();
       if(json.status!=='success' || !Array.isArray(json.data)) throw new Error(json.message||'Invalid response from Google Sheet.');
       const incoming=json.data;
-      let all=typeof records==='function'?records():[];
-      let added=0, skipped=0, empty=0;
-      const imported=JSON.parse(localStorage.getItem('chsGoogleImportedKeys')||'[]');
-      const importedSet=new Set(imported);
-      for(const row of incoming){        const mapped=mapGoogleRow(row);
-        if(!mapped.name && !mapped.cnic && !mapped.personal && !mapped.school){empty++;continue;}
-        const key=keyOf(mapped);
-        if(importedSet.has(key) || duplicateLocal(mapped)){skipped++; importedSet.add(key); continue;}
-        all.push(mapped); added++; importedSet.add(key);
-      }
-      if(typeof setRecords==='function') setRecords(all); else localStorage.setItem('employeeRecords',JSON.stringify(all));
-      localStorage.setItem('chsGoogleImportedKeys',JSON.stringify([...importedSet]));
-      if(typeof renderTable==='function')renderTable();
-      if(typeof updatePortalStats==='function')updatePortalStats();
-      if(typeof renderColumnManager==='function')renderColumnManager();
-      setStatus('Sync complete.',false);
-      if(result)result.innerHTML='<div class="notice-box"><b>Sync complete.</b><br>Google Sheet rows: '+incoming.length+'<br>New employees added: <b>'+added+'</b><br>Existing / duplicate rows skipped: <b>'+skipped+'</b>'+(empty?'<br>Empty rows skipped: <b>'+empty+'</b>':'')+'</div>';
+      if(!incoming.length) throw new Error('No Google Form responses found.');
+      if(typeof XLSX==='undefined') throw new Error('Excel library could not load. Please try again with internet access.');
+      const ws=XLSX.utils.json_to_sheet(incoming);
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Google Form Responses');
+      XLSX.writeFile(wb,'CHS_Moro_Google_Form_Responses.xlsx');
+      setStatus('Download ready — '+incoming.length+' responses.',false);
+      if(result)result.innerHTML='<div class="notice-box"><b>Google Form responses downloaded.</b><br>Total responses: <b>'+incoming.length+'</b><br><br>These responses were kept separate. Teachers Data was not changed.</div>';
     }catch(e){
       console.error(e);
-      setStatus('Sync failed.',true);
-      if(result)result.innerHTML='<div class="notice-box" style="border-color:#e8b4b4"><b>Sync failed.</b><br>'+String(e.message||e)+'</div>';
+      setStatus('Download failed.',true);
+      if(result)result.innerHTML='<div class="notice-box" style="border-color:#e8b4b4"><b>Could not download responses.</b><br>'+String(e.message||e)+'</div>';
     }
   };
+  // Backward-compatible button handler: fetch and download only; never import into Teachers Data.
+  window.syncGoogleFormData=window.downloadGoogleFormData;
 })();
 </script>
 <style>.contact-photo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:14px}.contact-photo-card{border:1px solid #dbe9e2;border-radius:14px;padding:12px;background:#fbfdfc;text-align:center}.contact-photo-card img,.contact-photo-placeholder{width:100%;height:145px;object-fit:cover;border-radius:10px;border:1px solid #dbe9e2}.contact-photo-placeholder{display:flex;align-items:center;justify-content:center;background:#eef5f1;color:#6a7d73;font-weight:800}.contact-photo-name{font-weight:800;color:#174c39;margin-top:9px;min-height:22px}.contact-photos-admin{margin-top:14px}.contact-photo-manager-row{border:1px solid #dbe9e2;border-radius:14px;padding:14px;margin:10px 0;display:grid;gap:9px}.contact-photo-manager-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.contact-photo-thumb{width:75px;height:75px;object-fit:cover;border-radius:9px;border:1px solid #dbe9e2}.contact-photo-actions{display:flex;gap:8px;flex-wrap:wrap}@media(max-width:800px){.contact-photo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:500px){.contact-photo-grid{grid-template-columns:1fr 1fr}.contact-photo-card img,.contact-photo-placeholder{height:120px}}
