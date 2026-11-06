@@ -295,7 +295,13 @@ function importExcel(ev){
 function downloadExcel(){
   if(typeof XLSX==='undefined'){msg('Excel library could not load. Please connect to the internet and try again.',true);return}
   const r=records(); if(!r.length){msg('No employee records available to download.',true);return}
-  const data=r.map((e,i)=>({'#':i+1,'Name':e.name||'','Gender':e.gender||'','Cluster':e.cluster||'','Father Name':e.father||'','CNIC':e.cnic||'','Personal Number':e.personal||'','Designation':e.designation||'','School/Office':e.school||'','District':e.district||'','Joining Date':e.joining||'','Seniority Number':e.seniority||'','Mobile':e.mobile||'','Qualification':e.qualification||'','Remarks':e.remarks||''}));
+  // Export only the approved teacher payroll columns; do not append legacy Seniority/Payroll fields.
+  const cols=DEFAULT_COLUMNS;
+  const data=r.map((e,i)=>{
+    const row={'S#':i+1};
+    cols.forEach(c=>{row[c.label]=fieldDisplayValue(e,c)||'';});
+    return row;
+  });
   const ws=XLSX.utils.json_to_sheet(data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Employee Records'); XLSX.writeFile(wb,'CHS_Moro_Employee_Records.xlsx');
 }
 document.addEventListener('DOMContentLoaded',()=>{
