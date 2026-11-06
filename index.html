@@ -2005,35 +2005,30 @@ if(window.__CHS_SAVED_STATE__){try{const S=window.__CHS_SAVED_STATE__;Object.key
 const ADMIN_USER='Faisal',ADMIN_PASS='Faisal@1993',HC_USER='HC',HC_PASS='HC12345';let editIndex=-1,employeePage=1;
 document.addEventListener('DOMContentLoaded',function(){setupAdminTeacherSearch();});
 const DEFAULT_COLUMNS=[
- {key:'semisCode',label:'SEMIS CODE',visible:true},
- {key:'school',label:'Name Of School',visible:true},
- {key:'costCentre',label:'Cost Centre',visible:true},
- {key:'name',label:'Name Of Employee',required:true,visible:true},
- {key:'father',label:'Father Name',visible:true},
- {key:'gender',label:'Gender',visible:true,required:true,type:'gender'},
- {key:'cluster',label:'Cluster',visible:true,required:true,type:'cluster'},
- {key:'designation',label:'Designation 9-Scale',visible:true},
- {key:'cnic',label:'CNIC Number',required:true,visible:true},
- {key:'personal',label:'PID Number',visible:true},
  {key:'rid',label:'RID',visible:true},
- {key:'dob',label:'Date Of Birth',visible:true,type:'date'},
- {key:'academicQualification',label:'Academic Qualification',visible:true},
- {key:'professionalQualification',label:'Professional Qualification',visible:true},
- {key:'bedDeclarationDate',label:'Date of Declaration of B.Ed',visible:true,type:'date'},
- {key:'firstAppointmentDesignationGrade',label:'First appointment designation and grade',visible:true},
- {key:'firstAppointmentPlace',label:'First appointment place of posting',visible:true},
- {key:'regularisationDate',label:'Date of Regularisation',visible:true,type:'date'},
- {key:'lastPromotionAs',label:'Last promotion as',visible:true},
- {key:'lastPromotionDate',label:'Date of Last Promotion',visible:true,type:'date'},
- {key:'ibianNumber',label:'IBIAN Number',visible:true},
+ {key:'name',label:'NAME',required:true,visible:true},
+ {key:'father',label:"FATHER'S NAME",visible:true},
+ {key:'gender',label:'Gender',visible:true,type:'gender'},
+ {key:'qualification',label:'QUALIFICATION',visible:true},
+ {key:'cnic',label:'CNIC',required:true,visible:true},
+ {key:'dob',label:'D.O.B',visible:true,type:'date'},
+ {key:'joining',label:'D.O.A',visible:true,type:'date'},
+ {key:'retirement',label:'D.O.R',visible:true,type:'date'},
+ {key:'personal',label:'PID',visible:true},
+ {key:'designation',label:'DESIG',visible:true},
+ {key:'status',label:'STATUS',visible:true},
+ {key:'semisId',label:'SEMIS ID',visible:true},
+ {key:'school',label:'SCHOOL',visible:true},
+ {key:'clusterCode',label:'CLUSTER CODE',visible:true},
+ {key:'costCentre',label:'COST CENTRE',visible:true},
+ {key:'district',label:'DISTRICT',visible:true},
  {key:'testBy',label:'Test by? IBA/NTS/SINDH/OTHER?',visible:true},
  {key:'testMarks',label:'Marks in test',visible:true},
- {key:'meritNumber',label:'Merit Number',visible:true},
- {key:'quota',label:'Quota/Disable/Son Quota',visible:true},
- {key:'workingAsPerSTR',label:'Working as per STR or Original?',visible:true},
- {key:'email',label:'Email',visible:true,type:'email'},
- {key:'mobile',label:'Contact Number',visible:true},
- {key:'remarks',label:'Remarks if any',visible:true,type:'textarea'}
+ {key:'bankIban',label:'BANK A/C IBAN',visible:true},
+ {key:'grossSalary',label:'CURRENT GROSS SALARY',visible:true},
+ {key:'netSalary',label:'NET SALARY DISBURSED TO BANK',visible:true},
+ {key:'mobile',label:'Contact #',visible:true},
+ {key:'totalService',label:'Total Service',visible:true}
 ];
 function getColumns(){
   const fresh=()=>DEFAULT_COLUMNS.map(x=>({...x}));
@@ -2045,11 +2040,11 @@ function getColumns(){
     let cols=JSON.parse(saved);
     if(!Array.isArray(cols)||!cols.length)throw 0;
 
-    // The portal previously used a 14-column employee schema.
-    // Automatically migrate that saved browser configuration to the required 29-column teacher schema.
-    const required29=['semisCode','school','costCentre','name','father','gender','cluster','designation','cnic','personal','rid','dob','academicQualification','professionalQualification','bedDeclarationDate','firstAppointmentDesignationGrade','firstAppointmentPlace','regularisationDate','lastPromotionAs','lastPromotionDate','ibianNumber','testBy','testMarks','meritNumber','quota','workingAsPerSTR','email','mobile','remarks'];
-    const is29=required29.every(k=>cols.some(c=>c&&c.key===k));
-    if(!is29){
+    // Replace previous teacher column layouts with the latest approved 24-field layout.
+    // Existing employee records remain untouched in localStorage and Supabase.
+    const requiredTeacherFields=['rid','name','father','gender','qualification','cnic','dob','joining','retirement','personal','designation','status','semisId','school','clusterCode','costCentre','district','testBy','testMarks','bankIban','grossSalary','netSalary','mobile','totalService'];
+    const isCurrent=requiredTeacherFields.every(k=>cols.some(c=>c&&c.key===k)) && cols.length===requiredTeacherFields.length;
+    if(!isCurrent){
       cols=fresh();
       localStorage.setItem('employeeColumns',JSON.stringify(cols));
       return cols;
@@ -2548,7 +2543,25 @@ function pickGoogleSearch(obj,names){
   for(const k of keys){const nk=String(k).toLowerCase().replace(/[\s_\-\/().]+/g,'');if(wanted.includes(nk)&&String(obj[k]??'').trim()!=='')return obj[k]}
   return '';
 }
-function fieldDisplayValue(e,c){let v=e[c.key];const key=String(c.key||'').toLowerCase(),label=String(c.label||'').toLowerCase();if(key==='personal'||/personal number|\bpid\b/.test(label)){v=e.personal||e.pid||e.payrollId||e.payroll||'';}else if((v===undefined||v===null||String(v).trim()==='') && /payroll|pay roll/i.test(label)){v=e.payrollId||e.payroll||'';}return (v===undefined||v===null||String(v).trim()==='')?'':String(v)}
+function fieldDisplayValue(e,c){
+ const aliases={
+  rid:['rid','reg','registrationId'],name:['name','fullName'],father:['father','fatherName'],
+  gender:['gender'],qualification:['qualification','academicQualification','professionalQualification'],
+  cnic:['cnic','nic'],dob:['dob','dateOfBirth'],joining:['joining','dateOfAppointment','appointmentDate'],
+  retirement:['retirement','dateOfRetirement'],personal:['personal','pid','payrollId','payroll'],
+  designation:['designation','desig'],status:['status','employeeStatus'],semisId:['semisId','semisCode','semis'],
+  school:['school','currentPosting'],clusterCode:['clusterCode','cluster','salaryCode'],
+  costCentre:['costCentre','costCenter'],district:['district'],testBy:['testBy'],testMarks:['testMarks'],
+  bankIban:['bankIban','ibianNumber','iban'],grossSalary:['grossSalary','currentGrossSalary'],
+  netSalary:['netSalary','netSalaryDisbursedToBank'],mobile:['mobile','contact','contactNumber'],
+  totalService:['totalService','serviceLength']
+ };
+ let v=e?.[c.key];
+ if(v===undefined||v===null||String(v).trim()===''){
+  for(const k of (aliases[c.key]||[])){if(e?.[k]!==undefined&&e[k]!==null&&String(e[k]).trim()!==''){v=e[k];break;}}
+ }
+ return (v===undefined||v===null||String(v).trim()==='')?'':String(v)
+}
 function renderView(e){
   let f=visibleColumns();
   const photo=e.photo||e.image||e.employeePhoto||'';
@@ -2778,7 +2791,7 @@ function renderTable(){
   const head='<tr><th>#</th>'+cols.map(c=>'<th>'+esc(String(c.label||((DEFAULT_COLUMNS.find(d=>d.key===c.key)||{}).label)||c.key||'Column').trim())+'</th>').join('')+'<th>Actions</th></tr>';
   const th=document.getElementById('tableHead'),body=document.getElementById('rows');
   if(th)th.innerHTML=head;
-  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(x.e[c.key]||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
+  if(body)body.innerHTML=slice.length?slice.map((x,n)=>'<tr><td>'+(from+n+1)+'</td>'+cols.map(c=>'<td>'+esc(fieldDisplayValue(x.e,c)||'-')+'</td>').join('')+'<td class="record-actions"><button class="blue" type="button" onclick="editRecord('+x.i+')">✏ Edit</button><button class="red" type="button" onclick="deleteRecord('+x.i+')">🗑 Delete</button></td></tr>').join(''):'<tr><td colspan="'+(cols.length+2)+'" class="center">No records found.</td></tr>';
   const info=document.getElementById('employeePageInfo');
   if(info)info.textContent=filtered.length?`Showing ${from+1}-${Math.min(from+size,filtered.length)} of ${filtered.length}`:'Showing 0 of 0';
   const pg=document.getElementById('employeePagination');
