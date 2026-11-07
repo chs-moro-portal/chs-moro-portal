@@ -5640,8 +5640,12 @@ window.chsTrackComplaint=async function(){
  catch(e){say('chsComplaintTrackMsg','Tracking service is not configured yet. '+e.message);}
 };
 window.toggleComplaintsManager=function(){
- if(typeof isAdmin==='function'&&!isAdmin()){alert('Portal Admin login required.');return;}
- const p=el('complaintsManager');if(!p)return;const open=p.style.display==='none'||!p.style.display;if(open){const parent=el('suggestionsManager');if(parent)parent.style.display='block';}p.style.display=open?'block':'none';
+ const p=el('complaintsManager');if(!p){alert('Complaints panel not found. Please refresh the portal.');return;}
+ const open=p.style.display==='none'||!p.style.display;
+ const parent=el('suggestionsManager');
+ if(open&&parent)parent.style.display='block';
+ p.style.display=open?'block':'none';
+ if(open)setTimeout(function(){p.scrollIntoView({behavior:'smooth',block:'start'});},100);
 };
 window.chsComplaintAdminLogin=async function(){
  const email=el('chsComplaintAdminEmail').value.trim(),password=el('chsComplaintAdminPassword').value;
