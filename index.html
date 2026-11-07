@@ -1035,6 +1035,48 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 #chsComplaintBox .chs-track-row button{white-space:nowrap;border-radius:10px;padding:10px 14px;background:#e9f1ec;color:#17563b;font-weight:750}
 #chsComplaintBox #chsComplaintTrackMsg{padding-top:8px}
 @media(max-width:600px){#chsComplaintBox .chs-complaint-head{padding:18px 14px 10px;gap:11px}#chsComplaintBox .chs-complaint-icon{width:45px;height:45px;flex-basis:45px;font-size:23px;border-radius:13px}#chsComplaintBox .chs-complaint-trust{padding:7px 14px 13px;gap:6px}#chsComplaintBox .chs-complaint-trust span{font-size:10px;padding:5px 8px}#chsComplaintBox .chs-complaint-form-title{margin-left:14px;margin-right:14px}#chsComplaintBox .chs-complaint-grid{padding:0 14px 10px;grid-template-columns:1fr!important}#chsComplaintBox .chs-complaint-submit-row{padding-left:14px;padding-right:14px}#chsComplaintBox .chs-complaint-submit-row button{width:100%}#chsComplaintBox .chs-track-panel{margin-left:9px;margin-right:9px}#chsComplaintBox .chs-track-row{flex-direction:column;align-items:stretch}#chsComplaintBox .chs-track-row button{width:100%}#chsComplaintBox .chs-complaint-form-title small{font-size:10px}}
+
+/* CHS compact complaint layout */
+#chsComplaintBox{margin-top:10px!important;border-radius:13px!important;box-shadow:0 5px 16px rgba(8,75,48,.07)!important}
+#chsComplaintBox:before{height:3px}
+#chsComplaintBox .chs-complaint-head{padding:12px 16px 7px;gap:10px}
+#chsComplaintBox .chs-complaint-icon{width:40px;height:40px;flex-basis:40px;border-radius:11px;font-size:21px}
+#chsComplaintBox .chs-complaint-kicker{font-size:9px;letter-spacing:1px}
+#chsComplaintBox .chs-complaint-heading h3{font-size:19px!important;margin:2px 0!important}
+#chsComplaintBox .chs-complaint-heading p{font-size:11px;line-height:1.35}
+#chsComplaintBox .chs-complaint-trust{padding:5px 16px 8px;gap:5px}
+#chsComplaintBox .chs-complaint-trust span{padding:4px 7px;font-size:10px}
+#chsComplaintBox .chs-complaint-form-title{margin:0 16px 8px;padding-top:9px;gap:7px}
+#chsComplaintBox .chs-complaint-form-title b{width:23px;height:23px;border-radius:6px}
+#chsComplaintBox .chs-complaint-form-title span{font-size:12px}
+#chsComplaintBox .chs-complaint-form-title small{font-size:10px}
+#chsComplaintBox .chs-complaint-grid{padding:0 16px 8px;gap:8px}
+#chsComplaintBox .chs-complaint-field{gap:4px;font-size:11px}
+#chsComplaintBox .chs-complaint-field input,#chsComplaintBox .chs-complaint-field select,#chsComplaintBox .chs-complaint-field textarea,#chsComplaintBox .chs-track-row input{padding:8px 10px!important;border-radius:8px!important;font-size:12px}
+#chsComplaintBox .chs-complaint-field textarea{min-height:72px;line-height:1.4}
+#chsComplaintBox .chs-complaint-submit-row{padding:3px 16px 8px;gap:8px}
+#chsComplaintBox .chs-complaint-submit-row>span{font-size:10px}
+#chsComplaintBox .chs-complaint-submit-row button{padding:9px 14px!important;border-radius:8px!important;font-size:12px}
+#chsComplaintBox .suggestion-msg{margin:0 16px 8px;font-size:12px}
+#chsComplaintBox .chs-track-panel{margin:4px 10px 10px;padding:3px 6px 7px;border-radius:10px}
+#chsComplaintBox .chs-track-panel .chs-complaint-form-title{margin:0 8px 5px;padding-top:4px}
+#chsComplaintBox .chs-track-panel p{margin:0 8px 7px;font-size:11px;line-height:1.35}
+#chsComplaintBox .chs-track-row{gap:7px;padding:0 8px}
+#chsComplaintBox .chs-track-row button{padding:8px 11px;font-size:11px;border-radius:8px}
+@media(max-width:600px){
+#chsComplaintBox .chs-complaint-head{padding:10px 11px 6px;gap:8px}
+#chsComplaintBox .chs-complaint-icon{width:36px;height:36px;flex-basis:36px;font-size:19px}
+#chsComplaintBox .chs-complaint-trust{padding:4px 11px 7px;gap:4px}
+#chsComplaintBox .chs-complaint-trust span{font-size:9px;padding:3px 6px}
+#chsComplaintBox .chs-complaint-form-title{margin-left:11px;margin-right:11px}
+#chsComplaintBox .chs-complaint-grid{padding:0 11px 7px;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px}
+#chsComplaintBox .chs-complaint-field.full{grid-column:1/-1}
+#chsComplaintBox .chs-complaint-submit-row{padding-left:11px;padding-right:11px}
+#chsComplaintBox .chs-complaint-submit-row button{width:auto;flex:1}
+#chsComplaintBox .chs-track-panel{margin-left:7px;margin-right:7px}
+#chsComplaintBox .chs-track-row{flex-direction:row;align-items:center}
+#chsComplaintBox .chs-track-row button{width:auto}
+}
 </style>
 </head>
 <body>
@@ -1202,7 +1244,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
     <label class="chs-complaint-field"><span>SEMIS ID <small>Optional</small></span><input id="chsComplaintSemis" placeholder="Enter SEMIS ID"/></label>
     <label class="chs-complaint-field"><span>Mobile Number <small>Optional</small></span><input id="chsComplaintMobile" placeholder="Enter contact number" inputmode="tel"/></label>
     <label class="chs-complaint-field full"><span>Subject *</span><input id="chsComplaintSubject" placeholder="Brief subject of your complaint or request"/></label>
-    <label class="chs-complaint-field full"><span>Details *</span><textarea id="chsComplaintDetails" placeholder="Explain your complaint or request clearly..." rows="5"></textarea></label>
+    <label class="chs-complaint-field full"><span>Details *</span><textarea id="chsComplaintDetails" placeholder="Explain your complaint or request clearly..." rows="3"></textarea></label>
   </div>
   <div class="chs-complaint-submit-row"><span>Review your details before submitting.</span><button class="blue" type="button" onclick="chsSubmitComplaint()">📨 Submit Securely</button></div>
   <div class="suggestion-msg" id="chsComplaintMsg" aria-live="polite"></div>
