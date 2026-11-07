@@ -1809,7 +1809,7 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 <h3 style="margin:0 0 8px;color:#174ea6">🔐 STR Administration — Admin Only</h3>
 <div id="strLoginBox"><p style="margin:5px 0 10px">Sign in with the Supabase administrator account.</p><label>Admin Email</label><input id="strAdminEmail" type="email" autocomplete="username" placeholder="Admin email"><label>Password</label><input id="strAdminPassword" type="password" autocomplete="current-password" placeholder="Supabase password"><button type="button" onclick="strAdminLogin()">🔐 Admin Login</button></div>
 <div id="strAdminTools" style="display:none"><p id="strAdminWelcome" style="font-weight:700;color:#075c3b">Admin session active</p>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" onclick="strSaveRecord()">＋ Add / Save Record</button><button type="button" class="blue" onclick="document.getElementById('strImportFile').click()">⬆ Upload Excel / CSV</button><input id="strImportFile" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="strImportFile(event)"><button type="button" class="gray" onclick="strExportExcel()">⬇ Download Excel</button><button type="button" class="red" onclick="strAdminLogout()">Logout</button><button type="button" class="blue" onclick="document.getElementById('strPdfFile').click()">📄 Upload STR PDF</button><input id="strPdfFile" type="file" accept=".pdf,application/pdf" style="display:none" onchange="strUploadPDF(event)"></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"><button type="button" onclick="strSaveRecord()">＋ Add / Save Record</button><button type="button" class="blue" onclick="document.getElementById('strImportFile').click()">⬆ Upload Excel / CSV</button><input id="strImportFile" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="strImportFile(event)"><button type="button" class="gray" onclick="strExportExcel()">⬇ Download Excel</button><button type="button" class="red" onclick="strRemoveExactDuplicates()">🧹 Remove Exact Duplicates</button><button type="button" class="red" onclick="strAdminLogout()">Logout</button><button type="button" class="blue" onclick="document.getElementById('strPdfFile').click()">📄 Upload STR PDF</button><input id="strPdfFile" type="file" accept=".pdf,application/pdf" style="display:none" onchange="strUploadPDF(event)"></div>
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px"><input id="strEditId" type="hidden"><input id="strName" placeholder="Name"><input id="strPayroll" placeholder="Payroll"><input id="strOldSemis" placeholder="Old School SEMIS"><input id="strNewSemis" placeholder="New School SEMIS"><input id="strPID" placeholder="PID"></div>
 <p style="font-size:12px;color:#64748b;margin:8px 0 0">Import headers supported: Name, Payroll, Old School SEMIS, New School SEMIS, PID. S# is generated automatically.</p></div></div>
 <div style="overflow:auto;border:1px solid #dce5ef;border-radius:10px"><table style="width:100%;border-collapse:collapse;min-width:850px;font-size:13px"><thead><tr><th>S#</th><th>Name</th><th>Payroll</th><th>Old School SEMIS</th><th>New School SEMIS</th><th>PID</th><th id="strActionHead" style="display:none">Admin Action</th></tr></thead><tbody id="strRows"><tr><td colspan="7">Loading…</td></tr></tbody></table></div>
@@ -5374,6 +5374,33 @@ window.strUploadPDF=async function(ev){
 };
 
 window.strExportExcel=function(){if(!strToken){strMsg('Admin login required.',true);return;}if(typeof XLSX==='undefined'){strMsg('Excel library is not available.',true);return;}const data=strRows.map((r,i)=>({'S#':i+1,'Name':r.name||'','Payroll':r.payroll||'','Old School SEMIS':r.old_school_semis||'','New School SEMIS':r.new_school_semis||'','PID':r.pid||''}));const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'STR List');XLSX.writeFile(wb,'CHS_Moro_STR_List.xlsx');};
+window.strRemoveExactDuplicates=async function(){
+ if(!strToken){strMsg('Admin login required.',true);return;}
+ if(!Array.isArray(strRows)||!strRows.length){strMsg('No STR records are loaded. Refresh the STR list first.',true);return;}
+ const norm=v=>String(v==null?'':v).toLowerCase().replace(/\\s+/g,' ').trim();
+ const seen=new Set(),remove=[];
+ strRows.slice().sort((a,b)=>Number(a.id)-Number(b.id)).forEach(r=>{
+  const key=JSON.stringify([r.name,r.payroll,r.old_school_semis,r.new_school_semis,r.pid].map(norm));
+  if(seen.has(key))remove.push(r);else seen.add(key);
+ });
+ if(!remove.length){strMsg('No exact duplicate records found. All '+strRows.length+' records are retained.',false);return;}
+ const preview=remove.slice(0,5).map(r=>'#'+r.id+' '+(r.name||'Unnamed')+' (PID '+(r.pid||'blank')+')').join('\\n');
+ const more=remove.length>5?'\\n… and '+(remove.length-5)+' more.':'';
+ if(!confirm('Found '+remove.length+' exact duplicate record(s).\\n\\nOnly records with identical Name, Payroll, Old School SEMIS, New School SEMIS and PID will be removed. The earliest record is kept.\\n\\n'+preview+more+'\\n\\nContinue?'))return;
+ let deleted=0;
+ try{
+  for(const row of remove){
+   const response=await fetch(STR_BASE+'/rest/v1/str_records?id=eq.'+encodeURIComponent(row.id),{method:'DELETE',headers:strHeaders()});
+   if(!response.ok)throw new Error('Could not delete record ID '+row.id+': '+await response.text());
+   deleted++;
+  }
+  await window.loadSTRRecords();
+  strMsg('Completed: '+deleted+' exact duplicate record(s) removed. '+strRows.length+' records remain. Different school transfers were not matched.',false);
+ }catch(e){
+  await window.loadSTRRecords();
+  strMsg(deleted+' duplicate(s) removed before an error. Remaining list refreshed. '+e.message,true);
+ }
+};
 document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){strAdminUI();window.strLoadPDFs();}});
 })();
 </script>
