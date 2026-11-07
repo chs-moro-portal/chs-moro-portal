@@ -5647,7 +5647,7 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
 .chs-faisal-footer-photo{width:34px;height:34px;object-fit:cover;object-position:center 28%;border-radius:50%;border:2px solid #d3ae58;display:inline-block;vertical-align:middle;margin:0 7px 0 0;box-shadow:0 2px 7px #0003;flex:0 0 auto}
 .footer{padding:8px 9px!important;line-height:1.25!important}
 .footer>div:first-child{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px}
-.chs-footer-contact-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:0 0 auto}.chs-footer-contact-stack .chs-faisal-footer-photo{margin:0!important}.chs-footer-whatsapp{display:block;color:#d1fae5!important;font-size:13px;font-weight:800;text-decoration:underline!important;white-space:nowrap}
+.footer>div:first-of-type{display:flex!important;flex-direction:column!important;align-items:center!important;gap:2px!important}.chs-footer-whatsapp{display:block;color:#d1fae5!important;font-size:10px!important;font-weight:700;text-decoration:underline!important;white-space:nowrap;line-height:1.15!important}
 </style>
 <script id="chs-faisal-personal-photo-restore">
 (function(){
@@ -5660,12 +5660,14 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
    var footer=document.querySelector('.footer');
    if(footer){
     var img=footer.querySelector('.chs-faisal-footer-photo');
-    if(!img){img=document.createElement('img');img.className='chs-faisal-footer-photo';img.alt='Faisal Jan Thaheem';img.src=personalPhoto;}
     var stack=footer.querySelector('.chs-footer-contact-stack');
-    if(!stack){stack=document.createElement('div');stack.className='chs-footer-contact-stack';footer.insertBefore(stack,footer.firstChild);}
-    if(img.parentElement!==stack)stack.appendChild(img);
-    var link=stack.querySelector('.chs-footer-whatsapp');
-    if(!link){link=document.createElement('a');link.className='chs-footer-whatsapp';link.href='https://wa.me/92302291670';link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label','Chat on WhatsApp');link.textContent='WhatsApp: 03022291670';stack.appendChild(link);}
+    if(stack){if(!img)img=stack.querySelector('.chs-faisal-footer-photo');if(img)footer.insertBefore(img,footer.firstChild);stack.remove();}
+    if(!img){img=document.createElement('img');img.className='chs-faisal-footer-photo';img.alt='Faisal Jan Thaheem';img.src=personalPhoto;footer.insertBefore(img,footer.firstChild);}
+    var credit=footer.querySelector(':scope > div');
+    if(credit){
+     var link=credit.querySelector('.chs-footer-whatsapp');
+     if(!link){link=document.createElement('a');link.className='chs-footer-whatsapp';link.href='https://wa.me/923022291670';link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label','Chat on WhatsApp');link.textContent='WhatsApp: 0302 2291670';credit.appendChild(link);}
+    }
    }
   }catch(e){}
  }
