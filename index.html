@@ -2023,7 +2023,6 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 
 <div class="footer">
 <div>Developed by <b>Faisal Jan Thaheem</b>  •  <b>Focal Person (Cluster School)</b></div>
-<div style="margin-top:5px"><a href="https://wa.me/92302291670" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp" style="color:#d1fae5;font-weight:800;text-decoration:underline">WhatsApp: 0302 2291670</a></div>
 <div>Employee Data Centre • Taluka Moro</div>
 <div style="margin-top:8px"><div id="chsReliableMgmt">
   <button id="chsReliableMgmtBtn" type="button" onclick="chsRM_toggle()">🛠️ Management Tools ▾</button>
@@ -5648,6 +5647,7 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
 .chs-faisal-footer-photo{width:34px;height:34px;object-fit:cover;object-position:center 28%;border-radius:50%;border:2px solid #d3ae58;display:inline-block;vertical-align:middle;margin:0 7px 0 0;box-shadow:0 2px 7px #0003;flex:0 0 auto}
 .footer{padding:8px 9px!important;line-height:1.25!important}
 .footer>div:first-child{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px}
+.chs-footer-contact-stack{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:0 0 auto}.chs-footer-contact-stack .chs-faisal-footer-photo{margin:0!important}.chs-footer-whatsapp{display:block;color:#d1fae5!important;font-size:13px;font-weight:800;text-decoration:underline!important;white-space:nowrap}
 </style>
 <script id="chs-faisal-personal-photo-restore">
 (function(){
@@ -5658,11 +5658,14 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
    var wp=welcome&&welcome.querySelector('#chsV41WelcomePhoto');
    if(wp){wp.style.backgroundImage='url("'+personalPhoto+'")';wp.style.backgroundSize='cover';wp.style.backgroundPosition='center 28%';wp.style.backgroundRepeat='no-repeat';}
    var footer=document.querySelector('.footer');
-   if(footer&&!footer.querySelector('.chs-faisal-footer-photo')){
-    var img=document.createElement('img');img.className='chs-faisal-footer-photo';img.alt='Faisal Jan Thaheem';
-    img.src=personalPhoto;
-    var first=footer.firstElementChild;
-    if(first)footer.insertBefore(img,first);else footer.appendChild(img);
+   if(footer){
+    var img=footer.querySelector('.chs-faisal-footer-photo');
+    if(!img){img=document.createElement('img');img.className='chs-faisal-footer-photo';img.alt='Faisal Jan Thaheem';img.src=personalPhoto;}
+    var stack=footer.querySelector('.chs-footer-contact-stack');
+    if(!stack){stack=document.createElement('div');stack.className='chs-footer-contact-stack';footer.insertBefore(stack,footer.firstChild);}
+    if(img.parentElement!==stack)stack.appendChild(img);
+    var link=stack.querySelector('.chs-footer-whatsapp');
+    if(!link){link=document.createElement('a');link.className='chs-footer-whatsapp';link.href='https://wa.me/92302291670';link.target='_blank';link.rel='noopener noreferrer';link.setAttribute('aria-label','Chat on WhatsApp');link.textContent='WhatsApp: 03022291670';stack.appendChild(link);}
    }
   }catch(e){}
  }
