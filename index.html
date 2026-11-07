@@ -5377,16 +5377,16 @@ window.strExportExcel=function(){if(!strToken){strMsg('Admin login required.',tr
 window.strRemoveExactDuplicates=async function(){
  if(!strToken){strMsg('Admin login required.',true);return;}
  if(!Array.isArray(strRows)||!strRows.length){strMsg('No STR records are loaded. Refresh the STR list first.',true);return;}
- const norm=v=>String(v==null?'':v).toLowerCase().replace(/\\s+/g,' ').trim();
+ const norm=v=>String(v==null?'':v).toLowerCase().replace(/\s+/g,' ').trim();
  const seen=new Set(),remove=[];
  strRows.slice().sort((a,b)=>Number(a.id)-Number(b.id)).forEach(r=>{
   const key=JSON.stringify([r.name,r.payroll,r.old_school_semis,r.new_school_semis,r.pid].map(norm));
   if(seen.has(key))remove.push(r);else seen.add(key);
  });
  if(!remove.length){strMsg('No exact duplicate records found. All '+strRows.length+' records are retained.',false);return;}
- const preview=remove.slice(0,5).map(r=>'#'+r.id+' '+(r.name||'Unnamed')+' (PID '+(r.pid||'blank')+')').join('\\n');
- const more=remove.length>5?'\\n… and '+(remove.length-5)+' more.':'';
- if(!confirm('Found '+remove.length+' exact duplicate record(s).\\n\\nOnly records with identical Name, Payroll, Old School SEMIS, New School SEMIS and PID will be removed. The earliest record is kept.\\n\\n'+preview+more+'\\n\\nContinue?'))return;
+ const preview=remove.slice(0,5).map(r=>'#'+r.id+' '+(r.name||'Unnamed')+' (PID '+(r.pid||'blank')+')').join('\n');
+ const more=remove.length>5?'\n… and '+(remove.length-5)+' more.':'';
+ if(!confirm('Found '+remove.length+' exact duplicate record(s).\n\nOnly records with identical Name, Payroll, Old School SEMIS, New School SEMIS and PID will be removed. The earliest record is kept.\n\n'+preview+more+'\n\nContinue?'))return;
  let deleted=0;
  try{
   for(const row of remove){
