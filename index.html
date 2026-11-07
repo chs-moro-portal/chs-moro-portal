@@ -1820,7 +1820,35 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 <section class="page" id="admin"><div class="container"><div class="card">
 <div class="topbar"><h2>Admin Panel</h2><button class="red" onclick="adminLogout()">Logout</button></div>
 <p>Admin can Add and Edit employee records. Records are saved automatically in this browser. Public users can only view records.</p>
-<div class="column-tools"><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">📥 Download Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
+<div class="column-tools"><button class="manage-columns-btn" type="button" onclick="toggleTalukaTeacherAdmin()">📋 Manage Taluka Teacher Search</button><button class="manage-columns-btn" onclick="toggleColumnManager()">⚙ Manage Columns</button><button onclick="openDataSubmissionManager()">🧩 Manage Data Submission Form</button><button onclick="openProformaAdminManager()">📚 Manage Proforma Submissions</button><button class="manage-columns-btn" onclick="toggleLinkManager()">🔗 Manage Links</button><button class="manage-columns-btn" onclick="toggleNewsManager()">📰 Manage News</button><button class="manage-columns-btn" onclick="toggleNotificationManager()">🔔 Manage Notifications</button><button class="manage-columns-btn" onclick="toggleFileManager()">📁 Manage Forms / Files</button><button class="manage-columns-btn" onclick="toggleFileManager()">✅ Forms Approval</button><button class="manage-columns-btn" onclick="toggleIntroductionManager()">📖 Manage Introduction</button><button class="manage-columns-btn" onclick="editWaseemPhoto()">🖼️ Waseem Abbas Photo</button><button class="manage-columns-btn" onclick="toggleContactManager()">✉ Manage Contact</button><button class="manage-columns-btn" onclick="toggleContactPhotosManager()">👥 Contact Photos</button><button class="manage-columns-btn" onclick="toggleHCManager()">⭕ Manage HC / C1 C2 C3</button><button class="manage-columns-btn" onclick="toggleSubmissionManager()">🎫 Teacher Tickets</button><button class="manage-columns-btn" onclick="toggleHMRequestManager()">🏫 HM Change Requests <span class="suggestion-badge" id="hmRequestBadge" style="display:none"></span></button><button class="manage-columns-btn" onclick="toggleGoogleSyncManager()">📥 Download Google Form Data</button><button class="blue" onclick="document.getElementById('excelFile').click()">📥 Upload Excel</button><button class="gray" onclick="downloadExcel()">📊 Download Excel</button><input accept=".xlsx,.xls,.csv" class="hidden" id="excelFile" onchange="importExcel(event)" type="file"/></div>
+
+<div class="manage-panel" id="talukaTeacherAdminPanel" style="display:none;margin:14px 0;padding:14px;border:1px solid #cfe1d8;border-radius:12px;background:#f8fcfa">
+ <div class="topbar"><div><h3 style="margin:0;color:#075c3b">📋 Manage Taluka Teacher Search</h3><p class="column-help" style="margin:5px 0">Separate Taluka-wide directory. Changes sync to Supabase for all visitors.</p></div><button class="gray" type="button" onclick="toggleTalukaTeacherAdmin()">Close</button></div>
+ <div id="talukaTeacherAuthBox" style="max-width:480px">
+  <p class="column-help">Sign in with the Supabase administrator account (app_metadata role = admin).</p>
+  <label>Admin Email</label><input id="talukaTeacherEmail" type="email" autocomplete="username" placeholder="Admin email">
+  <label style="display:block;margin-top:8px">Password</label><input id="talukaTeacherPassword" type="password" autocomplete="current-password" placeholder="Supabase password">
+  <button class="blue" type="button" onclick="talukaTeacherLogin()">🔐 Secure Admin Login</button>
+  <div class="message" id="talukaTeacherAuthMsg"></div>
+ </div>
+ <div id="talukaTeacherDashboard" style="display:none">
+  <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0"><b id="talukaTeacherAdminWho" style="color:#075c3b">Admin session active</b><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="gray" type="button" onclick="talukaTeacherRefresh()">↻ Refresh</button><button class="gray" type="button" onclick="talukaTeacherDownload()">⬇ Download Excel</button><button class="red" type="button" onclick="talukaTeacherLogout()">Logout</button></div></div>
+  <div id="talukaTeacherStatus" class="message"></div>
+  <h4 style="margin:12px 0 8px">Add / Edit Teacher</h4>
+  <input id="tt_pid" placeholder="PID *">
+  <input id="tt_name" placeholder="Teacher Name *">
+  <input id="tt_father" placeholder="Father's Name">
+  <select id="tt_gender"><option value="">Select Gender</option><option>Male</option><option>Female</option></select>
+  <input id="tt_designation" placeholder="Designation">
+  <input id="tt_uc" placeholder="UC">
+  <input id="tt_school" placeholder="School Name">
+  <input id="tt_semis" placeholder="SEMIS ID">
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button class="blue" type="button" onclick="talukaTeacherSave()">💾 Save Teacher</button><button class="gray" type="button" onclick="talukaTeacherClearForm()">Clear Form</button><label class="gray" style="padding:9px 12px;border-radius:8px;cursor:pointer">⬆ Upload Excel/CSV<input id="talukaTeacherExcel" type="file" accept=".xlsx,.xls,.csv" onchange="talukaTeacherImport(event)" style="display:none"></label></div>
+  <p class="column-help">Required columns for Excel: PID, Teacher Name, Father's Name, Gender, Designation, UC, School Name, SEMIS ID. Duplicate PID records are skipped and reported.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="talukaTeacherAdminSearch" placeholder="Find by PID or Teacher Name" oninput="talukaTeacherRender()" style="flex:1;min-width:200px"><span id="talukaTeacherCount" class="column-help"></span></div>
+  <div id="talukaTeacherAdminList" style="margin-top:10px;overflow-x:auto"></div>
+ </div>
+</div>
 <div class="manage-panel" id="columnManager">
 <h3 style="margin-top:0">Manage Employee Columns</h3>
 <div class="column-help">Edit changes the column title. Hide/Remove only removes it from the screen; existing employee data is kept. You can add it again later.</div>
@@ -3892,29 +3920,21 @@ function openFrontSchoolTeachersComplete(semis,name){
   if(typeof renderSchoolEmployees==='function') renderSchoolEmployees(currentSchoolSemis);
   window.scrollTo(0,0);
 }
-function searchFrontTeacherComplete(){
-  const input=document.getElementById('frontTeacherSearchInput');
-  const box=document.getElementById('frontTeacherSearchResult');
-  if(!input||!box)return;
-  const q=String(input.value||'').trim().toLowerCase().replace(/\\s+/g,'');
-  if(!q){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">Enter a PID or Teacher Name.</div>';return;}
-  const all=typeof getSchoolTeachers==='function'?getSchoolTeachers():{};
-  const schools=typeof getSchools==='function'?getSchools():[];
-  const matches=[];
-  Object.keys(all||{}).forEach(semis=>{
-    (Array.isArray(all[semis])?all[semis]:[]).forEach(t=>{
-      const pid=String(t.pid||t.personal||t.reg||'').toLowerCase().replace(/\\s+/g,'');
-      const fullName=String(t.name||'');
-      const displayName=fullName.split(/\\s+S\\/?O\\.?\\s+/i)[0].trim()||fullName;
-      const nameKey=displayName.toLowerCase().replace(/\\s+/g,'');
-      if(pid.includes(q)||nameKey.includes(q)){
-        const school=schools.find(x=>String(x.semis||'')===String(semis));
-        matches.push({name:displayName,designation:String(t.designation||'Not available'),school:String(school?.name||'School record'),semis:String(semis)});
-      }
-    });
-  });
-  if(!matches.length){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">No matching teacher found in the records currently available. More Taluka Moro records will be added gradually.</div>';return;}
-  box.innerHTML=matches.slice(0,30).map(t=>'<div style="background:#fff;border:1px solid #d7e7df;border-radius:12px;padding:12px;margin-bottom:8px"><div style="font-weight:800;color:#075c3b">'+(typeof esc==='function'?esc(t.name):t.name)+'</div><div style="font-size:13px;color:#475569;margin-top:4px">'+(typeof esc==='function'?esc(t.designation):t.designation)+'</div><div style="font-size:13px;color:#475569;margin-top:3px">'+(typeof esc==='function'?esc(t.school):t.school)+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">SEMIS: '+(typeof esc==='function'?esc(t.semis):t.semis)+'</div></div>').join('')+(matches.length>30?'<div style="font-size:12px;color:#64748b">Showing first 30 matches. Refine your search.</div>':'');
+async function searchFrontTeacherComplete(){
+ const input=document.getElementById('frontTeacherSearchInput'),box=document.getElementById('frontTeacherSearchResult');
+ if(!input||!box)return;const q=String(input.value||'').trim();
+ if(!q){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">Enter a PID or Teacher Name.</div>';return;}
+ box.innerHTML='<div style="padding:12px;color:#64748b">Searching central Taluka Moro directory…</div>';
+ try{
+  const base='https://khyrdadphbyhypxjsgsa.supabase.co/rest/v1/public_teacher_directory?select=pid,teacher_name,designation,school_name,semis_id&limit=30';
+  const isPid=/^[0-9]+$/.test(q);
+  const filter=isPid?'&pid=eq.'+encodeURIComponent(q):'&teacher_name=ilike.*'+encodeURIComponent(q.replace(/[,*()]/g,''))+'*';
+  const res=await fetch(base+filter,{headers:{apikey:'sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046',Accept:'application/json'},cache:'no-store'});
+  const data=await res.json();if(!res.ok)throw new Error(data.message||'Directory could not be loaded.');
+  if(!Array.isArray(data)||!data.length){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">No matching teacher found. Records are being added gradually.</div>';return;}
+  const safe=v=>typeof esc==='function'?esc(String(v||'')):String(v||'');
+  box.innerHTML=data.map(t=>'<div style="background:#fff;border:1px solid #d7e7df;border-radius:12px;padding:12px;margin-bottom:8px"><div style="font-weight:800;color:#075c3b">'+safe(t.teacher_name)+'</div><div style="font-size:13px;color:#475569;margin-top:4px">'+safe(t.designation||'Designation not available')+'</div><div style="font-size:13px;color:#475569;margin-top:3px">'+safe(t.school_name||'School not available')+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">SEMIS: '+safe(t.semis_id||'—')+'</div></div>').join('');
+ }catch(e){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fee2e2;color:#991b1b">Central directory is not configured yet. Admin must complete the Supabase setup. ('+(typeof esc==='function'?esc(e.message):e.message)+')</div>';}
 }
 function searchFrontSchoolComplete(){
   const input=document.getElementById('schoolSearch');
@@ -5557,6 +5577,35 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
     }
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFillMissing);else initFillMissing();
+})();
+</script>
+
+<script id="chs-taluka-teacher-directory">
+(function(){
+ 'use strict';
+ const BASE='https://khyrdadphbyhypxjsgsa.supabase.co';
+ const KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+ const TABLE='taluka_teacher_directory',VIEW='public_teacher_directory';
+ let token='',adminEmail='',rows=[],editingPid='';
+ const el=id=>document.getElementById(id);
+ const msg=(t,kind)=>{const x=el('talukaTeacherStatus');if(x){x.style.display='block';x.className='message '+(kind==='error'?'error':'success');x.textContent=t;}};
+ const authMsg=(t,kind)=>{const x=el('talukaTeacherAuthMsg');if(x){x.style.display='block';x.className='message '+(kind==='error'?'error':'success');x.textContent=t;}};
+ const hdr=()=>({apikey:KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Accept:'application/json'});
+ async function req(path,opt){const r=await fetch(BASE+path,Object.assign({cache:'no-store'},opt||{}));const t=await r.text();let d;try{d=t?JSON.parse(t):null}catch(e){d=t}if(!r.ok)throw new Error((d&&d.message)||String(t||('HTTP '+r.status)));return d;}
+ const norm=v=>String(v||'').trim().replace(/\s+/g,'').toLowerCase();
+ function form(){return {pid:el('tt_pid').value.trim(),teacher_name:el('tt_name').value.trim(),father_name:el('tt_father').value.trim(),gender:el('tt_gender').value,designation:el('tt_designation').value.trim(),uc:el('tt_uc').value.trim(),school_name:el('tt_school').value.trim(),semis_id:el('tt_semis').value.trim()};}
+ window.toggleTalukaTeacherAdmin=function(){if(typeof isAdmin==='function'&&!isAdmin()){alert('Portal Admin login required.');return;}const p=el('talukaTeacherAdminPanel');if(!p)return;const open=p.style.display==='none'||!p.style.display;p.style.display=open?'block':'none';if(open&&token)window.talukaTeacherRefresh();};
+ window.talukaTeacherLogin=async function(){const email=el('talukaTeacherEmail').value.trim(),password=el('talukaTeacherPassword').value;if(!email||!password){authMsg('Enter admin email and password.','error');return;}try{const d=await req('/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});if(!d?.access_token||d?.user?.app_metadata?.role!=='admin')throw new Error('This Supabase account must have app_metadata role=admin.');token=d.access_token;adminEmail=d.user.email||email;el('talukaTeacherPassword').value='';el('talukaTeacherAuthBox').style.display='none';el('talukaTeacherDashboard').style.display='block';el('talukaTeacherAdminWho').textContent='Signed in as '+adminEmail;await window.talukaTeacherRefresh();}catch(e){authMsg('Login failed: '+e.message,'error');}};
+ window.talukaTeacherLogout=function(){token='';adminEmail='';rows=[];editingPid='';el('talukaTeacherDashboard').style.display='none';el('talukaTeacherAuthBox').style.display='block';el('talukaTeacherAdminList').innerHTML='';authMsg('Logged out.','success');};
+ window.talukaTeacherRefresh=async function(){if(!token)return;msg('Loading central teacher directory…');try{const d=await req('/rest/v1/'+TABLE+'?select=*&order=teacher_name.asc&limit=10000',{headers:hdr()});rows=Array.isArray(d)?d:[];window.talukaTeacherRender();msg('Loaded '+rows.length+' Taluka teacher records.','success');}catch(e){msg('Could not load records: '+e.message,'error');}};
+ window.talukaTeacherClearForm=function(){editingPid='';['tt_pid','tt_name','tt_father','tt_designation','tt_uc','tt_school','tt_semis'].forEach(id=>el(id).value='');el('tt_gender').value='';};
+ window.talukaTeacherSave=async function(){if(!token)return;const x=form();if(!x.pid||!x.teacher_name){msg('PID and Teacher Name are required.','error');return;}const duplicate=rows.find(r=>norm(r.pid)===norm(x.pid));if(duplicate&&norm(x.pid)!==norm(editingPid)){msg('Duplicate PID: this teacher already exists. Use Edit instead.','error');return;}try{if(editingPid){await req('/rest/v1/'+TABLE+'?pid=eq.'+encodeURIComponent(editingPid),{method:'PATCH',headers:Object.assign(hdr(),{Prefer:'return=representation'}),body:JSON.stringify(x)});}else{await req('/rest/v1/'+TABLE,{method:'POST',headers:Object.assign(hdr(),{Prefer:'return=representation'}),body:JSON.stringify(x)});}window.talukaTeacherClearForm();await window.talukaTeacherRefresh();msg(editingPid?'Teacher updated in Supabase.':'Teacher added to Supabase; visitors can now search it.','success');}catch(e){msg('Save failed: '+e.message,'error');}};
+ window.talukaTeacherEdit=function(pid){const x=rows.find(r=>norm(r.pid)===norm(pid));if(!x)return;editingPid=x.pid;el('tt_pid').value=x.pid||'';el('tt_pid').disabled=true;el('tt_name').value=x.teacher_name||'';el('tt_father').value=x.father_name||'';el('tt_gender').value=x.gender||'';el('tt_designation').value=x.designation||'';el('tt_uc').value=x.uc||'';el('tt_school').value=x.school_name||'';el('tt_semis').value=x.semis_id||'';window.scrollTo({top:el('talukaTeacherAdminPanel').getBoundingClientRect().top+window.scrollY-20,behavior:'smooth'});};
+ const clearPidDisabled=window.talukaTeacherClearForm;window.talukaTeacherClearForm=function(){clearPidDisabled();el('tt_pid').disabled=false;};
+ window.talukaTeacherDelete=async function(pid){if(!token||!confirm('Remove teacher PID '+pid+' from the Taluka directory?'))return;try{await req('/rest/v1/'+TABLE+'?pid=eq.'+encodeURIComponent(pid),{method:'DELETE',headers:hdr()});await window.talukaTeacherRefresh();msg('Teacher removed from central directory.','success');}catch(e){msg('Remove failed: '+e.message,'error');}};
+ window.talukaTeacherRender=function(){const q=norm(el('talukaTeacherAdminSearch')?.value||'');const list=rows.filter(x=>!q||norm(x.pid).includes(q)||norm(x.teacher_name).includes(q));el('talukaTeacherCount').textContent=list.length+' records';const safe=v=>typeof esc==='function'?esc(String(v||'')):String(v||'');el('talukaTeacherAdminList').innerHTML=list.slice(0,500).map(x=>'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:9px;border-bottom:1px solid #e2e8f0;background:#fff"><div style="flex:1;min-width:190px"><b>'+safe(x.teacher_name)+'</b><div style="font-size:12px;color:#64748b">PID: '+safe(x.pid)+' • '+safe(x.school_name)+' • SEMIS: '+safe(x.semis_id)+'</div></div><button type="button" class="blue" onclick="talukaTeacherEdit('+JSON.stringify(String(x.pid))+')">Edit</button><button type="button" class="red" onclick="talukaTeacherDelete('+JSON.stringify(String(x.pid))+')">Remove</button></div>').join('')+(list.length>500?'<p class="column-help">Showing first 500. Search to narrow results.</p>':'');};
+ window.talukaTeacherDownload=function(){if(!token||typeof XLSX==='undefined')return;const data=rows.map(x=>({'PID':x.pid,'Teacher Name':x.teacher_name,"Father's Name":x.father_name,'Gender':x.gender,'Designation':x.designation,'UC':x.uc,'School Name':x.school_name,'SEMIS ID':x.semis_id}));const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Taluka Teachers');XLSX.writeFile(wb,'Moro_Taluka_Teachers.xlsx');};
+ window.talukaTeacherImport=async function(ev){if(!token)return;const file=ev.target.files?.[0];if(!file)return;try{const buf=await file.arrayBuffer(),wb=XLSX.read(buf,{type:'array'}),data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});let added=0,skipped=0,updated=0;for(const row of data){const get=(...keys)=>{for(const k of keys){const z=Object.keys(row).find(h=>norm(h)===norm(k));if(z)return String(row[z]??'').trim();}return '';};const x={pid:get('PID','Personal ID'),teacher_name:get('Teacher Name','Name','Full Name'),father_name:get("Father's Name",'Father Name'),gender:get('Gender'),designation:get('Designation'),uc:get('UC','Union Council'),school_name:get('School Name','School'),semis_id:get('SEMIS ID','SEMIS','SEMIS Code')};if(!x.pid||!x.teacher_name){skipped++;continue;}const old=rows.find(t=>norm(t.pid)===norm(x.pid));if(old){skipped++;continue;}try{await req('/rest/v1/'+TABLE,{method:'POST',headers:Object.assign(hdr(),{Prefer:'return=minimal'}),body:JSON.stringify(x)});added++;}catch(e){skipped++;}}await window.talukaTeacherRefresh();msg('Excel import complete: '+added+' added, '+skipped+' skipped (including duplicate PID or incomplete rows).','success');}catch(e){msg('Excel import failed: '+e.message,'error');}finally{ev.target.value='';}};
 })();
 </script>
 </body></html>
