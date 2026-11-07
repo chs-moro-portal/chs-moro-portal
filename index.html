@@ -1164,6 +1164,26 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <button class="blue" onclick="submitSuggestion()" style="margin-top:10px" type="button">📨 Submit Suggestion</button>
 <div class="suggestion-msg" id="suggestionMsg"></div>
 </div>
+<div class="suggestion-box" id="chsComplaintBox" style="margin-top:14px">
+<h3>📝 Online Complaint & Request</h3>
+<p>Teachers can submit a complaint or request without login. Keep your tracking number safe.</p>
+<div class="suggestion-grid">
+<select id="chsComplaintType"><option value="Complaint">Complaint</option><option value="Request">Request</option></select>
+<input id="chsComplaintName" placeholder="Teacher Name *"/>
+<input id="chsComplaintPid" placeholder="PID (optional)"/>
+<input id="chsComplaintSchool" placeholder="School Name *"/>
+<input id="chsComplaintSemis" placeholder="SEMIS ID (optional)"/>
+<input id="chsComplaintMobile" placeholder="Mobile Number (optional)"/>
+<input class="full" id="chsComplaintSubject" placeholder="Subject *"/>
+<textarea class="full" id="chsComplaintDetails" placeholder="Write complaint / request details *"></textarea>
+</div>
+<button class="blue" type="button" onclick="chsSubmitComplaint()" style="margin-top:10px">📨 Submit Complaint / Request</button>
+<div class="suggestion-msg" id="chsComplaintMsg"></div>
+<hr style="margin:12px 0"/>
+<h4 style="margin:0 0 7px;color:#075b3f">🔎 Track Your Submission</h4>
+<div class="suggestion-grid"><input id="chsComplaintTrackCode" placeholder="Enter Tracking Number"/><button class="gray" type="button" onclick="chsTrackComplaint()">Check Status</button></div>
+<div class="suggestion-msg" id="chsComplaintTrackMsg"></div>
+</div>
 </section>
 
 <section class="page" id="sponsor">
@@ -1950,7 +1970,7 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 </div>
 <div class="admin-record-toolbar">
 <div><h3 style="margin:0 0 4px">Employee Records</h3><p class="column-help" style="margin:0">Add a new employee or edit an existing record from a separate, clean form page.</p></div>
-<button class="blue add-employee-btn" onclick="openEmployeeForm()">＋ Add Employee Record</button><button class="gray" onclick="toggleSuggestionsManager()">💡 Suggestions <span class="suggestion-badge" id="suggestionBadge" style="display:none"></span></button>
+<button class="blue add-employee-btn" onclick="openEmployeeForm()">＋ Add Employee Record</button><button class="gray" onclick="toggleSuggestionsManager()">💡 Suggestions <span class="suggestion-badge" id="suggestionBadge" style="display:none"></span></button><button class="gray" type="button" onclick="toggleComplaintsManager()">📝 Complaints / Requests <span class="suggestion-badge" id="complaintBadge" style="display:none"></span></button>
 </div>
 <div class="record-search-box"><input id="adminSearch" oninput="employeePage=1;renderTable()" placeholder="Search name, CNIC or Personal No."/></div>
 <div class="employee-pagination-bar" id="employeePaginationBar">
@@ -1963,6 +1983,18 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
 <div class="topbar"><div><h3 style="margin:0">💡 Submitted Suggestions</h3><p class="column-help">Suggestions submitted on this browser are shown here.</p></div>
 <button class="gray" onclick="toggleSuggestionsManager()">Close</button></div>
 <div id="suggestionsList"></div>
+<div class="manage-panel" id="complaintsManager" style="display:none;margin-top:16px">
+<div class="topbar"><div><h3 style="margin:0">📝 Manage Complaints & Requests</h3><p class="column-help">Supabase central submissions. Only authorized administrators can view and update them.</p></div><button class="gray" type="button" onclick="toggleComplaintsManager()">Close</button></div>
+<div id="chsComplaintAdminAuth">
+<label>Supabase Admin Email</label><input id="chsComplaintAdminEmail" type="email" placeholder="Admin email"/>
+<label style="display:block;margin-top:7px">Password</label><input id="chsComplaintAdminPassword" type="password" placeholder="Supabase password"/>
+<button class="blue" type="button" onclick="chsComplaintAdminLogin()">🔐 Secure Admin Login</button><div class="message" id="chsComplaintAdminAuthMsg"></div>
+</div>
+<div id="chsComplaintAdminDash" style="display:none">
+<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0"><b id="chsComplaintAdminWho"></b><button class="gray" type="button" onclick="chsLoadComplaints()">↻ Refresh</button><button class="red" type="button" onclick="chsComplaintAdminLogout()">Logout</button></div>
+<div id="chsComplaintAdminMsg" class="message"></div><div id="chsComplaintAdminList"></div>
+</div>
+</div>
 </div>
 </div></div><div id="dataSubmissionManager" style="display:none">
 <div class="card" style="margin-top:18px">
@@ -5578,6 +5610,60 @@ document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){st
 })();
 </script>
 
+<script id="chs-online-complaints">
+(function(){
+'use strict';
+const BASE='https://khyrdadphbyhypxjsgsa.supabase.co',KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+let token='',adminEmail='';
+const el=id=>document.getElementById(id);
+const say=(id,msg)=>{const x=el(id);if(x)x.textContent=msg;};
+async function call(path,opt){const r=await fetch(BASE+path,Object.assign({cache:'no-store'},opt||{}));const t=await r.text();let d;try{d=t?JSON.parse(t):null}catch(e){d=t}if(!r.ok)throw new Error(d?.message||d?.hint||String(t||('HTTP '+r.status)));return d;}
+const publicHeaders={apikey:KEY,'Content-Type':'application/json',Accept:'application/json'};
+window.chsSubmitComplaint=async function(){
+ const type=el('chsComplaintType').value,name=el('chsComplaintName').value.trim(),pid=el('chsComplaintPid').value.trim(),school=el('chsComplaintSchool').value.trim(),semis=el('chsComplaintSemis').value.trim(),mobile=el('chsComplaintMobile').value.trim(),subject=el('chsComplaintSubject').value.trim(),details=el('chsComplaintDetails').value.trim();
+ if(!name||!school||!subject||!details){say('chsComplaintMsg','Please fill Teacher Name, School Name, Subject and Details.');return;}
+ const code='CHS-'+Math.random().toString(36).slice(2,8).toUpperCase()+'-'+Date.now().toString().slice(-4);
+ say('chsComplaintMsg','Submitting securely…');
+ try{
+  await call('/rest/v1/rpc/submit_public_complaint',{method:'POST',headers:publicHeaders,body:JSON.stringify({p_ticket_code:code,p_type:type,p_teacher_name:name,p_pid:pid||null,p_school_name:school,p_semis_id:semis||null,p_mobile:mobile||null,p_subject:subject,p_details:details})});
+  ['chsComplaintName','chsComplaintPid','chsComplaintSchool','chsComplaintSemis','chsComplaintMobile','chsComplaintSubject','chsComplaintDetails'].forEach(id=>el(id).value='');
+  el('chsComplaintTrackCode').value=code;
+  say('chsComplaintMsg','✓ Submitted successfully. Your Tracking Number is '+code+'. Please save it.');
+  say('chsComplaintTrackMsg','Tracking number filled in. Select Check Status to view updates.');
+  chsUpdateComplaintBadge();
+ }catch(e){say('chsComplaintMsg','Could not submit. Admin must first run the Complaint System SQL setup. '+e.message);}
+};
+window.chsTrackComplaint=async function(){
+ const code=el('chsComplaintTrackCode').value.trim();if(!code){say('chsComplaintTrackMsg','Enter your Tracking Number.');return;}
+ say('chsComplaintTrackMsg','Checking status…');
+ try{const d=await call('/rest/v1/rpc/track_public_complaint',{method:'POST',headers:publicHeaders,body:JSON.stringify({p_ticket_code:code})});const x=Array.isArray(d)?d[0]:d;if(!x){say('chsComplaintTrackMsg','No submission found for this tracking number.');return;}say('chsComplaintTrackMsg','Status: '+x.status+(x.admin_reply?' | Admin Reply: '+x.admin_reply:'')+' | Submitted: '+(x.created_at||''));}
+ catch(e){say('chsComplaintTrackMsg','Tracking service is not configured yet. '+e.message);}
+};
+window.toggleComplaintsManager=function(){
+ if(typeof isAdmin==='function'&&!isAdmin()){alert('Portal Admin login required.');return;}
+ const p=el('complaintsManager');if(!p)return;p.style.display=p.style.display==='none'?'block':'none';
+};
+window.chsComplaintAdminLogin=async function(){
+ const email=el('chsComplaintAdminEmail').value.trim(),password=el('chsComplaintAdminPassword').value;
+ if(!email||!password){say('chsComplaintAdminAuthMsg','Enter admin email and password.');return;}
+ try{const d=await call('/auth/v1/token?grant_type=password',{method:'POST',headers:publicHeaders,body:JSON.stringify({email,password})});if(!d?.access_token||d?.user?.app_metadata?.role!=='admin')throw new Error('Supabase account must have app_metadata role=admin.');token=d.access_token;adminEmail=d.user.email||email;el('chsComplaintAdminPassword').value='';el('chsComplaintAdminAuth').style.display='none';el('chsComplaintAdminDash').style.display='block';el('chsComplaintAdminWho').textContent='Signed in as '+adminEmail;await chsLoadComplaints();}
+ catch(e){say('chsComplaintAdminAuthMsg','Login failed: '+e.message);}
+};
+window.chsComplaintAdminLogout=function(){token='';adminEmail='';el('chsComplaintAdminDash').style.display='none';el('chsComplaintAdminAuth').style.display='block';el('chsComplaintAdminList').innerHTML='';};
+window.chsLoadComplaints=async function(){
+ if(!token)return;const box=el('chsComplaintAdminList');box.innerHTML='Loading…';
+ try{const a=await call('/rest/v1/portal_complaints?select=*&order=created_at.desc&limit=500',{headers:{apikey:KEY,Authorization:'Bearer '+token,Accept:'application/json'}});
+ box.innerHTML=a.length?a.map(x=>'<div class="suggestion-item" style="margin:9px 0"><b>'+esc(x.ticket_code)+'</b> • '+esc(x.type)+' • <b>'+esc(x.status)+'</b><br>'+esc(x.teacher_name)+' • '+esc(x.school_name)+(x.pid?' • PID '+esc(x.pid):'')+'<br><b>'+esc(x.subject)+'</b><p>'+esc(x.details)+'</p><small>'+esc(x.created_at||'')+(x.mobile?' • '+esc(x.mobile):'')+'</small><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px"><select id="chsStatus_'+esc(x.id)+'"><option '+(x.status==='Pending'?'selected':'')+'>Pending</option><option '+(x.status==='In Process'?'selected':'')+'>In Process</option><option '+(x.status==='Resolved'?'selected':'')+'>Resolved</option><option '+(x.status==='Rejected'?'selected':'')+'>Rejected</option></select><input id="chsReply_'+esc(x.id)+'" placeholder="Reply to teacher" value="'+esc(x.admin_reply||'')+'"/><button class="blue" type="button" onclick="chsUpdateComplaint(\''+esc(x.id)+'\')">Save Update</button></div></div>').join(''):'<div class="suggestion-item">No complaints or requests yet.</div>';
+ say('chsComplaintAdminMsg','Loaded '+a.length+' submissions.');
+ }catch(e){box.textContent='Could not load complaints: '+e.message;}
+};
+window.chsUpdateComplaint=async function(id){
+ if(!token)return;try{const status=el('chsStatus_'+id).value,reply=el('chsReply_'+id).value.trim();await call('/rest/v1/portal_complaints?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{apikey:KEY,Authorization:'Bearer '+token,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({status,admin_reply:reply,updated_at:new Date().toISOString()})});say('chsComplaintAdminMsg','Status/reply updated.');await chsLoadComplaints();}
+ catch(e){say('chsComplaintAdminMsg','Update failed: '+e.message);}
+};
+window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1/rpc/count_pending_public_complaints',{method:'POST',headers:publicHeaders,body:'{}'});const n=Number(d)||0,b=el('complaintBadge');if(b){b.textContent=n?'🔔 '+n+' Pending':'';b.style.display=n?'inline-block':'none';}}catch(e){}};
+})();
+</script>
 <script id="chs-taluka-teacher-directory">
 (function(){
  'use strict';
