@@ -5641,7 +5641,7 @@ window.chsTrackComplaint=async function(){
 };
 window.toggleComplaintsManager=function(){
  if(typeof isAdmin==='function'&&!isAdmin()){alert('Portal Admin login required.');return;}
- const p=el('complaintsManager');if(!p)return;p.style.display=p.style.display==='none'?'block':'none';
+ const p=el('complaintsManager');if(!p)return;const open=p.style.display==='none'||!p.style.display;if(open){const parent=el('suggestionsManager');if(parent)parent.style.display='block';}p.style.display=open?'block':'none';
 };
 window.chsComplaintAdminLogin=async function(){
  const email=el('chsComplaintAdminEmail').value.trim(),password=el('chsComplaintAdminPassword').value;
