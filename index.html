@@ -5376,7 +5376,138 @@ window.strUploadPDF=async function(ev){
 window.strExportExcel=function(){if(!strToken){strMsg('Admin login required.',true);return;}if(typeof XLSX==='undefined'){strMsg('Excel library is not available.',true);return;}const data=strRows.map((r,i)=>({'S#':i+1,'Name':r.name||'','Payroll':r.payroll||'','Old School SEMIS':r.old_school_semis||'','New School SEMIS':r.new_school_semis||'','PID':r.pid||''}));const ws=XLSX.utils.json_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'STR List');XLSX.writeFile(wb,'CHS_Moro_STR_List.xlsx');};
 document.addEventListener('DOMContentLoaded',function(){if(se('str-tracker')){strAdminUI();window.strLoadPDFs();}});
 })();
-</script></body></html>
+</script>
+<script id="chs-fill-missing-teacher-data">
+(function(){
+  'use strict';
+  function initFillMissing(){
+    const admin=document.getElementById('admin');
+    const tools=admin&&admin.querySelector('.column-tools');
+    if(!tools||document.getElementById('chsFillMissingBtn'))return;
+    const btn=document.createElement('button');
+    btn.type='button';btn.className='blue';btn.id='chsFillMissingBtn';
+    btn.textContent='🧩 Fill Missing Teacher Data (Excel)';
+    const file=document.createElement('input');
+    file.type='file';file.accept='.xlsx,.xls,.csv';file.id='chsFillMissingFile';
+    file.style.display='none';
+    const note=document.createElement('div');
+    note.id='chsFillMissingStatus';
+    note.style.cssText='display:none;width:100%;padding:10px 12px;margin-top:8px;border:1px solid #cfe3d7;border-radius:9px;background:#f4fbf7;color:#174c39;font-size:13px;line-height:1.5';
+    btn.addEventListener('click',function(){
+      if(typeof isAdmin!=='function'||!isAdmin()){alert('Admin login required.');return;}
+      file.click();
+    });
+    file.addEventListener('change',handleFile);
+    tools.appendChild(btn);tools.appendChild(file);tools.appendChild(note);
+    function clean(v){return String(v==null?'':v).trim();}
+    function key(v){return clean(v).toLowerCase().replace(/[^a-z0-9]/g,'');}
+    function digits(v){return clean(v).replace(/\D/g,'');}
+    function pick(row,names){
+      const keys=Object.keys(row||{});
+      for(const n of names){const k=key(n),hit=keys.find(x=>key(x)===k);if(hit!==undefined)return row[hit];}
+      return '';
+    }
+    function dateValue(v){
+      if(v===null||v===undefined||v==='')return '';
+      if(typeof v==='number'&&window.XLSX&&XLSX.SSF){const d=XLSX.SSF.parse_date_code(v);if(d)return [d.y,String(d.m).padStart(2,'0'),String(d.d).padStart(2,'0')].join('-');}
+      const s=clean(v);if(!s)return '';
+      if(/^\d{4}-\d{1,2}-\d{1,2}/.test(s)){const a=s.slice(0,10).split('-');return a[0]+'-'+a[1].padStart(2,'0')+'-'+a[2].padStart(2,'0');}
+      const m=s.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+      if(m)return m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+      return s;
+    }
+    function mapRow(row){
+      return {
+        name:clean(pick(row,['Name','Employee Name'])),
+        father:clean(pick(row,['Father Name',"Father's Name"])),
+        cnic:clean(pick(row,['CNIC','CNIC Number','CNIC No'])),
+        payrollId:clean(pick(row,['Payroll ID','Payroll','Payroll Number'])),
+        personal:clean(pick(row,['Personal Number','PID','Personal No','PID Number'])),
+        designation:clean(pick(row,['Designation','DESIG','Post'])),
+        school:clean(pick(row,['School / Office','School/Office','School','School Name'])),
+        district:clean(pick(row,['District'])),
+        joining:dateValue(pick(row,['Joining Date','D.O.A','Date of Appointment'])),
+        seniority:clean(pick(row,['Seniority Number','Seniority No','Seniority'])),
+        mobile:clean(pick(row,['Mobile Number','Mobile','Contact #','Phone'])),
+        gender:clean(pick(row,['Gender','Sex'])),
+        cluster:clean(pick(row,['Cluster','Cluster Name'])),
+        qualification:clean(pick(row,['Qualification','Academic Qualification'])),
+        remarks:clean(pick(row,['Remarks','Remark'])),
+        rid:clean(pick(row,['RID','Reg ID','Registration ID'])),
+        dob:dateValue(pick(row,['D.O.B','DOB','Date of Birth'])),
+        retirement:dateValue(pick(row,['D.O.R','Date of Retirement'])),
+        status:clean(pick(row,['STATUS','Status'])),
+        semisId:clean(pick(row,['SEMIS ID','SEMIS','Semis Code'])),
+        clusterCode:clean(pick(row,['CLUSTER CODE','Cluster Code'])),
+        costCentre:clean(pick(row,['COST CENTRE','Cost Center','Cost Centre'])),
+        testBy:clean(pick(row,['Test by? IBA/NTS/SINDH/OTHER?','Test by','Test Agency'])),
+        testMarks:clean(pick(row,['Marks in test','Test Marks'])),
+        bankIban:clean(pick(row,['BANK A/C IBAN','IBAN','Bank IBAN'])),
+        grossSalary:clean(pick(row,['CURRENT GROSS SALARY','Gross Salary'])),
+        netSalary:clean(pick(row,['NET SALARY DISBURSED TO BANK','Net Salary','Net Salary Disbursed to Bank'])),
+        totalService:clean(pick(row,['Total Service']))
+      };
+    }
+    function matchRecord(list,x){
+      const pay=key(x.payrollId),pid=key(x.personal),cn=digits(x.cnic);
+      let hits=[];
+      if(pay)hits=list.filter(e=>key(e.payrollId||e.payroll||e.payrollNumber)===pay);
+      if(hits.length===1)return hits[0];
+      if(hits.length>1)return null;
+      if(pid)hits=list.filter(e=>key(e.personal||e.pid)===pid);
+      if(hits.length===1)return hits[0];
+      if(hits.length>1)return null;
+      if(cn)hits=list.filter(e=>digits(e.cnic)===cn);
+      if(hits.length===1)return hits[0];
+      return null;
+    }
+    async function handleFile(){
+      const f=file.files&&file.files[0];if(!f)return;
+      if(typeof XLSX==='undefined'){alert('Excel library load nahi hui. Internet connection check karein.');file.value='';return;}
+      try{
+        const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:false});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+        if(!rows.length)throw new Error('Excel sheet is empty.');
+        const list=typeof records==='function'?records():[];
+        if(!Array.isArray(list)||!list.length)throw new Error('Admin Panel mein existing teacher records nahi mile.');
+        const plans=[];let unmatched=0,ambiguous=0,emptyRows=0,fields=0;
+        rows.forEach(row=>{
+          const x=mapRow(row);
+          if(!x.name||(!x.payrollId&&!x.personal&&!x.cnic)){emptyRows++;return;}
+          const old=matchRecord(list,x);
+          if(!old){
+            const hasAmbiguous=list.some(e=>(x.payrollId&&key(e.payrollId||e.payroll||e.payrollNumber)===key(x.payrollId))||(x.personal&&key(e.personal||e.pid)===key(x.personal))||(x.cnic&&digits(e.cnic)===digits(x.cnic)));
+            if(hasAmbiguous)ambiguous++;else unmatched++;
+            return;
+          }
+          const patch={};Object.keys(x).forEach(k=>{if(clean(x[k])&&clean(old[k])===''){patch[k]=x[k];}});
+          if(Object.keys(patch).length){plans.push({old,patch});fields+=Object.keys(patch).length;}
+        });
+        const msg='Excel rows: '+rows.length+'\nMatched teachers with missing data: '+plans.length+'\nFields to fill: '+fields+'\nNot matched: '+unmatched+'\nAmbiguous matches skipped: '+ambiguous+'\nRows without usable ID/name: '+emptyRows+'\n\nSirf blank fields fill honge. Existing filled data overwrite nahi hoga. Continue?';
+        if(!confirm(msg)){file.value='';return;}
+        const updated=list.map(e=>{const p=plans.find(z=>z.old===e);return p?Object.assign({},e,p.patch):e;});
+        localStorage.setItem('employeeRecords',JSON.stringify(updated));
+        let saved=0,failed=0;
+        if(window.CHS_LIVE_DB&&typeof window.CHS_LIVE_DB.saveEmployee==='function'){
+          for(const p of plans){
+            try{await window.CHS_LIVE_DB.saveEmployee(Object.assign({},p.old,p.patch));saved++;}
+            catch(err){failed++;console.error('Missing-data central update failed',err);}
+          }
+        }else{failed=plans.length;}
+        if(typeof renderTable==='function')renderTable();
+        note.style.display='block';
+        note.textContent='Completed: '+plans.length+' matched local teacher records; '+fields+' blank fields filled. Central Database confirmations: '+saved+'; failed: '+failed+'. Not matched: '+unmatched+'; ambiguous skipped: '+ambiguous+'. Existing filled data was preserved.';
+        if(failed)note.style.borderColor='#e4b6b6';
+        alert(note.textContent);
+      }catch(err){console.error(err);alert('Excel update nahi ho saka: '+err.message);}
+      finally{file.value='';}
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initFillMissing);else initFillMissing();
+})();
+</script>
+</body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
 <style id="chs-moro-title-visibility-fix">
