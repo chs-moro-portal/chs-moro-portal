@@ -1065,14 +1065,14 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <button class="full hm-front-btn" onclick="show('hmAccount')" type="button">🏫 HM Account</button>
 <a class="full google-form-front-btn" href="https://forms.gle/72vPuNDRFd1hAfvD6" rel="noopener noreferrer" style="display:block;text-align:center;text-decoration:none;background:#4285f4;color:#fff;margin-top:10px;padding:12px;border-radius:10px;font-weight:700" target="_blank">📝 Teacher Data Google Form</a>
 <button class="full heads-front-btn" onclick="openHeads()" type="button">👔 Heads</button>
-<div id="frontSchoolSearchPanel" style="margin-top:16px;border:1px solid #cfe1d8;border-radius:16px;padding:16px;background:linear-gradient(135deg,#f8fcfa,#eef7f2)">
-<div style="font-size:20px;font-weight:800;color:#075c3b;margin-bottom:4px">🏫 School Record Search</div>
-<div style="font-size:13px;color:#64748b;margin-bottom:10px">Search by SEMIS Code or School Name. Public records are view-only.</div>
+<div id="frontTeacherSearchPanel" style="margin-top:16px;border:1px solid #cfe1d8;border-radius:16px;padding:16px;background:linear-gradient(135deg,#f8fcfa,#eef7f2)">
+<div style="font-size:20px;font-weight:800;color:#075c3b;margin-bottom:4px">👨‍🏫 Teacher Search — Taluka Moro</div>
+<div style="font-size:13px;color:#64748b;margin-bottom:10px">Search by PID or Teacher Name. Teacher records are being added gradually. Public view only.</div>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
-<input id="frontSchoolSearchInput" placeholder="Enter SEMIS Code or School Name" style="flex:1;min-width:210px;margin:0"/>
-<button onclick="searchFrontSchoolComplete()" type="button">🔍 Search School</button>
+<input id="frontTeacherSearchInput" placeholder="Enter PID or Teacher Name" style="flex:1;min-width:210px;margin:0"/>
+<button onclick="searchFrontTeacherComplete()" type="button">🔍 Search Teacher</button>
 </div>
-<div id="frontSchoolSearchResult" style="margin-top:12px"></div>
+<div id="frontTeacherSearchResult" style="margin-top:12px"></div>
 </div><button class="primary" type="button" onclick="show('training')" style="margin-top:14px;background:linear-gradient(90deg,#075c3b,#0a8255)">🎓 Training – Click Here for Update</button>
 <button class="primary" type="button" onclick="show('str-tracker');loadSTRRecords()" style="margin-top:9px;background:linear-gradient(90deg,#174ea6,#2878d0)">📋 STR – Status Tracking Record</button>
 <!-- Front Page: Moro Cluster Schools Marquee -->
@@ -1255,7 +1255,8 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <section class="page" id="schools"><div class="container"><div class="card schools-card">
 <div class="topbar"><h2>Schools — Cluster Head School Taluka Moro</h2><button class="gray" onclick="show('home')">⌂ Home</button></div>
 <div style="margin:10px 0;padding:11px 14px;border:1px solid #b9dccb;border-radius:12px;background:#f1faf5;color:#075c3b;font-weight:700">👁️ Visitor View Only — Schools can be searched and viewed. Editing, adding or deleting school data is available to Admin only.</div><p class="school-help">Search by <b>SEMIS Code</b> or <b>School Name</b>. Click a school to view its record.</p>
-<div class="school-search-row"><input id="schoolSearch" oninput="renderSchools()" placeholder="Search SEMIS Code or School Name"/><button class="blue" onclick="renderSchools()">🔍 Search</button></div>
+<div class="school-search-row"><input id="schoolSearch" oninput="renderSchools();searchFrontSchoolComplete()" placeholder="Search SEMIS Code or School Name"/><button class="blue" onclick="renderSchools();searchFrontSchoolComplete()">🔍 Search</button></div>
+<div id="frontSchoolSearchResult" style="margin:12px 0"></div>
 <div class="school-admin-tools hidden" id="schoolAdminTools"><button class="manage-columns-btn" onclick="toggleSchoolManager()">⚙ Edit / Change Schools</button></div>
 <div class="school-count" id="schoolCount"></div>
 <div class="school-list" id="schoolList"></div>
@@ -3891,8 +3892,32 @@ function openFrontSchoolTeachersComplete(semis,name){
   if(typeof renderSchoolEmployees==='function') renderSchoolEmployees(currentSchoolSemis);
   window.scrollTo(0,0);
 }
+function searchFrontTeacherComplete(){
+  const input=document.getElementById('frontTeacherSearchInput');
+  const box=document.getElementById('frontTeacherSearchResult');
+  if(!input||!box)return;
+  const q=String(input.value||'').trim().toLowerCase().replace(/\\s+/g,'');
+  if(!q){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">Enter a PID or Teacher Name.</div>';return;}
+  const all=typeof getSchoolTeachers==='function'?getSchoolTeachers():{};
+  const schools=typeof getSchools==='function'?getSchools():[];
+  const matches=[];
+  Object.keys(all||{}).forEach(semis=>{
+    (Array.isArray(all[semis])?all[semis]:[]).forEach(t=>{
+      const pid=String(t.pid||t.personal||t.reg||'').toLowerCase().replace(/\\s+/g,'');
+      const fullName=String(t.name||'');
+      const displayName=fullName.split(/\\s+S\\/?O\\.?\\s+/i)[0].trim()||fullName;
+      const nameKey=displayName.toLowerCase().replace(/\\s+/g,'');
+      if(pid.includes(q)||nameKey.includes(q)){
+        const school=schools.find(x=>String(x.semis||'')===String(semis));
+        matches.push({name:displayName,designation:String(t.designation||'Not available'),school:String(school?.name||'School record'),semis:String(semis)});
+      }
+    });
+  });
+  if(!matches.length){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">No matching teacher found in the records currently available. More Taluka Moro records will be added gradually.</div>';return;}
+  box.innerHTML=matches.slice(0,30).map(t=>'<div style="background:#fff;border:1px solid #d7e7df;border-radius:12px;padding:12px;margin-bottom:8px"><div style="font-weight:800;color:#075c3b">'+(typeof esc==='function'?esc(t.name):t.name)+'</div><div style="font-size:13px;color:#475569;margin-top:4px">'+(typeof esc==='function'?esc(t.designation):t.designation)+'</div><div style="font-size:13px;color:#475569;margin-top:3px">'+(typeof esc==='function'?esc(t.school):t.school)+'</div><div style="font-size:12px;color:#64748b;margin-top:2px">SEMIS: '+(typeof esc==='function'?esc(t.semis):t.semis)+'</div></div>').join('')+(matches.length>30?'<div style="font-size:12px;color:#64748b">Showing first 30 matches. Refine your search.</div>':'');
+}
 function searchFrontSchoolComplete(){
-  const input=document.getElementById('frontSchoolSearchInput');
+  const input=document.getElementById('schoolSearch');
   const box=document.getElementById('frontSchoolSearchResult');
   if(!input||!box)return;
   const q=typeof norm==='function'?norm(input.value):String(input.value||'').replace(/\s+/g,'').toLowerCase();
