@@ -3926,10 +3926,8 @@ async function searchFrontTeacherComplete(){
  if(!q){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">Enter a PID or Teacher Name.</div>';return;}
  box.innerHTML='<div style="padding:12px;color:#64748b">Searching central Taluka Moro directory…</div>';
  try{
-  const base='https://khyrdadphbyhypxjsgsa.supabase.co/rest/v1/public_teacher_directory?select=pid,teacher_name,designation,school_name,semis_id&limit=30';
-  const isPid=/^[0-9]+$/.test(q);
-  const filter=isPid?'&pid=eq.'+encodeURIComponent(q):'&teacher_name=ilike.*'+encodeURIComponent(q.replace(/[,*()]/g,''))+'*';
-  const res=await fetch(base+filter,{headers:{apikey:'sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046',Accept:'application/json'},cache:'no-store'});
+  const endpoint='https://khyrdadphbyhypxjsgsa.supabase.co/rest/v1/rpc/search_public_teacher_directory';
+  const res=await fetch(endpoint,{method:'POST',headers:{apikey:'sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046','Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({search_term:q}),cache:'no-store'});
   const data=await res.json();if(!res.ok)throw new Error(data.message||'Directory could not be loaded.');
   if(!Array.isArray(data)||!data.length){box.innerHTML='<div style="padding:12px;border-radius:10px;background:#fff7ed;color:#9a3412">No matching teacher found. Records are being added gradually.</div>';return;}
   const safe=v=>typeof esc==='function'?esc(String(v||'')):String(v||'');
