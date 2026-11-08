@@ -5847,6 +5847,26 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
 })();
 </script>
 <script src="school-map-data.js"></script>
+
+<!-- chs-edubridge-corner-download: small front-page corner link only; no existing portal features changed -->
+<style id="chs-edubridge-corner-download-style">
+#chsEduBridgeCornerDownload{
+ position:fixed;right:12px;top:12px;z-index:99999;
+ display:inline-flex;align-items:center;gap:6px;
+ padding:8px 11px;border-radius:20px;
+ background:linear-gradient(135deg,#063b78,#0878bd);
+ color:#fff!important;text-decoration:none!important;
+ font:700 12px/1.2 Arial,sans-serif;
+ border:1px solid rgba(255,255,255,.55);
+ box-shadow:0 3px 12px rgba(0,0,0,.22);
+}
+#chsEduBridgeCornerDownload:hover{filter:brightness(1.12)}
+@media(max-width:600px){
+ #chsEduBridgeCornerDownload{right:7px;top:7px;padding:7px 9px;font-size:11px}
+}
+</style>
+<a id="chs-edubridge-corner-download" href="./EduBridge.apk" download="EduBridge.apk" aria-label="Download EduBridge APK">⬇ Download APK</a>
+
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
