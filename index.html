@@ -2476,7 +2476,7 @@ function renderMoroSchoolMap(){
  const matches=data.map((s,i)=>({s,i})).filter(o=>(!q||norm(o.s.name).includes(q)||norm(o.s.semis).includes(q))&&(!uc||o.s.uc===uc)&&(!cell||o.s.cell===cell));
  const count=document.getElementById('moroMapCount');if(count)count.textContent=matches.length+' of '+data.length+' schools found';
  box.innerHTML=matches.length?matches.map(o=>'<button type="button" class="moro-map-result'+(window.__moroMapSelectedIndex===o.i?' active':'')+'" onclick="selectMoroMapSchool('+o.i+')"><strong>'+esc(o.s.name)+'</strong><small>SEMIS: '+esc(o.s.semis)+' · UC/MC: '+esc(o.s.uc)+' · Cell: '+esc(o.s.cell)+'</small></button>').join(''):'<div class="no-schools">No school found for these filters.</div>';
- if(window.__moroMapSelectedIndex==null&&matches.length)selectMoroMapSchool(matches[0].i,false);
+ if(matches.length&&!matches.some(o=>o.i===window.__moroMapSelectedIndex))selectMoroMapSchool(matches[0].i,false);
 }
 function selectMoroMapSchool(index,rerender=true){
  const s=getMoroMapSchools()[index];if(!s)return;window.__moroMapSelectedIndex=index;
