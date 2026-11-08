@@ -1078,6 +1078,21 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 #chsComplaintBox .chs-track-row button{width:auto}
 }
 </style>
+<style id="moro-school-map-css">
+.moro-map-launch{margin:12px 0}.moro-map-launch button{width:100%;padding:12px 15px;border-radius:12px;font-weight:800}
+.moro-map-panel{margin:14px 0 18px;padding:14px;border:1px solid #b8d8ca;border-radius:15px;background:#f7fcf9}
+.moro-map-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.moro-map-head h3{margin:0 0 5px;color:#075c3b}.moro-map-head p{margin:0 0 12px;color:#526b60;font-size:13px}
+.moro-map-filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin:10px 0}.moro-map-filters input,.moro-map-filters select{min-width:0;width:100%;margin:0}
+.moro-map-count{font-weight:800;color:#075c3b;margin:8px 0}.moro-map-layout{display:grid;grid-template-columns:minmax(230px,0.9fr) minmax(280px,1.1fr);gap:12px;align-items:start}
+.moro-map-results{display:grid;gap:7px;max-height:470px;overflow:auto;padding-right:3px}
+.moro-map-result{display:block;width:100%;text-align:left;background:#fff;border:1px solid #cfe1d8;border-radius:10px;padding:10px;color:#164b37;cursor:pointer}
+.moro-map-result strong{display:block;font-size:13px}.moro-map-result small{display:block;color:#64748b;margin-top:4px}
+.moro-map-result.active{border:2px solid #08784d;background:#effaf4}
+.moro-map-view{position:sticky;top:8px}.moro-map-view iframe{width:100%;height:360px;border:1px solid #d5e2dc;border-radius:12px;background:#eaf1ed}
+.moro-map-selected{padding:10px;margin-top:8px;background:#fff;border:1px solid #dce8e2;border-radius:10px;font-size:13px}.moro-map-selected a{display:inline-block;margin-top:6px;color:#075c3b;font-weight:800}
+.moro-map-note{font-size:12px;color:#765b1a;background:#fff9e8;border:1px solid #f0dfa7;border-radius:9px;padding:9px;margin:10px 0 0}
+@media(max-width:760px){.moro-map-filters{grid-template-columns:1fr}.moro-map-layout{grid-template-columns:1fr}.moro-map-results{max-height:300px}.moro-map-view{position:static}.moro-map-view iframe{height:300px}}
+</style>
 </head>
 <body>
 <button aria-label="Back" id="globalBackButton" onclick="visitorGoBack()" title="Back" type="button">←</button>
@@ -1347,6 +1362,24 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="topbar"><h2>Schools — Cluster Head School Taluka Moro</h2><button class="gray" onclick="show('home')">⌂ Home</button></div>
 <div style="margin:10px 0;padding:11px 14px;border:1px solid #b9dccb;border-radius:12px;background:#f1faf5;color:#075c3b;font-weight:700">👁️ Visitor View Only — Schools can be searched and viewed. Editing, adding or deleting school data is available to Admin only.</div><p class="school-help">Search by <b>SEMIS Code</b> or <b>School Name</b>. Click a school to view its record.</p>
 <div class="school-search-row"><input id="schoolSearch" oninput="renderSchools();searchFrontSchoolComplete()" placeholder="Search SEMIS Code or School Name"/><button class="blue" onclick="renderSchools();searchFrontSchoolComplete()">🔍 Search</button></div>
+<div class="moro-map-launch"><button class="blue" type="button" onclick="toggleMoroSchoolMap()">🗺️ Open Taluka Moro School Map — 536 Schools</button></div>
+<div id="moroSchoolMapPanel" class="moro-map-panel" hidden>
+  <div class="moro-map-head"><div><h3>🗺️ Taluka Moro — School Map &amp; Directory</h3><p>All schools from the supplied Excel list. Search by school name or SEMIS, and filter by UC and Cell.</p></div><button class="gray" type="button" onclick="toggleMoroSchoolMap()">Close</button></div>
+  <div class="moro-map-filters">
+    <input id="moroMapSearch" type="search" placeholder="Search School Name / SEMIS" oninput="renderMoroSchoolMap()"/>
+    <select id="moroMapUCFilter" onchange="renderMoroSchoolMap()"><option value="">All UCs / MCs</option></select>
+    <select id="moroMapCellFilter" onchange="renderMoroSchoolMap()"><option value="">All Cells (optional)</option></select>
+  </div>
+  <div id="moroMapCount" class="moro-map-count"></div>
+  <div class="moro-map-layout">
+    <div id="moroMapResults" class="moro-map-results"></div>
+    <div class="moro-map-view">
+      <iframe id="moroMapFrame" title="Google Maps school search" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=schools+in+Moro+Sindh+Pakistan&amp;output=embed"></iframe>
+      <div id="moroMapSelected" class="moro-map-selected">Select a school from the list to view its Google Maps search.</div>
+    </div>
+  </div>
+  <p class="moro-map-note">Note: The supplied Excel file did not contain GPS coordinates. Google Maps search is shown for each selected school; exact school pins will need verified latitude and longitude.</p>
+</div>
 <div id="frontSchoolSearchResult" style="margin:12px 0"></div>
 <div class="school-admin-tools hidden" id="schoolAdminTools"><button class="manage-columns-btn" onclick="toggleSchoolManager()">⚙ Edit / Change Schools</button></div>
 <div class="school-count" id="schoolCount"></div>
@@ -2420,6 +2453,40 @@ function importLinksBackup(input){
   const file=input&&input.files&&input.files[0];if(!file)return;
   const r=new FileReader();r.onload=function(e){try{const a=JSON.parse(String(e.target.result||'[]'));if(!Array.isArray(a))throw Error('bad');const cur=getLinks(),m=[...cur];let n=0;a.filter(x=>x&&x.label&&x.url).forEach(x=>{if(!m.some(y=>y.label===x.label&&normalizeUrl(y.url)===normalizeUrl(x.url))){m.push({label:String(x.label),url:normalizeUrl(x.url)});n++}});setLinks(m);alert('Links imported. Added: '+n);input.value='';}catch(err){alert('Invalid Links backup file.')}};r.readAsText(file);
 }
+
+// ===== TALUKA MORO SCHOOL MAP (separate from the existing 21-school cluster list) =====
+function getMoroMapSchools(){return Array.isArray(window.MORO_MAP_SCHOOLS)?window.MORO_MAP_SCHOOLS:[]}
+function toggleMoroSchoolMap(){
+ const panel=document.getElementById('moroSchoolMapPanel');if(!panel)return;
+ panel.hidden=!panel.hidden;
+ if(!panel.hidden){initMoroMapFilters();renderMoroSchoolMap();panel.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+function initMoroMapFilters(){
+ const data=getMoroMapSchools(),uc=document.getElementById('moroMapUCFilter'),cell=document.getElementById('moroMapCellFilter');
+ if(!uc||!cell||uc.dataset.ready==='1')return;
+ const ucs=[...new Set(data.map(x=>x.uc).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ const cells=[...new Set(data.map(x=>x.cell).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+ uc.innerHTML='<option value="">All UCs / MCs</option>'+ucs.map(x=>'<option value="'+escAttr(x)+'">'+esc(x)+'</option>').join('');
+ cell.innerHTML='<option value="">All Cells (optional)</option>'+cells.map(x=>'<option value="'+escAttr(x)+'">'+esc(x)+'</option>').join('');
+ uc.dataset.ready='1';cell.dataset.ready='1';
+}
+function renderMoroSchoolMap(){
+ const data=getMoroMapSchools(),box=document.getElementById('moroMapResults');if(!box)return;
+ const q=norm(document.getElementById('moroMapSearch')?.value||''),uc=document.getElementById('moroMapUCFilter')?.value||'',cell=document.getElementById('moroMapCellFilter')?.value||'';
+ const matches=data.map((s,i)=>({s,i})).filter(o=>(!q||norm(o.s.name).includes(q)||norm(o.s.semis).includes(q))&&(!uc||o.s.uc===uc)&&(!cell||o.s.cell===cell));
+ const count=document.getElementById('moroMapCount');if(count)count.textContent=matches.length+' of '+data.length+' schools found';
+ box.innerHTML=matches.length?matches.map(o=>'<button type="button" class="moro-map-result'+(window.__moroMapSelectedIndex===o.i?' active':'')+'" onclick="selectMoroMapSchool('+o.i+')"><strong>'+esc(o.s.name)+'</strong><small>SEMIS: '+esc(o.s.semis)+' · UC/MC: '+esc(o.s.uc)+' · Cell: '+esc(o.s.cell)+'</small></button>').join(''):'<div class="no-schools">No school found for these filters.</div>';
+ if(window.__moroMapSelectedIndex==null&&matches.length)selectMoroMapSchool(matches[0].i,false);
+}
+function selectMoroMapSchool(index,rerender=true){
+ const s=getMoroMapSchools()[index];if(!s)return;window.__moroMapSelectedIndex=index;
+ const query=[s.name,s.uc,'Moro','Sindh','Pakistan'].filter(Boolean).join(', '),encoded=encodeURIComponent(query);
+ const frame=document.getElementById('moroMapFrame');if(frame)frame.src='https://www.google.com/maps?q='+encoded+'&output=embed';
+ const info=document.getElementById('moroMapSelected');
+ if(info)info.innerHTML='<b>'+esc(s.name)+'</b><br>SEMIS: '+esc(s.semis)+'<br>UC/MC: '+esc(s.uc)+' · Cell: '+esc(s.cell)+'<br><a href="https://www.google.com/maps/search/?api=1&query='+encoded+'" target="_blank" rel="noopener noreferrer">Open this school in Google Maps ↗</a>';
+ if(rerender){const box=document.getElementById('moroMapResults');if(box)box.querySelectorAll('.moro-map-result').forEach(el=>el.classList.toggle('active',el.getAttribute('onclick')==='selectMoroMapSchool('+index+')'));}
+}
+
 function renderSchools(){
  const q=norm(document.getElementById('schoolSearch')?.value||'');
  const box=document.getElementById('schoolList'); if(!box)return;
@@ -5769,6 +5836,7 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
  window.talukaTeacherImport=async function(ev){if(!token)return;const file=ev.target.files?.[0];if(!file)return;try{const buf=await file.arrayBuffer(),wb=XLSX.read(buf,{type:'array'}),data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});let added=0,skipped=0,updated=0;for(const row of data){const get=(...keys)=>{for(const k of keys){const z=Object.keys(row).find(h=>norm(h)===norm(k));if(z)return String(row[z]??'').trim();}return '';};const x={pid:get('PID','Personal ID'),teacher_name:get('Teacher Name','Name','Full Name'),father_name:get("Father's Name",'Father Name'),gender:get('Gender'),designation:get('Designation'),uc:get('UC','Union Council'),school_name:get('School Name','School'),semis_id:get('SEMIS ID','SEMIS','SEMIS Code')};if(!x.pid||!x.teacher_name){skipped++;continue;}const old=rows.find(t=>norm(t.pid)===norm(x.pid));if(old){skipped++;continue;}try{await req('/rest/v1/'+TABLE,{method:'POST',headers:Object.assign(hdr(),{Prefer:'return=minimal'}),body:JSON.stringify(x)});added++;}catch(e){skipped++;}}await window.talukaTeacherRefresh();msg('Excel import complete: '+added+' added, '+skipped+' skipped (including duplicate PID or incomplete rows).','success');}catch(e){msg('Excel import failed: '+e.message,'error');}finally{ev.target.value='';}};
 })();
 </script>
+<script src="school-map-data.js"></script>
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
