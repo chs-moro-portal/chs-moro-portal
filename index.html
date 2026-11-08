@@ -1366,7 +1366,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="moro-map-launch"><button class="blue" type="button" onclick="toggleMoroSchoolMap()">🗺️ Open Taluka Moro School Map — 536 Schools</button></div>
 <div id="moroSchoolMapPanel" class="moro-map-panel" hidden>
   <div class="moro-map-head"><div><h3>🗺️ Taluka Moro — School Map &amp; Directory</h3><p>All schools from the supplied Excel list. Search by school name or SEMIS, and filter by UC and Cell.</p></div><button class="gray" type="button" onclick="toggleMoroSchoolMap()">Close</button></div>
-  <div id="moroClusterStats" class="moro-cluster-stats" aria-label="Cluster school gender summary"></div>
+  <div id="moroClusterStats" class="moro-cluster-stats" aria-label="Cluster school gender summary"><div class="stats-top"><div><div class="stats-label">CHS MORO CLUSTER SCHOOLS</div><div class="stats-total">21</div></div><div style="font-size:25px">🏫</div></div><div class="stats-legend"><span>👩 Female: 11</span><span>👨 Male: 10</span></div><div class="stats-track"><div class="stats-female" style="width:52.38%"></div><div class="stats-male" style="width:47.62%"></div></div></div>
   <div class="moro-map-filters">
     <input id="moroMapSearch" type="search" placeholder="Search School Name / SEMIS" oninput="renderMoroSchoolMap()"/>
     <select id="moroMapUCFilter" onchange="renderMoroSchoolMap()"><option value="">All UCs / MCs</option></select>
