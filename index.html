@@ -1080,8 +1080,9 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 </style>
 <style id="moro-school-map-css">
 .moro-map-launch{margin:12px 0}.moro-map-launch button{width:100%;padding:12px 15px;border-radius:12px;font-weight:800}
-.moro-map-panel{margin:14px 0 18px;padding:14px;border:1px solid #b8d8ca;border-radius:15px;background:#f7fcf9}
-.moro-map-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.moro-map-head h3{margin:0 0 5px;color:#075c3b}.moro-map-head p{margin:0 0 12px;color:#526b60;font-size:13px}
+.moro-map-panel{margin:14px 0 18px;padding:14px;border:1px solid #b8d8ca;border-radius:15px;background:#f7fcf9;position:relative}
+.moro-map-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding-right:0}.moro-map-head h3{margin:0 0 5px;color:#075c3b}.moro-map-head p{margin:0 0 12px;color:#526b60;font-size:13px}
+.moro-cluster-stats{position:absolute;right:64px;top:12px;width:230px;padding:10px 12px;border-radius:13px;background:linear-gradient(135deg,#073f31,#08784d);color:#fff;box-shadow:0 5px 16px #063b2c35;z-index:2}.moro-cluster-stats .stats-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.moro-cluster-stats .stats-total{font-size:26px;font-weight:900;line-height:1.1}.moro-cluster-stats .stats-label{font-size:11px;opacity:.88;font-weight:700}.moro-cluster-stats .stats-legend{display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin:8px 0 5px}.moro-cluster-stats .stats-track{height:10px;border-radius:20px;overflow:hidden;background:#ffffff40;display:flex}.moro-cluster-stats .stats-female{background:#f5a6d4;height:100%}.moro-cluster-stats .stats-male{background:#72c7ff;height:100%}
 .moro-map-filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin:10px 0}.moro-map-filters input,.moro-map-filters select{min-width:0;width:100%;margin:0}
 .moro-map-count{font-weight:800;color:#075c3b;margin:8px 0}.moro-map-layout{display:grid;grid-template-columns:minmax(230px,0.9fr) minmax(280px,1.1fr);gap:12px;align-items:start}
 .moro-map-results{display:grid;gap:7px;max-height:470px;overflow:auto;padding-right:3px}
@@ -1091,7 +1092,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 .moro-map-view{position:sticky;top:8px}.moro-map-view iframe{width:100%;height:360px;border:1px solid #d5e2dc;border-radius:12px;background:#eaf1ed}
 .moro-map-selected{padding:10px;margin-top:8px;background:#fff;border:1px solid #dce8e2;border-radius:10px;font-size:13px}.moro-map-selected a{display:inline-block;margin-top:6px;color:#075c3b;font-weight:800}
 .moro-map-note{font-size:12px;color:#765b1a;background:#fff9e8;border:1px solid #f0dfa7;border-radius:9px;padding:9px;margin:10px 0 0}
-@media(max-width:760px){.moro-map-filters{grid-template-columns:1fr}.moro-map-layout{grid-template-columns:1fr}.moro-map-results{max-height:300px}.moro-map-view{position:static}.moro-map-view iframe{height:300px}}
+@media(max-width:760px){.moro-cluster-stats{position:static;width:auto;margin:0 0 12px}.moro-map-filters{grid-template-columns:1fr}.moro-map-layout{grid-template-columns:1fr}.moro-map-results{max-height:300px}.moro-map-view{position:static}.moro-map-view iframe{height:300px}}
 </style>
 </head>
 <body>
@@ -1365,6 +1366,7 @@ table thead th{background:linear-gradient(135deg,var(--chs-deep),var(--chs-green
 <div class="moro-map-launch"><button class="blue" type="button" onclick="toggleMoroSchoolMap()">🗺️ Open Taluka Moro School Map — 536 Schools</button></div>
 <div id="moroSchoolMapPanel" class="moro-map-panel" hidden>
   <div class="moro-map-head"><div><h3>🗺️ Taluka Moro — School Map &amp; Directory</h3><p>All schools from the supplied Excel list. Search by school name or SEMIS, and filter by UC and Cell.</p></div><button class="gray" type="button" onclick="toggleMoroSchoolMap()">Close</button></div>
+  <div id="moroClusterStats" class="moro-cluster-stats" aria-label="Cluster school gender summary"></div>
   <div class="moro-map-filters">
     <input id="moroMapSearch" type="search" placeholder="Search School Name / SEMIS" oninput="renderMoroSchoolMap()"/>
     <select id="moroMapUCFilter" onchange="renderMoroSchoolMap()"><option value="">All UCs / MCs</option></select>
@@ -2456,10 +2458,17 @@ function importLinksBackup(input){
 
 // ===== TALUKA MORO SCHOOL MAP (separate from the existing 21-school cluster list) =====
 function getMoroMapSchools(){return Array.isArray(window.MORO_MAP_SCHOOLS)?window.MORO_MAP_SCHOOLS:[]}
+function renderMoroClusterStats(){
+ const box=document.getElementById('moroClusterStats');if(!box)return;
+ const schools=(typeof getSchools==='function'?getSchools():[]).filter(x=>x&&x.name);
+ const female=schools.filter(x=>typeof schoolGender==='function'&&schoolGender(x)==='female').length;
+ const male=schools.length-female,fp=schools.length?Math.round(female/schools.length*100):0,mp=100-fp;
+ box.innerHTML='<div class="stats-top"><div><div class="stats-label">CHS MORO CLUSTER SCHOOLS</div><div class="stats-total">'+schools.length+'</div></div><div style="font-size:25px">🏫</div></div><div class="stats-legend"><span>👩 Female: '+female+'</span><span>👨 Male: '+male+'</span></div><div class="stats-track"><div class="stats-female" style="width:'+fp+'%"></div><div class="stats-male" style="width:'+mp+'%"></div></div>';
+}
 function toggleMoroSchoolMap(){
  const panel=document.getElementById('moroSchoolMapPanel');if(!panel)return;
  panel.hidden=!panel.hidden;
- if(!panel.hidden){initMoroMapFilters();renderMoroSchoolMap();panel.scrollIntoView({behavior:'smooth',block:'start'});}
+ if(!panel.hidden){renderMoroClusterStats();initMoroMapFilters();renderMoroSchoolMap();panel.scrollIntoView({behavior:'smooth',block:'start'});}
 }
 function initMoroMapFilters(){
  const data=getMoroMapSchools(),uc=document.getElementById('moroMapUCFilter'),cell=document.getElementById('moroMapCellFilter');
