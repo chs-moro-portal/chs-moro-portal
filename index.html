@@ -5998,3 +5998,51 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
  #home #clusterGraphList .gender-line{grid-template-columns:60px minmax(0,1fr) 24px!important;width:100%!important;max-width:100%!important;min-width:0!important}
 }
 </style>
+
+<!-- CHS Moro welcome section premium animation: CSS-only, existing content/data/scripts unchanged -->
+<style id="chs-moro-welcome-premium-animation">
+#chsV41Welcome .chs-v41-wcard{
+  animation:chsWelcomeCardIn .9s cubic-bezier(.2,.75,.25,1) both;
+}
+#chsV41Welcome .chs-v41-wphoto{
+  animation:chsWelcomePhotoIn .85s ease-out both,chsWelcomeFloat 3.8s ease-in-out 1s infinite;
+  box-shadow:0 0 0 5px rgba(255,255,255,.10),0 12px 30px rgba(0,0,0,.28),0 0 22px rgba(211,174,88,.25);
+}
+#chsV41Welcome .chs-v41-wtitle{
+  animation:chsWelcomeTitleIn 1s ease-out both,chsWelcomeGlow 2.8s ease-in-out 1s infinite;
+  text-shadow:0 0 10px rgba(211,174,88,.18);
+}
+#chsV41Welcome .chs-v41-wmark{
+  animation:chsWelcomeMark 4.5s ease-in-out infinite;
+}
+@keyframes chsWelcomeCardIn{
+  from{opacity:0;transform:translateY(18px) scale(.975)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes chsWelcomePhotoIn{
+  from{opacity:0;transform:scale(.78)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes chsWelcomeFloat{
+  0%,100%{translate:0 0}
+  50%{translate:0 -6px}
+}
+@keyframes chsWelcomeTitleIn{
+  from{opacity:0;letter-spacing:1.5px}
+  to{opacity:1;letter-spacing:normal}
+}
+@keyframes chsWelcomeGlow{
+  0%,100%{text-shadow:0 0 8px rgba(211,174,88,.15)}
+  50%{text-shadow:0 0 16px rgba(211,174,88,.48)}
+}
+@keyframes chsWelcomeMark{
+  0%,100%{opacity:.72}
+  50%{opacity:1}
+}
+@media(prefers-reduced-motion:reduce){
+  #chsV41Welcome .chs-v41-wcard,
+  #chsV41Welcome .chs-v41-wphoto,
+  #chsV41Welcome .chs-v41-wtitle,
+  #chsV41Welcome .chs-v41-wmark{animation:none!important}
+}
+</style>
