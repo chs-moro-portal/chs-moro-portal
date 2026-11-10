@@ -6198,3 +6198,20 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
 })();
 </script>
 
+
+
+<!-- CHS Moro offline app-shell registration -->
+<script id="chs-moro-offline-sw-register">
+(function () {
+  if (!("serviceWorker" in navigator)) return;
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" })
+      .then(function (registration) {
+        registration.update().catch(function () {});
+      })
+      .catch(function (error) {
+        console.warn("EduBridge offline setup could not register:", error);
+      });
+  }, { once: true });
+})();
+</script>
