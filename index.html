@@ -6215,3 +6215,123 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
   }, { once: true });
 })();
 </script>
+
+
+<script id="chs-portal-cloud-resources-v1">
+(function(){
+'use strict';
+const BASE='https://khyrdadphbyhypxjsgsa.supabase.co';
+const KEY='sb_publishable_bVWItFd5UqS_HYJeh8YpbQ_5wbIr046';
+const BUCKET='portal-files';
+let token='',adminEmail='',links=[],files=[],busy=false;
+const el=id=>document.getElementById(id);
+const esc=v=>String(v==null?'':v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const apiHeaders=()=>({'apikey':KEY,'Authorization':'Bearer '+(token||KEY),'Content-Type':'application/json','Accept':'application/json'});
+async function request(path,opt){
+ const r=await fetch(BASE+path,Object.assign({cache:'no-store'},opt||{}));
+ const raw=await r.text();let data;try{data=raw?JSON.parse(raw):null}catch(e){data=raw}
+ if(!r.ok)throw new Error((data&&data.message)||String(data||('HTTP '+r.status)));
+ return data;
+}
+function publicFileUrl(path){return BASE+'/storage/v1/object/public/'+BUCKET+'/'+String(path||'').split('/').map(encodeURIComponent).join('/');}
+function say(text,isError){['portalCloudMsgLink','portalCloudMsgFile'].forEach(id=>{const n=el(id);if(n){n.textContent=text;n.style.color=isError?'#b91c1c':'#087443';}})}
+function authBox(suffix){
+ const host=el(suffix==='Link'?'linkManager':'fileManager');if(!host||el('portalCloudAuth'+suffix))return;
+ const box=document.createElement('div');box.id='portalCloudAuth'+suffix;
+ box.style.cssText='padding:12px;margin:10px 0;border:1px solid #cfe2d7;border-radius:10px;background:#f3faf6';
+ box.innerHTML='<b>🔐 Secure Supabase Admin Access</b><p style="font-size:12px;color:#64748b;margin:5px 0 8px">Sign in with the Supabase administrator account to publish shared links and upload documents.</p><input id="portalCloudEmail'+suffix+'" type="email" autocomplete="username" placeholder="Supabase Admin Email"><input id="portalCloudPass'+suffix+'" type="password" autocomplete="current-password" placeholder="Supabase Password"><button type="button" class="blue" id="portalCloudLoginBtn'+suffix+'">Secure Admin Login</button><span id="portalCloudMsg'+suffix+'" class="message" style="display:block;margin:7px 0"></span>';
+ const first=host.querySelector('#linkManagerList,#fileManagerList');host.insertBefore(box,first||host.firstChild);
+ el('portalCloudLoginBtn'+suffix).addEventListener('click',()=>login(suffix));
+}
+function updateAuthUI(){
+ ['Link','File'].forEach(s=>{
+  const box=el('portalCloudAuth'+s);if(!box)return;
+  if(token){box.innerHTML='<b>🟢 Supabase connected</b><div style="font-size:12px;margin:5px 0 8px;color:#52665b">Signed in as '+esc(adminEmail)+'</div><button type="button" class="gray" onclick="window.portalCloudLogout()">Logout</button><span id="portalCloudMsg'+s+'" class="message" style="display:block;margin:7px 0"></span>';}
+ });
+}
+async function login(s){
+ const email=(el('portalCloudEmail'+s)?.value||'').trim(),password=el('portalCloudPass'+s)?.value||'',btn=el('portalCloudLoginBtn'+s);
+ if(!email||!password){say('Enter Supabase admin email and password.',true);return;}
+ if(btn){btn.disabled=true;btn.textContent='Checking…';}
+ try{
+  const d=await request('/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  if(!d?.access_token||d.user?.app_metadata?.role!=='admin')throw new Error('This Supabase account must have app_metadata role=admin.');
+  token=d.access_token;adminEmail=d.user.email||email;
+  updateAuthUI();await loadAll();say('Secure admin access connected.',false);
+ }catch(e){say('Login failed: '+e.message,true);}
+ finally{if(btn){btn.disabled=false;btn.textContent='Secure Admin Login';}}
+}
+window.portalCloudLogout=function(){token='';adminEmail='';updateAuthUI();['Link','File'].forEach(s=>{const box=el('portalCloudAuth'+s);if(box){box.innerHTML='<b>🔐 Secure Supabase Admin Access</b><p style="font-size:12px;color:#64748b">Reload page to sign in again.</p>';}});loadAll();};
+async function loadAll(){
+ if(busy)return;busy=true;
+ try{
+  const rows=await request('/rest/v1/portal_resources?select=id,kind,title,url,file_path,file_name,approved,created_at&order=created_at.desc',{headers:apiHeaders()});
+  links=rows.filter(x=>x.kind==='link');files=rows.filter(x=>x.kind==='file');
+  renderLinks();renderLinkManager();renderPublicFiles();renderFileManager();
+ }catch(e){console.error('Portal resources load:',e);say('Could not load shared portal resources: '+e.message,true);}
+ finally{busy=false;}
+}
+function renderLinks(){
+ const b=el('publicLinks');if(!b)return;
+ b.innerHTML=links.length?links.map(x=>'<div class="link-item"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener noreferrer">🔗 '+esc(x.title)+'</a></div>').join(''):'<div class="no-schools">No links have been added by Admin yet.</div>';
+}
+function renderLinkManager(){
+ const b=el('linkManagerList');if(!b)return;
+ b.innerHTML=links.length?links.map((x,i)=>'<div class="school-edit-row"><input id="cloudLinkTitle_'+i+'" value="'+esc(x.title)+'"><input id="cloudLinkUrl_'+i+'" type="url" value="'+esc(x.url)+'"><button type="button" class="blue" onclick="portalCloudSaveLink('+i+')">Save</button><button type="button" class="red" onclick="portalCloudRemoveLink('+i+')">Remove</button></div>').join(''):'<div class="no-schools">No shared links added.</div>';
+}
+function renderPublicFiles(){
+ const b=el('publicFilesList');if(!b)return;
+ const approved=files.filter(x=>x.approved===true);
+ b.innerHTML=approved.length?approved.map(x=>'<div class="notification-item"><div><b>📄 '+esc(x.title||x.file_name)+'</b><div class="notification-text">'+esc(x.file_name||'')+'</div><div class="file-approved-badge">✅ Admin Approved</div></div><a class="blue" style="display:inline-block;padding:10px 14px;border-radius:7px;color:white;text-decoration:none" href="'+esc(publicFileUrl(x.file_path))+'" target="_blank" rel="noopener">⬇ Download</a></div>').join(''):'<div class="no-schools">No approved forms or documents available for download.</div>';
+}
+function renderFileManager(){
+ const b=el('fileManagerList');if(!b)return;
+ b.innerHTML=files.length?files.map((x,i)=>'<div class="notification-manager-row"><div style="flex:1"><input id="cloudFileTitle_'+i+'" value="'+esc(x.title||x.file_name)+'"><div style="font-size:12px;color:'+(x.approved?'#087443':'#b45309')+'">'+(x.approved?'✅ APPROVED — Download allowed':'⏳ PENDING — Admin approval required')+'</div></div><button type="button" class="blue" onclick="portalCloudSaveFile('+i+')">Save</button>'+(x.approved?'<button type="button" class="gray" onclick="portalCloudApprove('+i+',false)">Revoke Approval</button>':'<button type="button" class="blue" onclick="portalCloudApprove('+i+',true)">✅ Approve</button>')+'<a class="gray" style="padding:9px 12px;border-radius:7px;color:white;text-decoration:none" target="_blank" href="'+esc(publicFileUrl(x.file_path))+'">Preview</a><button type="button" class="red" onclick="portalCloudRemoveFile('+i+')">Remove</button></div>').join(''):'<div class="no-schools">No files uploaded.</div>';
+}
+function requireCloudAdmin(){if(!token){alert('Please sign in with the Supabase Admin account in Manage Links or Manage Forms & Documents first.');return false;}return true;}
+window.portalCloudAddLink=async function(){
+ if(!requireCloudAdmin())return;
+ const title=(el('newLinkLabel')?.value||'').trim(),url=String(el('newLinkUrl')?.value||'').trim();
+ if(!title||!url){alert('Enter link name and URL.');return;}
+ const full=/^https?:\/\//i.test(url)?url:'https://'+url;
+ try{await request('/rest/v1/portal_resources',{method:'POST',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({kind:'link',title,url:full,approved:true})});el('newLinkLabel').value='';el('newLinkUrl').value='';await loadAll();say('Shared link added successfully.',false);}
+ catch(e){alert('Could not save link: '+e.message);}
+};
+window.portalCloudSaveLink=async function(i){
+ if(!requireCloudAdmin())return;const x=links[i];if(!x)return;
+ const title=(el('cloudLinkTitle_'+i)?.value||'').trim(),raw=(el('cloudLinkUrl_'+i)?.value||'').trim();if(!title||!raw){alert('Title and URL are required.');return;}
+ const url=/^https?:\/\//i.test(raw)?raw:'https://'+raw;
+ try{await request('/rest/v1/portal_resources?id=eq.'+encodeURIComponent(x.id),{method:'PATCH',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({title,url,updated_at:new Date().toISOString()})});await loadAll();say('Link updated.',false);}catch(e){alert('Update failed: '+e.message);}
+};
+window.portalCloudRemoveLink=async function(i){if(!requireCloudAdmin())return;const x=links[i];if(!x||!confirm('Remove this shared link?'))return;try{await request('/rest/v1/portal_resources?id=eq.'+encodeURIComponent(x.id),{method:'DELETE',headers:apiHeaders()});await loadAll();}catch(e){alert('Remove failed: '+e.message);}};
+window.portalCloudUploadFile=async function(){
+ if(!requireCloudAdmin())return;
+ const file=el('newPublicFile')?.files?.[0],title=(el('newPublicFileTitle')?.value||'').trim();
+ if(!file){alert('Please select a file.');return;}
+ if(file.size>50*1024*1024){alert('Maximum file size is 50 MB.');return;}
+ const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_'),path=Date.now()+'-'+crypto.randomUUID()+'-'+safe;
+ try{
+  say('Uploading document to shared storage…',false);
+  const up=await fetch(BASE+'/storage/v1/object/'+BUCKET+'/'+path,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+token,'Content-Type':file.type||'application/octet-stream','x-upsert':'false'},body:file});
+  if(!up.ok){const t=await up.text();throw new Error(t||('Storage upload HTTP '+up.status));}
+  await request('/rest/v1/portal_resources',{method:'POST',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({kind:'file',title:title||file.name,file_name:file.name,file_path:path,approved:false})});
+  el('newPublicFileTitle').value='';el('newPublicFile').value='';await loadAll();say('Upload successful. File is pending Admin approval.',false);
+ }catch(e){alert('Upload failed: '+e.message);say('Upload failed: '+e.message,true);}
+};
+window.portalCloudSaveFile=async function(i){if(!requireCloudAdmin())return;const x=files[i];if(!x)return;const title=(el('cloudFileTitle_'+i)?.value||'').trim();if(!title){alert('Enter a document title.');return;}try{await request('/rest/v1/portal_resources?id=eq.'+encodeURIComponent(x.id),{method:'PATCH',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({title,updated_at:new Date().toISOString()})});await loadAll();}catch(e){alert('Save failed: '+e.message);}};
+window.portalCloudApprove=async function(i,approved){if(!requireCloudAdmin())return;const x=files[i];if(!x)return;try{await request('/rest/v1/portal_resources?id=eq.'+encodeURIComponent(x.id),{method:'PATCH',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({approved:!!approved,updated_at:new Date().toISOString()})});await loadAll();}catch(e){alert('Approval update failed: '+e.message);}};
+window.portalCloudRemoveFile=async function(i){if(!requireCloudAdmin())return;const x=files[i];if(!x||!confirm('Permanently remove this document?'))return;try{await request('/storage/v1/object/'+BUCKET+'/'+String(x.file_path).split('/').map(encodeURIComponent).join('/'),{method:'DELETE',headers:apiHeaders()});await request('/rest/v1/portal_resources?id=eq.'+encodeURIComponent(x.id),{method:'DELETE',headers:apiHeaders()});await loadAll();}catch(e){alert('Remove failed: '+e.message);}};
+window.addLink=window.portalCloudAddLink;
+window.getLinks=()=>links.map(x=>({label:x.title,url:x.url,id:x.id}));
+window.renderLinks=renderLinks;window.renderLinkManager=renderLinkManager;
+window.getPublicFiles=()=>files.map(x=>({id:x.id,title:x.title,fileName:x.file_name,file_path:x.file_path,approved:x.approved}));
+window.renderPublicFiles=renderPublicFiles;window.renderFileManager=renderFileManager;
+window.addPublicFile=window.portalCloudUploadFile;
+function start(){
+ authBox('Link');authBox('File');
+ const oldUpload=el('newPublicFile');if(oldUpload){oldUpload.setAttribute('accept','.pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png');}
+ loadAll();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
