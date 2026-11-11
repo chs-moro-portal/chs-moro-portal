@@ -1,7 +1,7 @@
 /* CHS Moro / EduBridge offline app-shell cache.
    This caches the portal shell and same-origin static assets.
    Supabase/live records still require internet unless separately saved locally. */
-const CACHE_NAME = "chs-moro-offline-v1";
+const CACHE_NAME = "chs-moro-offline-v2";
 const APP_SHELL = ["./", "./index.html", "./school-map-data.js"];
 
 self.addEventListener("install", event => {
@@ -38,7 +38,7 @@ self.addEventListener("fetch", event => {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
       try {
-        const response = await fetch(request);
+        const response = await fetch(request, { cache: "no-store" });
         if (response && response.ok) {
           await cache.put("./index.html", response.clone());
         }
@@ -59,13 +59,13 @@ self.addEventListener("fetch", event => {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
       const cached = await cache.match(request);
-      const networkFetch = fetch(request).then(response => {
+      const networkFetch = fetch(request, { cache: "no-store" }).then(response => {
         if (response && (response.ok || response.type === "opaque")) {
           cache.put(request, response.clone());
         }
         return response;
       }).catch(() => cached);
-      return cached || networkFetch;
+      return networkFetch || cached;
     })());
   }
 });
