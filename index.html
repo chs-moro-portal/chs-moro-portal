@@ -334,7 +334,7 @@ try{
     const savedLinks=JSON.parse(localStorage.getItem('portalLinks')||'[]');
     if(Array.isArray(savedLinks)){
       educationalDefaults.forEach(function(item){
-        if(!savedLinks.some(function(x){return x&&String(x.url||'').replace(/\/$/,'').toLowerCase()===item.url.replace(/\\/$/,'').toLowerCase();})){
+        if(!savedLinks.some(function(x){return x&&String(x.url||'').replace(/\/$/,'').toLowerCase()===item.url.replace(/\/+$/,'').toLowerCase();})){
           savedLinks.push(item);
         }
       });
@@ -6285,7 +6285,7 @@ function renderLinks(){
  let local=[];
  try{const a=JSON.parse(localStorage.getItem('portalLinks')||'[]');if(Array.isArray(a))local=a.filter(x=>x&&x.label&&x.url).map(x=>({title:x.label,url:x.url}));}catch(e){}
  const merged=[...links,...local,...defaults],seen=new Set(),shown=[];
- merged.forEach(x=>{const u=String(x.url||'').trim();const k=u.toLowerCase().replace(/\\/$/,'');if(u&&x.title&&!seen.has(k)){seen.add(k);shown.push(x);}});
+ merged.forEach(x=>{const u=String(x.url||'').trim();const k=u.toLowerCase().replace(/\/+$/,'');if(u&&x.title&&!seen.has(k)){seen.add(k);shown.push(x);}});
  b.innerHTML=shown.length?shown.map(x=>'<div class="link-item"><a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">🔗 '+esc(x.title)+'</a></div>').join(''):'<div class="no-schools">No links have been added by Admin yet.</div>';
 }
 function renderLinkManager(){
