@@ -6273,7 +6273,20 @@ async function loadAll(){
 }
 function renderLinks(){
  const b=el('publicLinks');if(!b)return;
- b.innerHTML=links.length?links.map(x=>'<div class="link-item"><a href="'+esc(x.url||'#')+'" target="_blank" rel="noopener noreferrer">🔗 '+esc(x.title)+'</a></div>').join(''):'<div class="no-schools">No links have been added by Admin yet.</div>';
+ const defaults=[
+  {title:'Sindh School Education & Literacy Department',url:'https://sindheducation.gov.pk/'},
+  {title:'SELD Employee Portal (eTransfer / eDocuments)',url:'https://eportal.sindheducation.gov.pk/'},
+  {title:'RSU / SEMIS Sindh Portal',url:'https://semis.rsusindh.gov.pk/'},
+  {title:'Sindh Textbook Board eBooks',url:'https://portal.stbb.edu.pk/ebooks/'},
+  {title:'PITE Sindh – Teacher Training',url:'https://www.pitesindh.edu.pk/'},
+  {title:'SIBA Testing Services (STS)',url:'https://sts.net.pk/'},
+  {title:'Government of Sindh',url:'https://www.sindh.gov.pk/'}
+ ];
+ let local=[];
+ try{const a=JSON.parse(localStorage.getItem('portalLinks')||'[]');if(Array.isArray(a))local=a.filter(x=>x&&x.label&&x.url).map(x=>({title:x.label,url:x.url}));}catch(e){}
+ const merged=[...links,...local,...defaults],seen=new Set(),shown=[];
+ merged.forEach(x=>{const u=String(x.url||'').trim();const k=u.toLowerCase().replace(/\\/$/,'');if(u&&x.title&&!seen.has(k)){seen.add(k);shown.push(x);}});
+ b.innerHTML=shown.length?shown.map(x=>'<div class="link-item"><a href="'+esc(x.url)+'" target="_blank" rel="noopener noreferrer">🔗 '+esc(x.title)+'</a></div>').join(''):'<div class="no-schools">No links have been added by Admin yet.</div>';
 }
 function renderLinkManager(){
  const b=el('linkManagerList');if(!b)return;
