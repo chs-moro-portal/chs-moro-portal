@@ -6327,7 +6327,14 @@ function renderLinks(){
   {title:'Sindh Textbook Board eBooks',url:'https://portal.stbb.edu.pk/ebooks/'},
   {title:'PITE Sindh – Teacher Training',url:'https://www.pitesindh.edu.pk/'},
   {title:'SIBA Testing Services (STS)',url:'https://sts.net.pk/'},
-  {title:'Government of Sindh',url:'https://www.sindh.gov.pk/'}
+  {title:'Government of Sindh',url:'https://www.sindh.gov.pk/'},
+  {title:'Biometric Checker',url:'https://checker.sindheducation.gov.pk/'},
+  {title:'Board of Intermediate and secondary education SBA',url:'https://www.bisesba.edu.pk/'},
+  {title:'RSU/LSU',url:'https://semis.rsusindh.gov.pk/login#login'},
+  {title:'Frames Dashboard',url:'https://frames.seld.gos.pk/dashboard'},
+  {title:'SAMRS Dashboard',url:'https://samr.edu.pk/login'},
+  {title:'Teachers Correction Record by DEO office',url:'https://script.google.com/macros/s/AKfycbw34l500FjapGBPrrvfdMGJtEAD6yZKZyPJSIbA5XCTL64jk3nQPYhJal0aLETRSru2cA/exec?page=teacher'},
+  {title:'Monitoring & Evaluation Department',url:'https://mne.seld.gos.pk/#/main'}
  ];
  let local=[];
  try{const a=JSON.parse(localStorage.getItem('portalLinks')||'[]');if(Array.isArray(a))local=a.filter(x=>x&&x.label&&x.url).map(x=>({title:x.label,url:x.url}));}catch(e){}
