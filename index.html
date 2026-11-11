@@ -6257,7 +6257,7 @@ async function login(s){
   const d=await request('/auth/v1/token?grant_type=password',{method:'POST',headers:{'apikey':KEY,'Content-Type':'application/json'},body:JSON.stringify({email,password})});
   if(!d?.access_token||d.user?.app_metadata?.role!=='admin')throw new Error('This Supabase account must have app_metadata role=admin.');
   token=d.access_token;adminEmail=d.user.email||email;
-  updateAuthUI();await migrateLegacyFiles();await loadAll();say('Secure admin access connected. Old documents were checked for recovery.',false);
+  updateAuthUI();await migrateLegacyFiles();await loadAll();await migrateLegacyLinks();await loadAll();say('Secure admin access connected. Old links and documents were checked for recovery.',false);
  }catch(e){say('Login failed: '+e.message,true);}
  finally{if(btn){btn.disabled=false;btn.textContent='Secure Admin Login';}}
 }
@@ -6287,6 +6287,27 @@ async function migrateLegacyFiles(){
  }
  if(moved||skipped)say('Old files synced: '+moved+' moved'+(skipped?', '+skipped+' need attention':''),skipped>0);
  return moved;
+}
+async function migrateLegacyLinks(){
+ if(!token)return;
+ let legacy=[];
+ try{const raw=localStorage.getItem('portalLinks');legacy=raw?JSON.parse(raw):[];}catch(e){legacy=[];}
+ if(!Array.isArray(legacy)||!legacy.length)return;
+ let existing=[];
+ try{existing=await request('/rest/v1/portal_resources?select=title,url&kind=eq.link',{headers:apiHeaders()});}catch(e){say('Could not check existing shared links: '+e.message,true);return;}
+ const keys=new Set(existing.map(x=>String(x.url||'').trim().toLowerCase().replace(/\\/+$/,'')));
+ let added=0,skipped=0;
+ for(const x of legacy){
+  if(!x||!x.label||!x.url)continue;
+  const url=/^https?:\\/\\//i.test(String(x.url).trim())?String(x.url).trim():'https://'+String(x.url).trim();
+  const key=url.toLowerCase().replace(/\\/+$/,'');
+  if(keys.has(key)){skipped++;continue;}
+  try{
+   await request('/rest/v1/portal_resources',{method:'POST',headers:Object.assign(apiHeaders(),{'Prefer':'return=minimal'}),body:JSON.stringify({kind:'link',title:String(x.label).trim(),url,approved:true})});
+   keys.add(key);added++;
+  }catch(e){console.error('Legacy link migration failed:',x.label,e);say('Some old links could not be synced: '+e.message,true);}
+ }
+ if(added||skipped)say('Old links synced: '+added+' added, '+skipped+' already shared.',false);
 }
 async function loadAll(){
  if(busy)return;busy=true;
