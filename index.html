@@ -334,7 +334,7 @@ try{
     const savedLinks=JSON.parse(localStorage.getItem('portalLinks')||'[]');
     if(Array.isArray(savedLinks)){
       educationalDefaults.forEach(function(item){
-        if(!savedLinks.some(function(x){return x&&String(x.url||'').replace(/\\/$/,'').toLowerCase()===item.url.replace(/\\/$/,'').toLowerCase();})){
+        if(!savedLinks.some(function(x){return x&&String(x.url||'').replace(/\/$/,'').toLowerCase()===item.url.replace(/\\/$/,'').toLowerCase();})){
           savedLinks.push(item);
         }
       });
