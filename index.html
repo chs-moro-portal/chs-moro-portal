@@ -1796,6 +1796,20 @@ document.addEventListener('DOMContentLoaded',function(){const page=el('knowledge
      <a href="https://trainingsystem.rsu-sindh.gov.pk/dashboard" target="_blank" rel="noopener noreferrer" style="display:block;padding:14px;border:1px solid #dce8e1;border-radius:12px;text-decoration:none;color:#174c39;background:#f8fcfa;font-weight:800">📊 RSU Training System – Dashboard</a>
     </div>
    </div>
+   <div style="margin-top:20px;text-align:right">
+    <button type="button" class="blue" onclick="openSamrsAdmin()">🔐 Admin Management</button>
+   </div>
+   <div id="samrsAdminPanel" style="display:none;margin-top:14px;padding:16px;border:1px solid #b8d8c7;border-radius:13px;background:#f3faf6">
+    <div class="topbar"><div><h3 style="margin:0;color:#075c3b">⚙️ SAMRS Admin Management</h3><p class="school-help" style="margin:5px 0">Admin-only resource controls</p></div><button class="gray" type="button" onclick="closeSamrsAdmin()">Close</button></div>
+    <div style="margin-top:12px;padding:12px;border:1px solid #d5e6dc;border-radius:10px;background:#fff">
+     <h4 style="margin:0 0 8px">🎬 Add Training Video</h4>
+     <label for="samrsVideoTitle">Video title</label><input id="samrsVideoTitle" type="text" placeholder="Enter video title">
+     <label for="samrsVideoFile">Choose video (up to 50 MB)</label><input id="samrsVideoFile" type="file" accept="video/*">
+     <button class="blue" type="button" onclick="uploadSamrsVideo()">⬆ Upload Video</button>
+     <p id="samrsVideoStatus" role="status"></p>
+    </div>
+    <p style="margin:12px 0 0;color:#8a4b08;font-size:13px">APK uploads, downloadable lists and editable resource links need a dedicated shared SAMRS database/storage setup. They are not enabled yet, so changes will not be saved locally or falsely shown as synced.</p>
+   </div>
    <p style="margin:20px 0 0;padding:12px;border-radius:10px;background:#f1f7f3;color:#52665b;font-size:12px">Note: External websites and shared files open in a new tab. Access to private Google Drive files depends on the sharing permissions set by the owner.</p>
   </div>
  </div>
@@ -2394,6 +2408,26 @@ async function uploadLearningVideo(){
   if(!response.ok){let detail='';try{detail=(await response.text()).slice(0,300)}catch(e){}throw new Error('Upload failed ('+response.status+'). '+detail)}
   status.textContent='Upload complete. Video is stored centrally.';input.value='';titleInput.value='';await renderLearningVideos();
  }catch(e){status.textContent='Upload failed: '+e.message}
+}
+function openSamrsAdmin(){
+ if(typeof isAdmin!=='function'||!isAdmin()){alert('Admin login required. Please login first.');if(typeof show==='function')show('adminLogin');return}
+ const p=document.getElementById('samrsAdminPanel');if(p)p.style.display='block';
+}
+function closeSamrsAdmin(){const p=document.getElementById('samrsAdminPanel');if(p)p.style.display='none'}
+async function uploadSamrsVideo(){
+ if(typeof isAdmin!=='function'||!isAdmin()){alert('Admin login required.');return}
+ const title=document.getElementById('samrsVideoTitle'),input=document.getElementById('samrsVideoFile'),status=document.getElementById('samrsVideoStatus'),file=input&&input.files&&input.files[0];
+ if(!file){alert('Please choose a video file.');return}
+ if(file.size>50*1024*1024){alert('Video file is over 50 MB.');return}
+ const base=(title.value.trim()||file.name.replace(/\\.[^.]+$/,'')).replace(/[^\\w\\-. ]+/g,'').trim().replace(/\\s+/g,'-').slice(0,90)||'samrs-video';
+ const ext=(file.name.match(/\\.[a-zA-Z0-9]{1,8}$/)||[''])[0],name=Date.now()+'-'+base+ext;
+ status.textContent='Uploading to shared video storage…';
+ try{
+  const response=await fetch(LEARNING_VIDEO_SUPABASE+'/storage/v1/object/learning-videos/'+encodeURIComponent(name),{method:'POST',headers:learningVideoHeaders({'Content-Type':file.type||'application/octet-stream','x-upsert':'false'}),body:file});
+  if(!response.ok)throw new Error('Upload failed ('+response.status+'). Check shared bucket permissions.');
+  status.textContent='Video uploaded to shared storage. Refresh the SAMRS page to see it in Learning Videos.';
+  title.value='';input.value='';
+ }catch(e){status.textContent=e.message}
 }
 function show(id,fromHistory=false){
   const target=document.getElementById(id);if(!target)return;
