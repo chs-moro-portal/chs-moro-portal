@@ -5907,10 +5907,42 @@ window.chsUpdateComplaintBadge=async function(){try{const d=await call('/rest/v1
      <a href="https://trainingsystem.rsu-sindh.gov.pk/dashboard" target="_blank" rel="noopener noreferrer" style="display:block;padding:14px;border:1px solid #dce8e1;border-radius:12px;text-decoration:none;color:#174c39;background:#f8fcfa;font-weight:800">📊 RSU Training System – Dashboard</a>
     </div>
    </div>
+   <div id="samrsCustomPublic" style="margin-top:22px"><h3 style="color:#075c3b">📌 Added Resources</h3><div id="samrsCustomList" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px"></div></div>
+   <div id="samrsEditArea" style="display:none;margin-top:22px;padding:16px;border:1px solid #b8d9c8;border-radius:14px;background:#f4fbf7">
+    <div class="topbar"><h3 style="margin:0;color:#075c3b">✏️ SAMRS Admin Edit</h3><button type="button" class="gray" onclick="samrsToggleEdit()">Close</button></div>
+    <p style="font-size:13px;color:#64748b">Add a video, resource link or list item. You can edit or delete your added entries.</p>
+    <label>Resource title</label><input id="samrsEditTitle" type="text" placeholder="e.g. Teacher Training Video">
+    <label>Link (YouTube / website / file URL)</label><input id="samrsEditUrl" type="url" placeholder="https://..." inputmode="url">
+    <label>Type</label><select id="samrsEditType"><option value="🎬 Video">Video</option><option value="🔗 Link">Website / Link</option><option value="📄 Document">Document / List</option></select>
+    <button type="button" class="full" onclick="samrsSaveItem()">＋ Add Resource</button>
+    <div id="samrsEditList" style="margin-top:14px"></div>
+   </div>
+   <div style="text-align:right;margin-top:14px"><button id="samrsAdminEditBtn" type="button" class="gray" style="display:none" onclick="samrsToggleEdit()">✏️ Admin Edit</button></div>
    <p style="margin:20px 0 0;padding:12px;border-radius:10px;background:#f1f7f3;color:#52665b;font-size:12px">Note: External websites and shared files open in a new tab. Access to private Google Drive files depends on the sharing permissions set by the owner.</p>
   </div>
  </div>
 </section>
+<script id="samrs-admin-editor">
+(function(){
+ const KEY='chsSamrsCustomResourcesV1';
+ function items(){try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}}
+ function save(a){localStorage.setItem(KEY,JSON.stringify(a));render()}
+ function safe(v){return String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+ function render(){
+  const pub=document.getElementById('samrsCustomList'),adm=document.getElementById('samrsEditList'),btn=document.getElementById('samrsAdminEditBtn');
+  const admin=typeof isAdmin==='function'&&isAdmin();
+  if(btn)btn.style.display=admin?'inline-flex':'none';
+  if(pub)pub.innerHTML=items().map(x=>'<a href="'+safe(x.url)+'" target="_blank" rel="noopener noreferrer" style="display:block;padding:14px;border:1px solid #dce8e1;border-radius:12px;text-decoration:none;color:#174c39;background:#f8fcfa;font-weight:800">'+safe(x.type)+' '+safe(x.title)+'</a>').join('')||'<p style="color:#64748b;font-size:13px">No extra resources added yet.</p>';
+  if(adm)adm.innerHTML=items().map((x,i)=>'<div style="padding:10px;margin:8px 0;border:1px solid #dce8e1;border-radius:10px;background:#fff"><b>'+safe(x.title)+'</b><div style="font-size:12px;color:#64748b;overflow-wrap:anywhere">'+safe(x.url)+'</div><div style="display:flex;gap:7px;margin-top:8px"><button type="button" class="blue" onclick="samrsEditItem('+i+')">Edit</button><button type="button" class="red" onclick="samrsDeleteItem('+i+')">Delete</button></div></div>').join('')||'<p>No added items.</p>';
+ }
+ window.samrsToggleEdit=function(){if(typeof isAdmin!=='function'||!isAdmin()){alert('Please login as Admin first.');show('adminLogin');return}const p=document.getElementById('samrsEditArea');if(p)p.style.display=p.style.display==='none'?'block':'none';render()};
+ window.samrsSaveItem=function(){if(!isAdmin()){alert('Admin login required.');return}const t=document.getElementById('samrsEditTitle'),u=document.getElementById('samrsEditUrl'),k=document.getElementById('samrsEditType');if(!t.value.trim()||!/^https?:\/\//i.test(u.value.trim())){alert('Enter a title and a valid http/https link.');return}const a=items(),idx=Number(document.getElementById('samrsEditArea').dataset.editIndex);const x={title:t.value.trim(),url:u.value.trim(),type:k.value};if(Number.isInteger(idx)&&idx>=0&&idx<a.length)a[idx]=x;else a.push(x);document.getElementById('samrsEditArea').dataset.editIndex='';t.value='';u.value='';k.value='🎬 Video';save(a)};
+ window.samrsEditItem=function(i){if(!isAdmin())return;const x=items()[i];if(!x)return;document.getElementById('samrsEditTitle').value=x.title;document.getElementById('samrsEditUrl').value=x.url;document.getElementById('samrsEditType').value=x.type;document.getElementById('samrsEditArea').dataset.editIndex=String(i);document.getElementById('samrsEditTitle').focus()};
+ window.samrsDeleteItem=function(i){if(!isAdmin())return;if(!confirm('Delete this SAMRS resource?'))return;const a=items();a.splice(i,1);save(a)};
+ document.addEventListener('DOMContentLoaded',render);window.addEventListener('pageshow',render);
+ const oldShow=window.show; if(typeof oldShow==='function')window.show=function(id,...args){const v=oldShow.call(this,id,...args);if(id==='samrs')render();return v};
+})();
+</script>
 </body></html>
 
 <!-- CHS Moro narrow welcome/title visibility fix -->
