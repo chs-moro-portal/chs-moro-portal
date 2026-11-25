@@ -41,18 +41,31 @@
 
   window.ebPrintTeacherId = function (i) {
     const t = found[i], pid = t && pidOf(t);
-    if (!pid) return;
-    const card = document.createElement('div');
-    card.className = 'eb-qr-card eb-qr-print';
-    card.innerHTML = '<div><b style="color:#075c3b">EDUBRIDGE — DIGITAL TEACHER ID</b><h2>' +
-      esc(t.teacher_name || 'Teacher') + '</h2><p><b>PID:</b> ' + esc(pid) +
-      '</p><p><b>Designation:</b> ' + esc(t.designation || 'Not available') +
-      '</p><p><b>School:</b> ' + esc(t.school_name || 'Not available') +
-      '</p><p><b>SEMIS:</b> ' + esc(t.semis_id || '—') +
-      '</p><small>Public basic profile • Taluka Moro</small></div><img alt="QR Code" src="' +
-      esc(qrUrl(profileUrl(pid))) + '">';
-    document.body.appendChild(card);
-    setTimeout(() => { window.print(); card.remove(); }, 400);
+    if (!t || !pid) return;
+    const w = window.open('', '_blank', 'width=720,height=520');
+    if (!w) {
+      alert('Please allow pop-ups to print the Teacher ID card.');
+      return;
+    }
+    const qr = qrUrl(profileUrl(pid));
+    const html = '<!doctype html><html><head><meta charset="utf-8"><title>Teacher ID Card</title>' +
+      '<style>@page{size:85.6mm 54mm;margin:0}*{box-sizing:border-box}html,body{margin:0;padding:0;width:85.6mm;height:54mm;font-family:Arial,sans-serif;color:#17332a}' +
+      '.card{width:85.6mm;height:54mm;position:relative;overflow:hidden;border:1.2mm solid #075c3b;border-radius:3mm;padding:3mm;background:linear-gradient(135deg,#fff 0%,#f0faf4 100%)}' +
+      '.head{background:#075c3b;color:white;margin:-3mm -3mm 2.5mm;padding:2mm 3mm;font-size:11pt;font-weight:bold;letter-spacing:.4px}' +
+      '.sub{font-size:6.5pt;color:#d8f5e5;font-weight:normal;margin-top:1mm}.body{display:flex;gap:3mm;align-items:center;height:35mm}.details{flex:1;min-width:0}.name{font-size:12pt;font-weight:bold;color:#075c3b;margin:0 0 2mm;overflow-wrap:anywhere}' +
+      '.line{font-size:7.5pt;margin:1.2mm 0;line-height:1.15}.line b{color:#075c3b}.qr{width:28mm;height:28mm;object-fit:contain;background:#fff;padding:1mm;border:.3mm solid #cbded2;border-radius:1.5mm}' +
+      '.foot{position:absolute;left:3mm;right:3mm;bottom:1.6mm;border-top:.25mm solid #cbded2;padding-top:1mm;font-size:5.8pt;color:#64748b;display:flex;justify-content:space-between}' +
+      '@media screen{body{margin:18px auto;box-shadow:0 2px 18px #999}.card{print-color-adjust:exact;-webkit-print-color-adjust:exact}}' +
+      '</style></head><body><main class="card"><header class="head">EDUBRIDGE · TEACHER ID<div class="sub">CLUSTER HEAD SCHOOL · TALUKA MORO</div></header>' +
+      '<section class="body"><div class="details"><h2 class="name">' + esc(t.teacher_name || 'Teacher') + '</h2>' +
+      '<p class="line"><b>PID:</b> ' + esc(pid) + '</p><p class="line"><b>Designation:</b> ' + esc(t.designation || 'Not available') +
+      '</p><p class="line"><b>School:</b> ' + esc(t.school_name || 'Not available') + '</p><p class="line"><b>SEMIS:</b> ' + esc(t.semis_id || '—') +
+      '</p></div><img class="qr" src="' + esc(qr) + '" alt="Teacher profile QR code"></section>' +
+      '<footer class="foot"><span>Scan QR for public teacher profile</span><span>Public basic information only</span></footer></main>' +
+      '<script>window.onload=function(){var q=document.querySelector(".qr");if(q.complete){setTimeout(function(){window.focus();window.print()},350)}else{q.onload=function(){window.focus();window.print()};q.onerror=function(){window.focus();window.print()}}};<\/script></body></html>';
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
   };
 
   window.searchFrontTeacherComplete = async function () {
