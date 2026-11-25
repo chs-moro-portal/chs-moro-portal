@@ -64,7 +64,7 @@
     box.textContent = 'Searching central teacher directory…';
     try {
       found = await lookup(q);
-      if (/^\\d+$/.test(q)) found = found.map(t => Object.assign({}, t, { pid: pidOf(t) || q }));
+      if (/^\d+$/.test(q)) found = found.map(t => Object.assign({}, t, { pid: pidOf(t) || q }));
       box.innerHTML = found.length ? found.map(render).join('') : 'No matching teacher found.';
     } catch (e) { box.textContent = 'Directory error: ' + e.message; }
   };
