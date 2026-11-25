@@ -61,7 +61,7 @@
       '<p class="line"><b>PID:</b> ' + esc(pid) + '</p><p class="line"><b>Designation:</b> ' + esc(t.designation || 'Not available') +
       '</p><p class="line"><b>School:</b> ' + esc(t.school_name || 'Not available') + '</p><p class="line"><b>SEMIS:</b> ' + esc(t.semis_id || '—') +
       '</p></div><img class="qr" src="' + esc(qr) + '" alt="Teacher profile QR code"></section>' +
-      '<footer class="foot"><span>Scan QR for public teacher profile</span><span>Public basic information only</span></footer></main>' +
+      '<footer class="foot"><span>Scan QR for public teacher profile</span><span>Developed by Faisal Jan</span></footer></main>' +
       '<script>window.onload=function(){var q=document.querySelector(".qr");if(q.complete){setTimeout(function(){window.focus();window.print()},350)}else{q.onload=function(){window.focus();window.print()};q.onerror=function(){window.focus();window.print()}}};<\/script></body></html>';
     w.document.open();
     w.document.write(html);
